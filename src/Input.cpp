@@ -1,6 +1,7 @@
 #include "Input.h"
 
-//Manager Input::manager;
+/*
+Manager Input::manager;
 
 void Input::update(GLFWwindow* window) {
     checkKey(window, &manager.move_forward);
@@ -16,3 +17,4 @@ void Input::checkKey(GLFWwindow* window, keybind* kb) {
         kb->value = 0.0f;
     }
 }
+*/

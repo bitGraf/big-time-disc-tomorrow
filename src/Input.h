@@ -2,6 +2,7 @@
 
 #include <glfw/glfw3.h>
 
+/*
 struct keybind {
     float value = 0;
     GLuint keymap = -1;
@@ -20,3 +21,4 @@ namespace Input {
     void update(GLFWwindow* window);
     void checkKey(GLFWwindow* window, keybind* kb);
 }
+*/

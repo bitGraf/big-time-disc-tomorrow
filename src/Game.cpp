@@ -161,14 +161,14 @@ void Render() {
 
 	quat kb_color = {.1f, .5, .1f, 1};
     
-    sprintf(kb_text, "m_forward:  %.0f", Input::manager.move_forward.value);
+    /*sprintf(kb_text, "m_forward:  %.0f", Input::manager.move_forward.value);
 	Font::drawText(fpsFont, windowInfo.width, y+=dy, kb_color, kb_text, ALIGN_TOP_RIGHT);
     sprintf(kb_text, "m_backward: %.0f", Input::manager.move_backward.value);
 	Font::drawText(fpsFont, windowInfo.width, y+=dy, kb_color, kb_text, ALIGN_TOP_RIGHT);
     sprintf(kb_text, "m_left:     %.0f", Input::manager.move_left.value);
 	Font::drawText(fpsFont, windowInfo.width, y+=dy, kb_color, kb_text, ALIGN_TOP_RIGHT);
     sprintf(kb_text, "m_right:    %.0f", Input::manager.move_right.value);
-	Font::drawText(fpsFont, windowInfo.width, y+=dy, kb_color, kb_text, ALIGN_TOP_RIGHT);
+	Font::drawText(fpsFont, windowInfo.width, y+=dy, kb_color, kb_text, ALIGN_TOP_RIGHT);*/
 
 	numRenders++;
 }
@@ -178,7 +178,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 }
 
 void ProcessInput(GLFWwindow *window) {	
-    Input::update(window);
+    //Input::update(window);
 
 	vec3 velocity;
 	float speed = 10;
