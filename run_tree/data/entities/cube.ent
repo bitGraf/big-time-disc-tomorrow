@@ -1,0 +1,14 @@
+#Cube Entity
+:player
+:quaternionRot
+#:axisAngleRot
+#:radian
+:degree
+:defaultScale
+
+p 0 0 -3
+r 0 0 0 1
+
+#M data/models/cube.modl
+M data/models/sphere.modl
+C 179 190 255

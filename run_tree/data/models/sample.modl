@@ -1,0 +1,20 @@
+#Model loading example. This is a comment.
+:numVerts = 4
+:numFaces = 2
+:normalizedVectors = false
+
+#Vertices
+v .5  .5 0
+v .5 -.5 0
+v -.5 -.5 0
+v -.5 .5 0
+
+#Normals
+n 1 1 0
+n 1 -1 0
+n -1 -1
+n -1 1 0
+
+#Face layout
+f 0 2 1
+f 0 3 2 

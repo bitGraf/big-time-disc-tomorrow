@@ -1,0 +1,17 @@
+#XYZ Coordinate Axis to render
+:lineRender = true
+:numVerts = 4
+:numFaces = 3
+
+#Vertices
+v 0 0 0
+v 1 0 0
+v 0 1 0
+v 0 0 1
+
+#Normals not needed
+
+#Face layout
+f 0 1
+f 0 2
+f 0 3
