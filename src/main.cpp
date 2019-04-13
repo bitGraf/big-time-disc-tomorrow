@@ -8,8 +8,8 @@ char exe_location[MAX_PATH];
 
 int main(int argc, char** argv) {
 	printf("\n-------------------------------------------\n\n");
-	get_run_location(exe_location);
-	change_working_directory(exe_location);
+	//get_run_location(exe_location);
+	//change_working_directory(exe_location);
 	print_current_working_directory();
 	printf("\n-------------------------------------------\n\n");
 

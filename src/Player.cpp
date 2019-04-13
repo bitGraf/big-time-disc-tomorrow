@@ -27,9 +27,9 @@ void PlayerEnt::update(double dt) {
     float forwardBackward = vf - vb;
     float rightLeft = vr - vl;
 
-    if (!grounded) {
+    /*if (!grounded) {
         printf("falling...\n");
-    }
+    }*/
     acc = {0, !grounded ? -9.81f : 0, 0};
     vel = vel + acc * dt;
     position = position + vel * dt;
