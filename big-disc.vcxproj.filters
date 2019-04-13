@@ -105,4 +105,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="run_tree\data\shaders\axisSymbol.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="run_tree\data\shaders\axisSymbol.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="run_tree\data\shaders\pbr.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="run_tree\data\shaders\simple.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="run_tree\data\shaders\simple.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="run_tree\data\shaders\text.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="run_tree\data\shaders\text.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

@@ -155,6 +155,15 @@
     <ClInclude Include="src\Utils.h" />
     <ClInclude Include="src\Vector.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="run_tree\data\shaders\axisSymbol.frag" />
+    <None Include="run_tree\data\shaders\axisSymbol.vert" />
+    <None Include="run_tree\data\shaders\pbr.frag" />
+    <None Include="run_tree\data\shaders\simple.frag" />
+    <None Include="run_tree\data\shaders\simple.vert" />
+    <None Include="run_tree\data\shaders\text.frag" />
+    <None Include="run_tree\data\shaders\text.vert" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
