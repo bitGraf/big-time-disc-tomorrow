@@ -12,7 +12,7 @@ set LIB_SDK_UM="..\deps\Other\um"
 
 set files=Main.cpp Game.cpp glad.c ShaderProgram.cpp Player.cpp
 set files=%files% VMQMath.cpp ModelLoader.cpp EntityManager.cpp
-set files=%files% Platform.cpp
+set files=%files% Platform.cpp Input.cpp
 set files=%files% stb_implementation.c DynamicFont.cpp
 
 set opts=/MD /nologo /EHsc

@@ -1,6 +1,6 @@
 #include "Input.h"
 
-/*
+
 Manager Input::manager;
 
 void Input::update(GLFWwindow* window) {
@@ -11,10 +11,9 @@ void Input::update(GLFWwindow* window) {
 }
 
 void Input::checkKey(GLFWwindow* window, keybind* kb) {
-    if (glfwGetKey(window, kb->keymap) == GLFW_KEY_DOWN) {
+    if (glfwGetKey(window, kb->keymap) == GLFW_PRESS) {
         kb->value = 1.0f;
     } else {
         kb->value = 0.0f;
     }
 }
-*/

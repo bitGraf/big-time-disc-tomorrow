@@ -6,19 +6,13 @@ void Entity::init_entities(WindowInfo windowInfo) {
     //
 	// Load assets from file
 	//
-    float camera_height = 8;
-    float camera_offset = 5;
 
     // Entities
-	Entity::loadEntityFromFile( "data/entities/cube.ent", &manager.playerID);
-	manager.player = (PlayerEnt*) Entity::lookup_entity_by_id(manager.playerID);
-	Entity::loadEntityFromFile("data/entities/cube2.ent");
-	Entity::loadEntityFromFile("data/entities/cube3.ent");
-	Entity::loadEntityFromFile("data/entities/pillar.ent");
+	Entity::loadEntityFromFile( "data/entities/cube.ent");
 	Entity::printAllEntities();
 
     //Camera
-	manager.camera.position = {0, camera_height, camera_offset-3};
+	manager.camera.position = {0, 5, 5};
 	manager.camera.lookAt({0, 0, -3});
 	manager.camera.updateVectors();
 	manager.camera.updateViewMatrix();
