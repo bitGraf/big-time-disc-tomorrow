@@ -34,7 +34,15 @@ int main(int argc, char** argv) {
 	printf("\n-------------------------------------------\n\n");
 }
 
+void ErrorCallback(int, const char* err_str)
+{
+	printf("GLFW Error: %s\n", err_str);
+}
+
 GLFWwindow* createWindow() {
+	// Register error callback first
+	glfwSetErrorCallback(ErrorCallback);
+
     printf("Creating GLFW Window.\n");
     glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
