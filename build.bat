@@ -3,15 +3,12 @@ echo Building...
 
 cls
 
-set INC_GL="G:\deps\OpenGL\headers"
-set INC_VS="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.13.26128\include"
-set INC_SDK_SH="C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\shared"
-set INC_SDK_UM="C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\um"
+set INC_GL="..\deps\OpenGL\headers"
 
-set LIB="G:\deps\OpenGL\libs"
-set LIB_VS="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.13.26128\lib\x64"
-set LIB_SDK_UC="C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\ucrt\x64"
-set LIB_SDK_UM="C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\um\x64"
+set LIB="..\deps\OpenGL\libs"
+set LIB_VS="..\deps\Other\msvc"
+set LIB_SDK_UC="..\deps\Other\ucrt"
+set LIB_SDK_UM="..\deps\Other\um"
 
 set files=Main.cpp Game.cpp glad.c ShaderProgram.cpp Player.cpp
 set files=%files% VMQMath.cpp ModelLoader.cpp EntityManager.cpp
