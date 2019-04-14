@@ -63,14 +63,13 @@ void Entity::fixedUpdateAllEntities(double dt) {
 }
 
 void Entity::renderAllEntities(ShaderProgram* shader) {
-    for (int i = 0; i < manager.numEntries; i++) {//don't render ID 0
+    for (int i = 0; i < manager.numEntries; i++) {
         EntityBase* ent = (manager.pointerList[i]);
         shader->setMat4("model", &ent->modelMatrix);
         shader->setvec3("color", &ent->Color);
         shader->setInt("baseColor", 0);
-		//shader->setvec3("texture", &ent->Texture);
         glBindVertexArray(ent->mesh.VAO);
-        ent->baseColor.bind(0);
+        ent->baseColor.bind(GL_TEXTURE0);
         glDrawElements(GL_TRIANGLES, ent->mesh.numFaces*3, GL_UNSIGNED_INT, 0);
     }
     glBindVertexArray(0);

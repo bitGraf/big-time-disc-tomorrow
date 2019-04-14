@@ -34,6 +34,8 @@ void Texture::loadImage(std::string filename, std::string _type) {
 		std::cout << "Failed to load texture [" << filename << "]" << std::endl;
 	}
 
+	printf("Loaded texture: [%dx%d], %d channels\n", width, height, nrChannels);
+
 	stbi_image_free(data);
 }
 
