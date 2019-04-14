@@ -73,7 +73,7 @@ struct mat4 {
 
     void print(char* prepend = NULL) {
         if (prepend != NULL)
-            printf(prepend);
+            printf("%s", prepend);
         printf( " /%.4f %.4f %.4f %.4f\\\n", a11, a12, a13, a14);
         printf( " |%.4f %.4f %.4f %.4f|\n",  a21, a22, a23, a24);
         printf( " |%.4f %.4f %.4f %.4f|\n",  a31, a32, a33, a34);
@@ -137,7 +137,7 @@ struct mat3 {
 
     void print(char* prepend = NULL) {
         if (prepend != NULL)
-            printf(prepend);
+            printf("%s", prepend);
         printf( " /%.2f %.2f %.2f\\\n", a11, a12, a13);
         printf( " |%.2f %.2f %.2f|\n",  a21, a22, a23);
         printf(" \\%.2f %.2f %.2f/\n",  a31, a32, a33);

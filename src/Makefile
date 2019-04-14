@@ -8,7 +8,7 @@ endif
 
 ifeq ($(UNAME_S), Darwin)
 	COMPILER = clang++
-	FLAGS = -std=c++1y -stdlib=libc++ -pedantic -Wall
+	FLAGS = -std=c++14 -stdlib=libc++ -pedantic -Wall
 	GL_FLAGS = -lGLEW -framework OpenGL -lm
 	GLAD_FLAGS = -ldl
 endif

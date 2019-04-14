@@ -36,7 +36,7 @@ struct quat {
 
     void print(char* prepend = NULL) {
         if (prepend != NULL)
-            printf(prepend);
+            printf("%s", prepend);
         printf("[%.2f, %.2f, %.2f, %.2f]\n", x, y, z, w);
     }
 };

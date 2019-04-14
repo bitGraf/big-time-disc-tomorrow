@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "platform.h"
+#include "Platform.h"
 
 #if GLM_ARCH & GLM_ARCH_SSE2_BIT
 

@@ -29,7 +29,7 @@ struct vec3 {
     }
     void print(char* prepend = NULL) {
         if (prepend != NULL)
-            printf(prepend);
+            printf("%s", prepend);
         printf("(%8.4f, %8.4f, %8.4f)\n", x, y, z);
     }
 };

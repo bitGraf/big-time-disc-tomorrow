@@ -1,4 +1,4 @@
-#include "platform.h"
+#include "Platform.h"
 
 void change_working_directory(char* dir) {
     printf("Setting working directory to '%s'.\n", dir);
