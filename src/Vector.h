@@ -35,9 +35,9 @@ struct vec3 {
 };
 
 namespace Vector {
-    float dot(vec3 a, vec3 b);
-    vec3 cross(vec3& a, vec3& b);
+    float dot(const vec3 a, const vec3 b);
+    vec3 cross(const vec3& a, const vec3& b);
 
-    vec3 normalized(vec3& v);
+    vec3 normalized(const vec3& v);
     void normalize(vec3& v);
 }

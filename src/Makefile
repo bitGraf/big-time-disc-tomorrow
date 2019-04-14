@@ -10,16 +10,16 @@ ifeq ($(UNAME_S), Darwin)
 	COMPILER = clang++
 	FLAGS = -std=c++14 -stdlib=libc++ -pedantic -Wall
 	GL_FLAGS = -lGLEW -framework OpenGL -lm
-	GLAD_FLAGS = -ldl
+	GLAD_FLAGS = -ldl -lglfw
 endif
 
-FILES = $(wildcard *.cpp)
+FILES = $(wildcard *.cpp) $(wildcard *.c)
 OUTPUT_NAME = dindin
 
 all: main
 
 main: $(FILES)
-	$(COMPILER) -I../deps/OpenGL/headers $(FLAGS) $(FILES) glad.c -o $(OUTPUT_NAME) $(GL_FLAGS) $(GLAD_FLAGS)
+	$(COMPILER) -I../deps/OpenGL/headers $(FLAGS) $(FILES) -o $(OUTPUT_NAME) $(GL_FLAGS) $(GLAD_FLAGS)
 
 .PHONY: clean run
 clean:

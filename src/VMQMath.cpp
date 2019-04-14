@@ -2,11 +2,11 @@
 #include "Matrix.h"
 #include "Quaternion.h"
 
-float Vector::dot(vec3 a, vec3 b) {
+float Vector::dot(const vec3 a, const vec3 b) {
     return ((a.x*b.x) + (a.y*b.y) + (a.z*b.z));
 }
 
-vec3 Vector::cross(vec3& a, vec3& b) {
+vec3 Vector::cross(const vec3& a, const vec3& b) {
     return {
         a.y*b.z - a.z*b.y,
         a.z*b.x - a.x*b.z,
@@ -14,7 +14,7 @@ vec3 Vector::cross(vec3& a, vec3& b) {
     };
 }
 
-vec3 Vector::normalized(vec3& v) {
+vec3 Vector::normalized(const vec3& v) {
     float m = 1/sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
     return {v.x*m, v.y*m, v.z*m};
 }
