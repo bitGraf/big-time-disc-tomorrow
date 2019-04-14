@@ -12,7 +12,7 @@ void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
 }
 
 void PlayerEnt::update(double dt) {
-    angle += 90 * dt;
+	angle += 90 * dt;
 
     if (angle > 360)
         angle = 0;
@@ -33,8 +33,10 @@ void PlayerEnt::update(double dt) {
     acc = {0, !grounded ? -9.81f : 0, 0};
     vel = vel + acc * dt;
     position = position + vel * dt;
-    if (position.y <= 0) {
+    if (position.y < 0) {
         position.y = 0;
+		vel.y = 0;
+		acc.y = 0;
         grounded = true;
     }
 
