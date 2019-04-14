@@ -128,12 +128,14 @@
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\Input.cpp" />
+    <ClCompile Include="src\Level.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ModelLoader.cpp" />
     <ClCompile Include="src\Platform.cpp" />
     <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />
     <ClCompile Include="src\stb_implementation.c" />
+    <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\VMQMath.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +146,7 @@
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\InputBindings.h" />
+    <ClInclude Include="src\Level.h" />
     <ClInclude Include="src\Matrix.h" />
     <ClInclude Include="src\ModelLoader.h" />
     <ClInclude Include="src\Platform.h" />
@@ -152,6 +155,7 @@
     <ClInclude Include="src\ShaderProgram.h" />
     <ClInclude Include="src\stb_image.h" />
     <ClInclude Include="src\stb_truetype.h" />
+    <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\Utils.h" />
     <ClInclude Include="src\Vector.h" />
   </ItemGroup>
