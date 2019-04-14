@@ -34,6 +34,36 @@ struct vec3 {
     }
 };
 
+struct vec2 {
+	float x = 0;
+	float y = 0;
+
+	vec2& operator=(const vec2 v) {
+		x = v.x;
+		y = v.y;
+		return *this;
+	}
+	vec2 operator+(const vec2& v) const {
+		return { x + v.x, y + v.y };
+	}
+	vec2 operator-(const vec2& v) const {
+		return { x - v.x, y - v.y };
+	}
+	vec2 operator-() const {
+		return { -x, -y };
+	}
+	vec2 operator*(const float& f) const {
+		return {
+			x*f, y*f
+		};
+	}
+	void print(char* prepend = NULL) {
+		if (prepend != NULL)
+			printf("%s", prepend);
+		printf("(%8.4f, %8.4f)\n", x, y);
+	}
+};
+
 namespace Vector {
     float dot(const vec3 a, const vec3 b);
     vec3 cross(const vec3& a, const vec3& b);

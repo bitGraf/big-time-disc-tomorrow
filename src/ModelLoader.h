@@ -18,6 +18,7 @@ struct TriangleMesh {
     //Vertex data
     vec3 *vertices = NULL;
     vec3 *normals = NULL;
+	vec2 *texture = NULL;
 
     //Face data
     GLuint *indices = NULL;
@@ -32,6 +33,7 @@ struct TriangleMesh {
     GLuint VAO = 0;
     GLuint VBOpos = 0;
     GLuint VBOnorm = 0;
+	GLuint VBOtex = 0;
     GLuint EBO = 0;
 
     ~TriangleMesh() {
@@ -40,6 +42,7 @@ struct TriangleMesh {
         free(vertices);
         free(indices);
         free(normals);
+		free(texture);
     }
 };
 
@@ -48,6 +51,7 @@ namespace ModelLoader {
     void bufferModel(TriangleMesh* mesh, bool lineRender = false);
     
     vec3 parseVec3(char* line, bool normalise = false);
+	vec2 parseVec2(char* line, bool normalise = false);
     Triangle parseFace(char* line, bool index1 = false);
     void parseCommand(char* line, TriangleMesh* mesh);
 }

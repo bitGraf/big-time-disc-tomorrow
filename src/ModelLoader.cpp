@@ -2,7 +2,7 @@
 
 void ModelLoader::bufferModel(TriangleMesh* mesh, bool lineRender) {
     //printf("buffering model\n");
-    GLuint VAO, VBOpos, VBOnorm, EBO;
+    GLuint VAO, VBOpos, VBOnorm, VBOtex, EBO;
 
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -20,6 +20,13 @@ void ModelLoader::bufferModel(TriangleMesh* mesh, bool lineRender) {
     glBufferData(GL_ARRAY_BUFFER, mesh->numVerts * sizeof(vec3), mesh->normals, GL_STATIC_DRAW);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
     glEnableVertexAttribArray(1);
+
+	//buffer Vertex texture data
+	glGenBuffers(1, &VBOtex);
+	glBindBuffer(GL_ARRAY_BUFFER, VBOtex);
+	glBufferData(GL_ARRAY_BUFFER, mesh->numVerts * sizeof(vec2), &(mesh->texture[0].x), GL_STATIC_DRAW);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(vec2), (void*)0);
+	glEnableVertexAttribArray(2);
 
     //buffer indexing
     glGenBuffers(1, &EBO);
@@ -40,6 +47,7 @@ void ModelLoader::bufferModel(TriangleMesh* mesh, bool lineRender) {
     mesh->VAO = VAO;
     mesh->VBOpos = VBOpos;
     mesh->VBOnorm = VBOnorm;
+	mesh->VBOtex = VBOtex;
     mesh->EBO = EBO;
 
     /*for (int i = 0; i < mesh->numVerts*3; i++) {
@@ -83,6 +91,7 @@ void ModelLoader::loadFile(TriangleMesh* triMesh, char* filename) {
     int currentVertex = 0;
     int currentNormal = 0;
     int currentIndex = 0;
+	int currentTexture = 0;
 
     char* lineContents;
     int i = 0;
@@ -138,7 +147,14 @@ void ModelLoader::loadFile(TriangleMesh* triMesh, char* filename) {
                         triMesh->indices[currentIndex++] = tri.indices[2];}
                         //currentIndex+=3;
                     }
-                }break;
+                } break;
+				case 'u': {
+					vec2 result = parseVec2(lineContents);
+					assert(triMesh->texture != NULL);
+					assert(currentTexture < triMesh->numVerts);
+					triMesh->texture[currentTexture] = result;
+					currentTexture++;
+				} break;
                 default: {
                 }break;
             }
@@ -154,12 +170,15 @@ void ModelLoader::loadFile(TriangleMesh* triMesh, char* filename) {
     if (
         (currentVertex != triMesh->numVerts) ||
         (currentNormal != triMesh->numVerts) ||
+		(currentTexture != triMesh->numVerts)||
         (currentIndex  != triMesh->numFaces*indPerPrim)
+
     ) {
         printf("Data load mismatch: amount of datapoints loaded incorrect.\n");
         printf("Type     Found     Expected\n");
         printf("Vertices %d        %d\n", currentVertex, triMesh->numVerts);
         printf("Normals  %d        %d\n", currentNormal, triMesh->numVerts);
+		printf("Textures %d        %d\n", currentTexture, triMesh->numVerts);
         printf("Indices  %d        %d\n\n", currentIndex,  triMesh->numFaces*indPerPrim);
     }
 
@@ -216,6 +235,24 @@ vec3 ModelLoader::parseVec3(char* line, bool normalise) {
     return ret;
 }
 
+vec2 ModelLoader::parseVec2(char* line, bool normalise) {
+	int start = 0;
+	while (line[start] != ' ') {
+		start++;
+	}
+	while (line[start] == ' ') {
+		start++;
+	}
+	char* pstr = line + start;
+	float x = strtof(pstr, &pstr);  //split the string into two floats
+	float y = strtof(pstr, NULL);
+
+
+	vec2 ret = { x, y };
+	//ret.print("\tVector2: ");
+	return ret;
+}
+
 void ModelLoader::parseCommand(char* line, TriangleMesh* mesh) {
     int start = 0;
     while (line[start] != ' ') {
@@ -238,6 +275,7 @@ void ModelLoader::parseCommand(char* line, TriangleMesh* mesh) {
         //allocate memory for vertices
         mesh->vertices = (vec3*)malloc(mesh->numVerts * sizeof(vec3));
         mesh->normals  = (vec3*)malloc(mesh->numVerts * sizeof(vec3));
+		mesh->texture = (vec2*)malloc(mesh->numVerts * sizeof(vec2));
 
     } else if (!strcmp(varName, "numFaces")) {
         int value = (int)strtol(pstr+2, NULL, 10);

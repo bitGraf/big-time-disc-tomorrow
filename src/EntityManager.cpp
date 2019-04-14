@@ -67,6 +67,7 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
         EntityBase* ent = (manager.pointerList[i]);
         shader->setMat4("model", &ent->modelMatrix);
         shader->setvec3("color", &ent->Color);
+		//shader->setvec3("texture", &ent->Texture);
         glBindVertexArray(ent->mesh.VAO);
         glDrawElements(GL_TRIANGLES, ent->mesh.numFaces*3, GL_UNSIGNED_INT, 0);
     }
