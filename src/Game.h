@@ -10,6 +10,7 @@
 #include "Input.h"
 
 #include "DynamicFont.h"
+#include "Level.h"
 
 #include <thread>
 #include <chrono>

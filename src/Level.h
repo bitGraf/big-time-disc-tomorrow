@@ -4,6 +4,8 @@
 #include "Vector.h"
 #include "Quaternion.h"
 
+#include "Utils.h"
+
 struct Building {
     vec3 position;
     quat orientation;

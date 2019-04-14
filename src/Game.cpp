@@ -6,6 +6,9 @@ void initialize_game(GLFWwindow* window) {
     ModelLoader::loadFile(&axis, "../data/models/axis.modl");
     printf("\n\n");
 
+	//Load Level
+	LevelData* lvl = Level::loadLevel("filename");
+
     //Shaders
 	shader.smartLoad("simple.vert", "pbr.frag", "entityShader");
 	shader.use();

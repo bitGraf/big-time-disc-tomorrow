@@ -24,3 +24,7 @@ inline double deg2Rad(double deg) {
 inline double rad2deg(double rad) {
     return rad * 180.0 / M_PI;
 }
+
+inline float randomFloat(float min, float max) {
+    return ((max - min) * ((float)rand() / RAND_MAX)) + min;
+}
