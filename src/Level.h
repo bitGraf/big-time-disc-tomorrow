@@ -5,6 +5,7 @@
 #include "Quaternion.h"
 
 #include "Utils.h"
+#include "EntityManager.h"
 
 struct Building {
     vec3 position;
