@@ -5,6 +5,7 @@
 #include "Quaternion.h"
 #include "Matrix.h"
 #include "ShaderProgram.h"
+#include "Texture.h"
 
 struct EntityBase {
     //Transform components
@@ -22,6 +23,9 @@ struct EntityBase {
     //Entity information
     int ID = -1;//array[ID] to lookup pointer to this in manager
     int subType = -1;
+
+    //Textures
+    Texture baseColor;
 
     //Other information
     vec3 Color;

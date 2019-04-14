@@ -3,6 +3,7 @@ out vec4 FragColor;
 
 in vec3 pass_normal;
 in vec3 pass_fragPos;
+in vec2 pass_tex;
 
 struct Light {
 	vec3 position;
@@ -20,6 +21,7 @@ struct Light {
 uniform vec3 camPos;
 
 uniform vec3 color;
+uniform sampler2D baseColor;
 
 //uniform samplerCube irradianceMap;
 //uniform samplerCube prefilterMap;
@@ -60,6 +62,7 @@ void main()
    break;
  }*/
 	albedo = color;
+	albedo = vec3(texture(baseColor, pass_tex));
 	//vec3 albedo = vec3(0, .5, .2);
 	vec3 normal = pass_normal;
     

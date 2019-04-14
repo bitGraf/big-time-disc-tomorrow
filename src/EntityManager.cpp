@@ -67,8 +67,10 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
         EntityBase* ent = (manager.pointerList[i]);
         shader->setMat4("model", &ent->modelMatrix);
         shader->setvec3("color", &ent->Color);
+        shader->setInt("baseColor", 0);
 		//shader->setvec3("texture", &ent->Texture);
         glBindVertexArray(ent->mesh.VAO);
+        ent->baseColor.bind(0);
         glDrawElements(GL_TRIANGLES, ent->mesh.numFaces*3, GL_UNSIGNED_INT, 0);
     }
     glBindVertexArray(0);
@@ -158,6 +160,9 @@ int Entity::registerEntity(LoadOptions* opts) {
 
     //load mesh
     ModelLoader::loadFile(&ent->mesh, ent->modelFilePath);
+
+    //load texture
+    ent->baseColor.loadImage("sample.jpg");
 
     manager.VAOs.push_back(ent->mesh.VAO);
     manager.VBOs.push_back(ent->mesh.VBOpos);
