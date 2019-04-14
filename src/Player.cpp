@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "EntityManager.h"
 
 void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
     //printf("Key event: %d -> action: %d [mods: %d]\n",
@@ -9,6 +10,13 @@ void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
         vel.y += 5;
         grounded = false;
     }
+
+	if (grounded && (key == GLFW_KEY_P) && (action == GLFW_PRESS)) {
+		printf("Laying an egg... Yoshey..\n");
+		int id;
+		Entity::loadEntityFromFile("../data/entities/cube2.ent", &id);
+		Entity::lookup_entity_by_id(id, 0)->position = this->position;
+	}
 }
 
 void PlayerEnt::update(double dt) {

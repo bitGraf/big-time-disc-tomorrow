@@ -36,7 +36,7 @@ void initialize_game(GLFWwindow* window) {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
     //glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-	glClearColor(1, 1, 1, 1.0f);
+	glClearColor(0.716f, 0.68f, 0.652f, 1.0f);
 
     //
     // Initialize Input state

@@ -188,7 +188,7 @@ int Entity::registerEntity(LoadOptions* opts) {
 
     Matrix::buildFromTRS(&ent->modelMatrix, ent->position, ent->orientation, ent->scale);
 
-    return 0;
+    return ent->ID;
 }
 
 void Entity::loadEntityFromFile(char* filename, int* idLookup) {

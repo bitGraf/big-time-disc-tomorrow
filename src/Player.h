@@ -22,6 +22,6 @@ struct StaticEnt : EntityBase {
     float value2 = 69.0f;
 
     void update() {
-        
+		Matrix::buildFromTRS(&modelMatrix, position, orientation, scale);
     }
 };
