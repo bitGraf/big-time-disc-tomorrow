@@ -3,7 +3,7 @@
 void initialize_game(GLFWwindow* window) {
     // Load entities
     Entity::init_entities(windowInfo);
-    ModelLoader::loadFile(&axis, "data/models/axis.modl");
+    ModelLoader::loadFile(&axis, "../data/models/axis.modl");
     printf("\n\n");
 
     //Shaders
@@ -16,8 +16,8 @@ void initialize_game(GLFWwindow* window) {
 
 	//Fonts
 	Font::InitTextRendering(windowInfo);
-	fpsFont = Font::newDynamicFont("data/fonts/Consolas.ttf", 20);
-	otherFont = Font::newDynamicFont("data/fonts/Consolas.ttf", 32);
+	fpsFont = Font::newDynamicFont("../data/fonts/Consolas.ttf", 20);
+	otherFont = Font::newDynamicFont("../data/fonts/Consolas.ttf", 32);
     sprintf(fpsText, "Fps: 0");
 
     //

@@ -8,7 +8,7 @@ void Entity::init_entities(WindowInfo windowInfo) {
 	//
 
     // Entities
-	Entity::loadEntityFromFile( "data/entities/cube.ent");
+	Entity::loadEntityFromFile( "../data/entities/cube.ent");
 	Entity::printAllEntities();
 
     //Camera

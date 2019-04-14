@@ -9,7 +9,7 @@
 #include "stdio.h"
 #include <unordered_map>
 
-const std::string ShaderResourcePath = "data/shaders/";
+const std::string ShaderResourcePath = "../data/shaders/";
 
 struct ShaderProgram {
 	GLuint shaderID = 0;

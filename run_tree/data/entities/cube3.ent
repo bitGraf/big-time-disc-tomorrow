@@ -9,5 +9,5 @@ p 0 0 0
 r 0 0 0 1
 s .1 .1 .1
 
-M data/models/cube.modl
+M ../data/models/cube.modl
 C 255 128 128

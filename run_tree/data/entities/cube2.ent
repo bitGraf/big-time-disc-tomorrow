@@ -10,5 +10,5 @@ p 0 3 -3
 r 0 1 0 35
 s .1 .2 3
 
-M data/models/cube.modl
+M ../data/models/cube.modl
 C 206 255 133

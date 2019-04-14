@@ -18,7 +18,7 @@ set files=%files% stb_implementation.c DynamicFont.cpp
 set opts=/MD /nologo /EHsc
 
 pushd src
-set out_file="..\run_tree\run.exe"
+set out_file="..\run_tree\Release\run.exe"
 cl %opts% /I %INC_GL% %files% gdi32.lib kernel32.lib user32.lib shell32.lib glew32.lib glew32s.lib glfw3.lib glfw3dll.lib OpenGL32.lib /link /LIBPATH:%LIB% /LIBPATH:%LIB_VS% /LIBPATH:%LIB_SDK_UC% /LIBPATH:%LIB_SDK_Um% /out:%out_file%
 del *.obj
 
