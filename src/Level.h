@@ -1,12 +1,24 @@
 #pragma once
 
-#include "Player.h"
+#include "Texture.h"
+#include "Vector.h"
+#include "Quaternion.h"
+
+struct Building {
+    vec3 position;
+    quat orientation;
+    vec3 scale = {1, 1, 1};
+};
 
 struct LevelData {
-    char* name;
+    char* name = NULL;
 
-    EntityBase* props;
-    int numProps = 0;
+    //Buildings
+    int numBuildings;
+    Building* buildings = NULL;
+
+    //Ground
+    Texture groundHeightmap;
 };
 
 namespace Level {
