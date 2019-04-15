@@ -30,13 +30,15 @@ struct EntityBase {
     //Other information
     vec3 Color;
 
-    //Shader to use
-    //ShaderProgram* shader = NULL;
-    void update() {
-        //printf("[%d] EntityBase Update\n", ID);
+    //Common function prototypes
+    virtual void update(double dt) {
+        Matrix::buildFromTRS(&modelMatrix, position, orientation, scale);
     }
 
-    ~EntityBase() {
+    virtual void preRender() {}
+    virtual void handleInput(int key, int scancode, int action, int mods) {}
+
+    virtual ~EntityBase() {
         printf("\tFreeing Entity [%2d]...\n", ID);
         free(modelFilePath);
     }

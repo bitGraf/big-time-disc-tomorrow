@@ -91,7 +91,7 @@ namespace Entity {
     void handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int mods);
 
     // Entity lookup
-    EntityBase* lookup_entity_by_id(int ID, int *type = NULL);
+    EntityBase* lookup_entity_by_id(int ID);
 }
 
 

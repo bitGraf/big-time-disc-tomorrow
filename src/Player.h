@@ -13,15 +13,20 @@ struct PlayerEnt : EntityBase {
     vec3 acc;
     vec3 impulse;
 
-    void handleInput(int key, int scancode, int action, int mods);
 
-    void update(double dt);
+    void update(double dt) override;
+    void preRender() override;
+    void handleInput(int key, int scancode, int action, int mods) override;
 };
 
 struct StaticEnt : EntityBase {
-    float value2 = 69.0f;
-
-    void update() {
-		Matrix::buildFromTRS(&modelMatrix, position, orientation, scale);
+    void update(double dt) override {
+      EntityBase::update(dt);
+    };
+    void preRender() override {
+      EntityBase::preRender();
+    }
+    void handleInput(int key, int scancode, int action, int mods) override {
+      EntityBase::handleInput(key, scancode, action, mods);
     }
 };

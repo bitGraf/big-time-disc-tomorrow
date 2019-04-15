@@ -2,8 +2,7 @@
 #include "EntityManager.h"
 
 void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
-    //printf("Key event: %d -> action: %d [mods: %d]\n",
-    //    key, action, mods);
+    EntityBase::handleInput(key, scancode, action, mods);
 
     if (grounded && (key == GLFW_KEY_SPACE) && (action == GLFW_PRESS)) {
         printf("Jumping...\n");
@@ -15,7 +14,7 @@ void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
 		printf("Laying an egg... Yoshey..\n");
 		int id;
 		Entity::loadEntityFromFile("../data/entities/cube2.ent", &id);
-		Entity::lookup_entity_by_id(id, 0)->position = this->position;
+		Entity::lookup_entity_by_id(id)->position = this->position;
 	}
 }
 
@@ -35,9 +34,6 @@ void PlayerEnt::update(double dt) {
     float forwardBackward = vf - vb;
     float rightLeft = vr - vl;
 
-    /*if (!grounded) {
-        printf("falling...\n");
-    }*/
 	acc = { 0, !grounded ? -9.81f : 0, 0 };
 	vel = { rightLeft, (vel.y + acc.y * float(dt)), -forwardBackward };
     position = position + vel * dt;
@@ -48,22 +44,10 @@ void PlayerEnt::update(double dt) {
         grounded = true;
     }
 
-    /*vec3 Forward = {0, 0, -1};
-    vec3 Right = {1, 0, 0};
-    vec3 vel = (Forward * forwardBackward) + 
-                (Right   * rightLeft);
-    if (!grounded) {
-        vel.y -= 9.81 * dt;
-        printf("falling...\n");
-    }
-    position = position + (vel * dt * speed);
 
-    if (position.y <= 0) {
-        position.y = 0;
-        //printf("on ground...\n");
-        grounded = true;
-    }*/
+    EntityBase::update(dt);
+}
 
-    Matrix::buildFromTRS(&modelMatrix, position, orientation, scale);
-    //vel = {0, 0, 0};
+void PlayerEnt::preRender() {
+    EntityBase::preRender();
 }

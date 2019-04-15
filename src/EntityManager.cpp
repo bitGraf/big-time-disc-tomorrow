@@ -21,21 +21,9 @@ void Entity::init_entities(WindowInfo windowInfo) {
 
 void Entity::handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int mods) {
     for (int i = 0; i < manager.numEntries; i++) {//don't render ID 0
-    EntityBase* ent = (manager.pointerList[i]);
+        EntityBase* ent = (manager.pointerList[i]);
 
-    switch(ent->subType) {
-        case ENT_Base: {
-        } break;
-        case ENT_Player: {
-            PlayerEnt* pEnt = (PlayerEnt*)ent;
-            pEnt->handleInput(key, scancode, action, mods);
-        } break;
-        case ENT_Static: {
-            StaticEnt* sEnt = (StaticEnt*)ent;
-        } break;
-        default: {
-        } break;
-    }
+        ent->handleInput(key, scancode, action, mods);
     }
 }
 
@@ -43,22 +31,7 @@ void Entity::fixedUpdateAllEntities(double dt) {
     for (int i = 0; i < manager.numEntries; i++) {//don't render ID 0
         EntityBase* ent = (manager.pointerList[i]);
         
-        switch(ent->subType) {
-            case ENT_Base: {
-                ent->update();
-            } break;
-            case ENT_Player: {
-                PlayerEnt* pEnt = (PlayerEnt*)ent;
-                pEnt->update(dt);
-            } break;
-            case ENT_Static: {
-                StaticEnt* sEnt = (StaticEnt*)ent;
-                sEnt->update();
-            } break;
-            default: {
-                ent->update();
-            } break;
-        }
+        ent->update(dt);
     }
 }
 
@@ -70,6 +43,9 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
         shader->setInt("baseColor", 0);
         glBindVertexArray(ent->mesh.VAO);
         ent->baseColor.bind(GL_TEXTURE0);
+
+        ent->preRender();
+
         glDrawElements(GL_TRIANGLES, ent->mesh.numFaces*3, GL_UNSIGNED_INT, 0);
     }
     glBindVertexArray(0);
@@ -173,24 +149,6 @@ int Entity::registerEntity(LoadOptions* opts) {
             manager.numEntries, manager.maxSize);
     manager.numEntries++;
 
-
-    /*
-    //Old Way
-    manager.numEntities++;
-    manager.entPointers.push_back(ent);
-    ent->ID = manager.numEntities;//reserve 0-entity as a NULL pointer
-
-    manager.VAOs.push_back(ent->mesh.VAO);
-    manager.VBOs.push_back(ent->mesh.VBOpos);
-    manager.VBOs.push_back(ent->mesh.VBOnorm);
-    manager.EBOs.push_back(ent->mesh.EBO);
-
-    return 0;
-    */
-    //printf("Entity [%d] loaded at position: (%4.1f %4.1f %4.1f) orientation: [%4.1f %4.1f %4.1f %4.1f]\n\n\n",
-    //    ent->ID, ent->position.x, ent->position.y, ent->position.z,
-    //    ent->orientation.x, ent->orientation.y, ent->orientation.z, ent->orientation.w);
-
     Matrix::buildFromTRS(&ent->modelMatrix, ent->position, ent->orientation, ent->scale);
 
     return ent->ID;
@@ -272,18 +230,6 @@ void Entity::loadEntityFromFile(char* filename, int* idLookup) {
         lineContents = strtok(NULL, "\r\n");
     }
     free(fileContents);
-
-    //opts.print();
-
-    //EntityBase* ent = (EntityBase*)malloc(sizeof(EntityBase));
-    //ent->position = opts.position;
-    //ent->orientation = opts.orientation;
-    //ent->scale = opts.scale;
-    //ent->modelFilePath = opts.modelFilePath;
-    //ent->subType = opts.subType;
-
-    //load model file specified
-    //ModelLoader::loadFile(&pEnt->mesh, pEnt->modelFilePath);
 
     int id = registerEntity(&opts);
     if (idLookup != NULL) {
@@ -369,21 +315,11 @@ void Entity::parseCommand(char* line, LoadOptions* ent) {
     free(varName);
 }
 
-/*void Entity::loadEntityFromFile(char* filename) {
-    EntityBase* entity = (EntityBase*)malloc(sizeof(EntityBase));
-    loadEntityFromFile(entity, filename);
-}*/
-
-EntityBase* Entity::lookup_entity_by_id(int ID, int *type) {
+EntityBase* Entity::lookup_entity_by_id(int ID) {
     if (ID >= manager.numEntries)  {
         printf("Error: Trying to access entity ID %d, which does not exist.\n", ID);
         return NULL;
     }
-
-
-    //if (type != NULL) {
-    //    *type = manager.pointerList[ID]->subType;
-    //}
 
     return manager.pointerList[ID];
 }
