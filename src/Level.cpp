@@ -23,7 +23,7 @@ LevelData* Level::loadLevel(char* filename) {
             randomFloat(0.3, 2)};
 
         int id = 0;
-        Entity::loadEntityFromFile("box", &id);
+        //Entity::loadEntityFromFile("box", &id);
         EntityBase* ent = Entity::lookup_entity_by_id(id);
 
         ent->position = level->buildings[i].position;

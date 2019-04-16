@@ -33,9 +33,6 @@ struct EntityManager {
     GLuint numEntries = 0;              //amount of currently filled pointers
     GLuint entryGrowthAmount = 64;      //amount to **ADD** to maxSize when full
 
-    int playerID = -1;
-    PlayerEnt* player;
-
     //Render objects
     std::vector<GLuint> VAOs;
     std::vector<GLuint> VBOs;
@@ -73,21 +70,21 @@ struct EntityManager {
 namespace Entity {
     extern EntityManager manager;
 
-    EntityBase* createNewEntity(int* id);
+    EntityBase* createNewEntity(int* id = NULL);
 
     void init_entities(WindowInfo windowInfo);
 
     // Loading new entities
     //void loadEntityFromFile(EntityBase* ent, char* filename);
-    void loadEntityFromFile(std::string entFilename, int* idLookup = NULL);
+    //void loadEntityFromFile(std::string entFilename, int* idLookup = NULL);
 
     // Helper functions for loading
-    vec3 parseVec3(char* line, bool normalise = false);
-    quat parseQuat(char* line, bool normalise = false);
-    void parseCommand(char* line, LoadOptions* ent);
+    //vec3 parseVec3(char* line, bool normalise = false);
+    //quat parseQuat(char* line, bool normalise = false);
+    //void parseCommand(char* line, LoadOptions* ent);
 
     // Adding entities to the manager
-    int registerEntity(LoadOptions* ent = NULL);
+    int registerEntity(LoadOptions* opts = NULL);
     void printAllEntities();
     
     // Operating on current entities

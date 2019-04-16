@@ -8,9 +8,15 @@ void Entity::init_entities(WindowInfo windowInfo) {
 	//
 
     // Entities
-	Entity::loadEntityFromFile( "yosh");
+	//Entity::loadEntityFromFile( "yosh");
 	Entity::printAllEntities();
-    Level::loadLevel(" ");
+    //Level::loadLevel(" ");
+
+    Resources::manager.loadTriMeshResource("cube", ".modl");
+    Resources::manager.loadTextureResource("sample", ".jpg");
+    EntityBase* ent = Entity::createNewEntity();
+    ent->mesh = Resources::manager.getTriMeshResource("cube");
+    ent->baseColor = Resources::manager.getTextureResource("sample");
 
     //Camera
 	manager.camera.position = {0, 5, 5};
@@ -21,15 +27,18 @@ void Entity::init_entities(WindowInfo windowInfo) {
 }
 
 EntityBase* Entity::createNewEntity(int* id) {
-    *id = registerEntity();
-    return Entity::lookup_entity_by_id(*id);
+    int IDval = registerEntity();
+    if (id != NULL)
+        *id = IDval;
+    return Entity::lookup_entity_by_id(IDval);
 }
 
 void Entity::handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int mods) {
     for (int i = 0; i < manager.numEntries; i++) {//don't render ID 0
         EntityBase* ent = (manager.pointerList[i]);
 
-        ent->handleInput(key, scancode, action, mods);
+        if (!ent->Remove)
+            ent->handleInput(key, scancode, action, mods);
     }
 }
 
@@ -37,22 +46,26 @@ void Entity::fixedUpdateAllEntities(double dt) {
     for (int i = 0; i < manager.numEntries; i++) {//don't render ID 0
         EntityBase* ent = (manager.pointerList[i]);
         
-        ent->update(dt);
+        if (!ent->Remove)
+            ent->update(dt);    //For now, just ignore "Removed" entitites
     }
 }
 
 void Entity::renderAllEntities(ShaderProgram* shader) {
     for (int i = 0; i < manager.numEntries; i++) {
         EntityBase* ent = (manager.pointerList[i]);
-        shader->setMat4("model", &ent->modelMatrix);
-        shader->setvec3("color", &ent->Color);
-        shader->setInt("baseColor", 0);
-        glBindVertexArray(ent->mesh.VAO);
-        ent->baseColor.bind(GL_TEXTURE0);
 
-        ent->preRender();
+        if (!ent->Remove) {
+            shader->setMat4("model", &ent->modelMatrix);
+            shader->setvec3("color", &ent->Color);
+            shader->setInt("baseColor", 0);
+            glBindVertexArray(ent->mesh->data.VAO);
+            ent->baseColor->data.bind(GL_TEXTURE0);
 
-        glDrawElements(GL_TRIANGLES, ent->mesh.numFaces*3, GL_UNSIGNED_INT, 0);
+            ent->preRender();
+
+            glDrawElements(GL_TRIANGLES, ent->mesh->data.numFaces*3, GL_UNSIGNED_INT, 0);
+        }
     }
     glBindVertexArray(0);
 }
@@ -66,7 +79,7 @@ void Entity::printAllEntities() {
         if (manager.pointerList[i]) {
             EntityBase* ent = manager.pointerList[i];
 
-            printf("%p\t%d\t%d\t%s\n", ent, ent->ID, ent->mesh.VAO,
+            printf("%p\t%d\t%d\t%s\n", ent, ent->ID, ent->mesh->data.VAO,
                 ent->subType==ENT_Base ? " " : (
                 ent->subType==ENT_Player ? "Player" : (
                     "Static")));
@@ -106,6 +119,8 @@ int Entity::registerEntity(LoadOptions* opts) {
     EntityBase* ent = NULL;
 
     if (opts != NULL) {
+        printf("Y'all fucked up...\n");
+        assert(false);
         //insert new element of correct subtype
         switch(opts->subType) {
             case ENT_Base: {
@@ -134,20 +149,20 @@ int Entity::registerEntity(LoadOptions* opts) {
         ent->position = opts->position;
         ent->orientation = opts->orientation;
         ent->scale = opts->scale;
-        ent->modelFilePath = opts->modelFilePath;
+        //ent->modelFilePath = opts->modelFilePath;
         ent->subType = opts->subType;
         ent->Color = opts->color;
 
         //load mesh
-        ModelLoader::loadFile(&ent->mesh, ent->modelFilePath);
+        //ModelLoader::loadFile(&ent->mesh, ent->modelFilePath);
 
         //load texture
-        ent->baseColor.loadImage("sample.jpg");
+        //ent->baseColor.loadImage("sample.jpg");
 
-        manager.VAOs.push_back(ent->mesh.VAO);
-        manager.VBOs.push_back(ent->mesh.VBOpos);
-        manager.VBOs.push_back(ent->mesh.VBOnorm);
-        manager.EBOs.push_back(ent->mesh.EBO);
+        //manager.VAOs.push_back(ent->mesh.VAO);
+        //manager.VBOs.push_back(ent->mesh.VBOpos);
+        //manager.VBOs.push_back(ent->mesh.VBOnorm);
+        //manager.EBOs.push_back(ent->mesh.EBO);
     } else {
         manager.pointerList[manager.numEntries] = new EntityBase;
         ent = manager.pointerList[manager.numEntries];
@@ -166,7 +181,16 @@ int Entity::registerEntity(LoadOptions* opts) {
     return ent->ID;
 }
 
-void Entity::loadEntityFromFile(std::string entFilename, int* idLookup) {
+EntityBase* Entity::lookup_entity_by_id(int ID) {
+    if (ID >= manager.numEntries)  {
+        printf("Error: Trying to access entity ID %d, which does not exist.\n", ID);
+        return NULL;
+    }
+
+    return manager.pointerList[ID];
+}
+
+/*void Entity::loadEntityFromFile(std::string entFilename, int* idLookup) {
     //Check if entity is already loaded
     bool readFromFile = true;
 
@@ -337,12 +361,4 @@ void Entity::parseCommand(char* line, LoadOptions* ent) {
     }
     free(varName);
 }
-
-EntityBase* Entity::lookup_entity_by_id(int ID) {
-    if (ID >= manager.numEntries)  {
-        printf("Error: Trying to access entity ID %d, which does not exist.\n", ID);
-        return NULL;
-    }
-
-    return manager.pointerList[ID];
-}
+*/
