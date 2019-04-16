@@ -1,0 +1,6 @@
+#Cube Entity
+:static
+
+M ../data/models/cube.modl
+T ../data/textures/sample.jpg
+C 179 190 255

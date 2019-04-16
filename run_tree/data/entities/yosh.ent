@@ -1,0 +1,6 @@
+#Cube Entity
+:player
+
+M ../data/models/sphere.modl
+T ../data/textures/sample.jpg
+C 255 128 128
