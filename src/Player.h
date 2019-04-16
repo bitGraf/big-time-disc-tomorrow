@@ -4,6 +4,8 @@
 #include "InputBindings.h"
 #include "Input.h"
 
+#include "ResourceManager.h"
+
 struct PlayerEnt : EntityBase {
     int angle = 0;
     float speed = 3;

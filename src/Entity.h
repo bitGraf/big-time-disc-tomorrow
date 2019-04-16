@@ -7,6 +7,8 @@
 #include "ShaderProgram.h"
 #include "Texture.h"
 
+#include "ResourceManager.h"
+
 struct EntityBase {
     //Transform components
     vec3 position;
@@ -17,15 +19,15 @@ struct EntityBase {
     mat4 modelMatrix;
 
     //Actual mesh data (verts, norms, ...)
-    TriangleMesh mesh;
-    char* modelFilePath = NULL;
+    TriMeshResource* mesh;
 
     //Entity information
     int ID = -1;//array[ID] to lookup pointer to this in manager
     int subType = -1;
+    bool Remove = false;    //whether to remove next update cycle
 
     //Textures
-    Texture baseColor;
+    TextureResource* baseColor;
 
     //Other information
     vec3 Color = {1, 1, 1};
@@ -40,7 +42,7 @@ struct EntityBase {
 
     virtual ~EntityBase() {
         printf("\tFreeing Entity [%2d]...\n", ID);
-        free(modelFilePath);
+        //free(modelFilePath);
     }
 };
 
