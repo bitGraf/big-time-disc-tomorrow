@@ -13,7 +13,8 @@ struct ResourceManager {
     std::unordered_map<std::string, TriMeshResource*> TriMeshResources;
     std::unordered_map<std::string, TextureResource*> TextureResources;
     
-    void loadResource(std::string filename);
+    void loadTextureResource(std::string filename, std::string fileType);
+    void loadTriMeshResource(std::string filename, std::string fileType);
     
     TextureResource* getTextureResource(std::string lookup);
     TriMeshResource* getTriMeshResource(std::string lookup);
@@ -26,3 +27,7 @@ struct TextureResource {
 struct TriMeshResource {
     TriangleMesh data;
 };
+
+namespace Resources {
+    extern ResourceManager manager;
+}

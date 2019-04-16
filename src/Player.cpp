@@ -27,6 +27,20 @@ void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
         newEnt->baseColor = Entity::lookup_entity_by_id(pID-1)->baseColor;
         newEnt->position = this->position;
 	}
+
+    if (grounded && (key == GLFW_KEY_L) && (action == GLFW_PRESS)) {
+		printf("Loading new resource...\n\n\n");
+        
+        Resources::manager.loadTextureResource("sample", ".jpg");
+        Resources::manager.loadTriMeshResource("cube", ".modl");
+	}
+
+    if (grounded && (key == GLFW_KEY_K) && (action == GLFW_PRESS)) {
+		printf("Accessing new resources...\n\n\n");
+        
+        Resources::manager.getTextureResource("sample");
+        Resources::manager.getTriMeshResource("cube");
+	}
 }
 
 void PlayerEnt::update(double dt) {
