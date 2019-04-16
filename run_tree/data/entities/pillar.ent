@@ -1,11 +1,6 @@
 #Pillar Entity
 :static
-:quaternionRot
-:degree
-:defaultScale
-
-p 0 .5 -4
-r 0 0 0 1
 
 M ../data/models/pillar.modl
+T ../data/textures/sample.jpg
 C 150 150 150

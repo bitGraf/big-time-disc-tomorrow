@@ -61,8 +61,7 @@ void main()
    albedo = vec3(1, 1, 1);
    break;
  }*/
-	albedo = color;
-	albedo = vec3(texture(baseColor, pass_tex));
+	albedo = color * vec3(texture(baseColor, pass_tex));
 	//vec3 albedo = vec3(0, .5, .2);
 	vec3 normal = pass_normal;
     

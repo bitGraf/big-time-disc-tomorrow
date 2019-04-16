@@ -10,11 +10,28 @@ void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
         grounded = false;
     }
 
+    if (grounded && (key == GLFW_KEY_Q) && (action == GLFW_PRESS)) {
+        //printf("%f, %f, %f, %f", this->modelMatrix);
+        modelMatrix.print();
+    }
+
 	if (grounded && (key == GLFW_KEY_P) && (action == GLFW_PRESS)) {
 		printf("Laying an egg... Yoshey..\n");
 		int id;
-		Entity::loadEntityFromFile("../data/entities/cube2.ent", &id);
-		Entity::lookup_entity_by_id(id)->position = this->position;
+		Entity::loadEntityFromFile("ball", &id);
+        EntityBase* newEnt = Entity::lookup_entity_by_id(id);
+        newEnt->position = this->position;
+        newEnt->scale = {.1f, .3f, .1f};
+        printf("%d, %d\n", newEnt->mesh.VAO, newEnt->mesh.numVerts);
+	}
+
+    if (grounded && (key == GLFW_KEY_E) && (action == GLFW_PRESS)) {
+		printf("Acquire Fentanyl I must...\n");
+        int pID = 0;
+		EntityBase* newEnt = Entity::createNewEntity(&pID);
+        newEnt->mesh = Entity::lookup_entity_by_id(pID-1)->mesh;
+        newEnt->baseColor = Entity::lookup_entity_by_id(pID-1)->baseColor;
+        newEnt->position = this->position;
 	}
 }
 

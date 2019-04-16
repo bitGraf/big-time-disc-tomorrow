@@ -8,7 +8,7 @@ void Entity::init_entities(WindowInfo windowInfo) {
 	//
 
     // Entities
-	Entity::loadEntityFromFile( "../data/entities/cube.ent");
+	Entity::loadEntityFromFile( "yosh");
 	Entity::printAllEntities();
 
     //Camera
@@ -17,6 +17,11 @@ void Entity::init_entities(WindowInfo windowInfo) {
 	manager.camera.updateVectors();
 	manager.camera.updateViewMatrix();
 	manager.camera.updateProjectionMatrix(windowInfo);
+}
+
+EntityBase* Entity::createNewEntity(int* id) {
+    *id = registerEntity();
+    return Entity::lookup_entity_by_id(*id);
 }
 
 void Entity::handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -97,52 +102,58 @@ int Entity::registerEntity(LoadOptions* opts) {
         printf("%d elements\n", manager.maxSize);
     }
 
-    //insert new element of correct subtype
-    switch(opts->subType) {
-        case ENT_Base: {
-            manager.pointerList[manager.numEntries] = new EntityBase;
-            printf("Adding new EntityBase\n");
-            //strcpy(manager.pointerList[manager.numEntries]->Name, "DEFAULT");
-        } break;
-        case ENT_Player: {
-            manager.pointerList[manager.numEntries] = new PlayerEnt;
-            printf("Adding new EntityPlayer\n");
-            //strcpy(manager.pointerList[manager.numEntries]->Name, "Player");
-        } break;
-        case ENT_Static: {
-            manager.pointerList[manager.numEntries] = new StaticEnt;
-            printf("Adding new EntityStatic\n");
-            //strcpy(manager.pointerList[manager.numEntries]->Name, "Static");
-        } break;
-        default: {
-            manager.pointerList[manager.numEntries] = new EntityBase;
-            printf("Adding new EntityBase\n");
-            //strcpy(manager.pointerList[manager.numEntries]->Name, "DEFAULT");
-        } break;
+    EntityBase* ent = NULL;
+
+    if (opts != NULL) {
+        //insert new element of correct subtype
+        switch(opts->subType) {
+            case ENT_Base: {
+                manager.pointerList[manager.numEntries] = new EntityBase;
+                printf("Adding new EntityBase\n");
+            } break;
+            case ENT_Player: {
+                manager.pointerList[manager.numEntries] = new PlayerEnt;
+                printf("Adding new EntityPlayer\n");
+            } break;
+            case ENT_Static: {
+                manager.pointerList[manager.numEntries] = new StaticEnt;
+                printf("Adding new EntityStatic\n");
+            } break;
+            default: {
+                manager.pointerList[manager.numEntries] = new EntityBase;
+                printf("Adding new EntityBase\n");
+            } break;
+        }
+
+        //insert into list at numEntries
+        ent = manager.pointerList[manager.numEntries];
+        ent->ID = manager.numEntries;
+
+        //copy data from file
+        ent->position = opts->position;
+        ent->orientation = opts->orientation;
+        ent->scale = opts->scale;
+        ent->modelFilePath = opts->modelFilePath;
+        ent->subType = opts->subType;
+        ent->Color = opts->color;
+
+        //load mesh
+        ModelLoader::loadFile(&ent->mesh, ent->modelFilePath);
+
+        //load texture
+        ent->baseColor.loadImage("sample.jpg");
+
+        manager.VAOs.push_back(ent->mesh.VAO);
+        manager.VBOs.push_back(ent->mesh.VBOpos);
+        manager.VBOs.push_back(ent->mesh.VBOnorm);
+        manager.EBOs.push_back(ent->mesh.EBO);
+    } else {
+        manager.pointerList[manager.numEntries] = new EntityBase;
+        ent = manager.pointerList[manager.numEntries];
+        ent->ID = manager.numEntries;
+        ent->subType = ENT_Base;
+        printf("Adding new EntityBase\n");
     }
-
-    //insert into list at numEntries
-    EntityBase* ent = manager.pointerList[manager.numEntries];
-    ent->ID = manager.numEntries;
-
-    //copy data from file
-    ent->position = opts->position;
-    ent->orientation = opts->orientation;
-    ent->scale = opts->scale;
-    ent->modelFilePath = opts->modelFilePath;
-    ent->subType = opts->subType;
-    ent->Color = opts->color;
-
-    //load mesh
-    ModelLoader::loadFile(&ent->mesh, ent->modelFilePath);
-
-    //load texture
-    ent->baseColor.loadImage("sample.jpg");
-
-    manager.VAOs.push_back(ent->mesh.VAO);
-    manager.VBOs.push_back(ent->mesh.VBOpos);
-    manager.VBOs.push_back(ent->mesh.VBOnorm);
-    manager.EBOs.push_back(ent->mesh.EBO);
 
     //increment entry count
     printf("Inserting entry into position %d of %d\n\n", 
@@ -154,82 +165,93 @@ int Entity::registerEntity(LoadOptions* opts) {
     return ent->ID;
 }
 
-void Entity::loadEntityFromFile(char* filename, int* idLookup) {
-    FILE* entFile = fopen(filename, "rb");
-    if (entFile == NULL) {
-        printf("Failed to open file [%s]\n", filename);
-        return;
-    }
-    printf("Reading file: \"%s\"\n", filename);
-    
-    fseek(entFile, 0, SEEK_END);
-	long fileLength = ftell(entFile);
-	fseek(entFile, 0, SEEK_SET);
+void Entity::loadEntityFromFile(std::string entFilename, int* idLookup) {
+    //Check if entity is already loaded
+    bool readFromFile = true;
 
-	char *fileContents = (char *)malloc(fileLength + 1);
-	fread(fileContents, fileLength, 1, entFile);
-	fclose(entFile);
-	fileContents[fileLength] = 0;
+    std::string entResourcePath = "../data/entities/";
+    std::string entResourceEnd = ".ent";
+    std::string fullPath = entResourcePath + entFilename + entResourceEnd;
 
-    //EntityBase ent;
     LoadOptions opts;
-    char* path = NULL;
-    //opts.print();
-
-    char* lineContents = strtok(fileContents, "\r\n");
-    while (lineContents != NULL) {
-        // lineContents is the current line being read
-        if (lineContents[0] != '#') {
-            // This line isn't a comment
-            //printf("[%d]\t%s\n", i++, lineContents);
-
-            switch (lineContents[0]) {
-                case ':': {
-                    //parse command
-                    parseCommand(lineContents, &opts);
-                } break;
-                case 'p': {
-                    opts.position = parseVec3(lineContents);
-                } break;
-                case 'r': {
-                    quat rot = parseQuat(lineContents);
-                    if (!opts.quatLoad) {
-                        vec3 axis = {rot.x, rot.y, rot.z};
-                        float angle = rot.w;
-                        if (opts.degreeLoad)
-                            Quaternion::buildFromAxisAngleD(rot, axis, angle);
-                        else
-                            Quaternion::buildFromAxisAngle(rot, axis, angle);
-                    }
-                    opts.orientation = rot;
-                } break;
-                case 's': {
-                    opts.scale = parseVec3(lineContents);
-                } break;
-                case 'M': {
-                    //int pathLength = strlen(lineContents+2);
-                    //ent.modelFilePath = (char*)malloc((pathLength+1)*sizeof(char));
-                    //ent.modelFilePath[pathLength] = 0;
-                    //strcpy(ent.modelFilePath, lineContents+2);
-                    int pathLength = strlen(lineContents+2);
-
-                    path = (char*)malloc((pathLength+1)*sizeof(char));
-                    path[pathLength] = 0;
-                    strcpy(path, lineContents+2);
-                    opts.modelFilePath = path;
-                } break;
-                case 'C': {
-                    opts.color = parseVec3(lineContents) * (1/255.0f);
-                } break;
-                default: {
-                } break;
-            }
+    if (readFromFile) {
+        printf("Reading from file.\n");
+        // Else load entity from file
+        FILE* entFile = fopen(fullPath.c_str(), "rb");
+        if (entFile == NULL) {
+            printf("Failed to open file [%s]\n", fullPath.c_str());
+            return;
         }
+        printf("Reading file: \"%s\"\n", fullPath.c_str());
+        
+        fseek(entFile, 0, SEEK_END);
+        long fileLength = ftell(entFile);
+        fseek(entFile, 0, SEEK_SET);
 
-        //prepare the next line to be read
-        lineContents = strtok(NULL, "\r\n");
+        char *fileContents = (char *)malloc(fileLength + 1);
+        fread(fileContents, fileLength, 1, entFile);
+        fclose(entFile);
+        fileContents[fileLength] = 0;
+
+        //EntityBase ent;
+        char* path = NULL;
+        //opts.print();
+
+        char* lineContents = strtok(fileContents, "\r\n");
+        while (lineContents != NULL) {
+            // lineContents is the current line being read
+            if (lineContents[0] != '#') {
+                // This line isn't a comment
+                //printf("[%d]\t%s\n", i++, lineContents);
+
+                switch (lineContents[0]) {
+                    case ':': {
+                        //parse command
+                        parseCommand(lineContents, &opts);
+                    } break;
+                    case 'p': {
+                        opts.position = parseVec3(lineContents);
+                    } break;
+                    case 'r': {
+                        quat rot = parseQuat(lineContents);
+                        if (!opts.quatLoad) {
+                            vec3 axis = {rot.x, rot.y, rot.z};
+                            float angle = rot.w;
+                            if (opts.degreeLoad)
+                                Quaternion::buildFromAxisAngleD(rot, axis, angle);
+                            else
+                                Quaternion::buildFromAxisAngle(rot, axis, angle);
+                        }
+                        opts.orientation = rot;
+                    } break;
+                    case 's': {
+                        opts.scale = parseVec3(lineContents);
+                    } break;
+                    case 'M': {
+                        //int pathLength = strlen(lineContents+2);
+                        //ent.modelFilePath = (char*)malloc((pathLength+1)*sizeof(char));
+                        //ent.modelFilePath[pathLength] = 0;
+                        //strcpy(ent.modelFilePath, lineContents+2);
+                        int pathLength = strlen(lineContents+2);
+
+                        path = (char*)malloc((pathLength+1)*sizeof(char));
+                        path[pathLength] = 0;
+                        strcpy(path, lineContents+2);
+                        opts.modelFilePath = path;
+                    } break;
+                    case 'C': {
+                        opts.color = parseVec3(lineContents) * (1/255.0f);
+                    } break;
+                    default: {
+                    } break;
+                }
+            }
+
+            //prepare the next line to be read
+            lineContents = strtok(NULL, "\r\n");
+        }
+        free(fileContents);
     }
-    free(fileContents);
 
     int id = registerEntity(&opts);
     if (idLookup != NULL) {

@@ -11,7 +11,7 @@ struct EntityBase {
     //Transform components
     vec3 position;
     quat orientation;
-    vec3 scale;
+    vec3 scale = {1, 1, 1};
 
     //model transform matrix
     mat4 modelMatrix;
@@ -28,7 +28,7 @@ struct EntityBase {
     Texture baseColor;
 
     //Other information
-    vec3 Color;
+    vec3 Color = {1, 1, 1};
 
     //Common function prototypes
     virtual void update(double dt) {

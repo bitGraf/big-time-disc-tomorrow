@@ -4,6 +4,8 @@
 #include "Player.h"
 #include "Camera.h"
 
+#include <string>
+
 enum EntityTypes {
     ENT_Base = 0,
     ENT_Player,
@@ -19,7 +21,7 @@ struct LoadOptions {
 
     vec3 position;
     quat orientation;
-    vec3 scale;
+    vec3 scale = {1, 1, 1};
     vec3 color;
 };
 
@@ -70,11 +72,13 @@ struct EntityManager {
 namespace Entity {
     extern EntityManager manager;
 
+    EntityBase* createNewEntity(int* id);
+
     void init_entities(WindowInfo windowInfo);
 
     // Loading new entities
-    void loadEntityFromFile(EntityBase* ent, char* filename);
-    void loadEntityFromFile(char* filename, int* idLookup = NULL);
+    //void loadEntityFromFile(EntityBase* ent, char* filename);
+    void loadEntityFromFile(std::string entFilename, int* idLookup = NULL);
 
     // Helper functions for loading
     vec3 parseVec3(char* line, bool normalise = false);
@@ -82,7 +86,7 @@ namespace Entity {
     void parseCommand(char* line, LoadOptions* ent);
 
     // Adding entities to the manager
-    int registerEntity(LoadOptions* ent);
+    int registerEntity(LoadOptions* ent = NULL);
     void printAllEntities();
     
     // Operating on current entities
