@@ -6,9 +6,6 @@ void initialize_game(GLFWwindow* window) {
     ModelLoader::loadFile(&axis, "../data/models/axis.modl");
     printf("\n\n");
 
-	//Load Level
-	LevelData* lvl = Level::loadLevel("filename");
-
     //Shaders
 	shader.smartLoad("simple.vert", "pbr.frag", "entityShader");
 	shader.use();
@@ -188,39 +185,39 @@ void ProcessInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 	
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+	if ((glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) && updateMove != true) {
 		//velocity = velocity + Entity::manager.camera.Forward;//velocity = {0, 0, -1};
 		velocity = velocity + Entity::manager.camera.Up;
 		updateMove = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+	if ((glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) && updateMove != true) {
 		//velocity = velocity - Entity::manager.camera.Forward;//velocity = {0, 0, 1};
 		velocity = velocity - Entity::manager.camera.Up;
 		updateMove = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+	if ((glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) && updateMove != true) {
 		velocity = velocity - Entity::manager.camera.Right;//velocity = {-1, 0, 0};
 		updateMove = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+	if ((glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) && updateMove != true) {
 		velocity = velocity + Entity::manager.camera.Right;//velocity = {1, 0, 0};
 		updateMove = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS) {
+	if ((glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS) && updateMove != true) {
 		velocity = velocity + Entity::manager.camera.Forward;
 		updateMove = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS) {
+	if ((glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS) && updateMove != true) {
 		velocity = velocity - Entity::manager.camera.Forward;
 		updateMove = true;
 	}
 	if (updateMove) {
-		//Vector::normalize(velocity);
-		//Entity::manager.camera.position = Entity::manager.camera.position + velocity * (Timer.deltaTime*speed);
-		//Entity::manager.camera.position.print("Position: ");
+		Vector::normalize(velocity);
+		Entity::manager.camera.position = Entity::manager.camera.position + velocity * (Timer.deltaTime*speed);
+		Entity::manager.camera.position.print("Position: ");
 
-		//Entity::manager.camera.lookAt({0, 0, -3});
-		//Entity::manager.camera.updateVectors();
+		Entity::manager.camera.lookAt({0, 0, -3});
+		Entity::manager.camera.updateVectors();
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
