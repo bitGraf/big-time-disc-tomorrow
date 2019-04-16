@@ -1,6 +1,7 @@
 #include "Level.h"
 
 LevelData* Level::loadLevel(char* filename) {
+    printf("Loading level: %s\n", filename);
     LevelData *level = (LevelData*)malloc(sizeof(LevelData));
 
     level->numBuildings = 25;

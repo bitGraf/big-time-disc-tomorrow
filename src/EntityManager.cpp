@@ -10,6 +10,7 @@ void Entity::init_entities(WindowInfo windowInfo) {
     // Entities
 	Entity::loadEntityFromFile( "yosh");
 	Entity::printAllEntities();
+    Level::loadLevel(" ");
 
     //Camera
 	manager.camera.position = {0, 5, 5};
