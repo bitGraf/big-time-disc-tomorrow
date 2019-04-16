@@ -18,6 +18,8 @@ struct ResourceManager {
     
     TextureResource* getTextureResource(std::string lookup);
     TriMeshResource* getTriMeshResource(std::string lookup);
+
+    void printAllResources();
 };
 
 struct TextureResource {

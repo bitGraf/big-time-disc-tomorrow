@@ -34,9 +34,9 @@ struct EntityManager {
     GLuint entryGrowthAmount = 64;      //amount to **ADD** to maxSize when full
 
     //Render objects
-    std::vector<GLuint> VAOs;
-    std::vector<GLuint> VBOs;
-    std::vector<GLuint> EBOs;
+    //std::vector<GLuint> VAOs;
+    //std::vector<GLuint> VBOs;
+    //std::vector<GLuint> EBOs;
 
     //Camera objects
     Camera camera;

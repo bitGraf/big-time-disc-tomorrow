@@ -19,7 +19,6 @@ public:
 	void bind(GLuint offset);
 	void bindCube(GLuint offset);
 
-private:
 	GLuint textureID;
 	std::string type;
 	int width, height, nrChannels;

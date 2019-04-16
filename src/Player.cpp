@@ -29,6 +29,15 @@ void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
         ent->scale = {.6f, .6f, .6f};
         ent->position = this->position;
 	}
+
+    if (grounded && (key == GLFW_KEY_O) && (action == GLFW_PRESS)) {
+		printf("load pillar...\n");
+        Resources::manager.loadTriMeshResource("pillar", ".modl");
+	}
+
+    if (grounded && (key == GLFW_KEY_I) && (action == GLFW_PRESS)) {
+        Resources::manager.printAllResources();
+	}
 }
 
 void PlayerEnt::update(double dt) {
