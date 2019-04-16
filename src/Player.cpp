@@ -12,34 +12,22 @@ void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
 
 	if (grounded && (key == GLFW_KEY_P) && (action == GLFW_PRESS)) {
 		printf("Laying an egg... Yoshey..\n");
-		//int id;
-		//Entity::loadEntityFromFile("ball", &id);
-        //EntityBase* newEnt = Entity::lookup_entity_by_id(id);
-        //newEnt->position = this->position;
-        //newEnt->scale = {.1f, .3f, .1f};
+        EntityBase* ent = Entity::createNewEntity(ENT_Static);
+        ent->position = this->position;
+        ent->mesh = Resources::manager.getTriMeshResource("sphere");
+        ent->baseColor = Resources::manager.getTextureResource("sample");
+        ent->Color = {1, 5, 5};
+        ent->scale = {.1f, .3f, .1f};
 	}
 
     if (grounded && (key == GLFW_KEY_E) && (action == GLFW_PRESS)) {
 		printf("Acquire Fentanyl I must...\n");
-        //int pID = 0;
-		//EntityBase* newEnt = Entity::createNewEntity(&pID);
-        //newEnt->mesh = Entity::lookup_entity_by_id(pID-1)->mesh;
-        //newEnt->baseColor = Entity::lookup_entity_by_id(pID-1)->baseColor;
-        //newEnt->position = this->position;
-	}
-
-    if (grounded && (key == GLFW_KEY_L) && (action == GLFW_PRESS)) {
-		printf("Loading new resource...\n\n\n");
-        
-        Resources::manager.loadTextureResource("sample", ".jpg");
-        Resources::manager.loadTriMeshResource("cube", ".modl");
-	}
-
-    if (grounded && (key == GLFW_KEY_K) && (action == GLFW_PRESS)) {
-		printf("Accessing new resources...\n\n\n");
-        
-        Resources::manager.getTextureResource("sample");
-        Resources::manager.getTriMeshResource("cube");
+        EntityBase* ent = Entity::createNewEntity(ENT_Static);
+        ent->mesh = Resources::manager.getTriMeshResource("cube");
+        ent->baseColor = Resources::manager.getTextureResource("sample");
+        ent->Color = {.2f, 3, 10};
+        ent->scale = {.6f, .6f, .6f};
+        ent->position = this->position;
 	}
 }
 

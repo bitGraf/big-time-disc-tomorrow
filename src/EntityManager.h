@@ -45,7 +45,7 @@ struct EntityManager {
         if (pointerList) {
             printf("Freeing all entities\n");
             for (int i = 0; i < numEntries; i++) {
-                printf("\t%02d/%02d\n", i+1, numEntries);
+                //printf("\t%02d/%02d\n", i+1, numEntries);
 
                 //delete pointerList[i];
                 pointerList[i]->~EntityBase();
@@ -70,7 +70,7 @@ struct EntityManager {
 namespace Entity {
     extern EntityManager manager;
 
-    EntityBase* createNewEntity(int* id = NULL);
+    EntityBase* createNewEntity(EntityTypes type = ENT_Base, int* id = NULL);
 
     void init_entities(WindowInfo windowInfo);
 
@@ -84,7 +84,7 @@ namespace Entity {
     //void parseCommand(char* line, LoadOptions* ent);
 
     // Adding entities to the manager
-    int registerEntity(LoadOptions* opts = NULL);
+    int registerEntity(EntityTypes type = ENT_Base, LoadOptions* opts = NULL);
     void printAllEntities();
     
     // Operating on current entities

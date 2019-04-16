@@ -8,15 +8,14 @@ void Entity::init_entities(WindowInfo windowInfo) {
 	//
 
     // Entities
-	//Entity::loadEntityFromFile( "yosh");
-	Entity::printAllEntities();
     //Level::loadLevel(" ");
-
     Resources::manager.loadTriMeshResource("cube", ".modl");
     Resources::manager.loadTextureResource("sample", ".jpg");
-    EntityBase* ent = Entity::createNewEntity();
+    EntityBase* ent = Entity::createNewEntity(ENT_Player);
     ent->mesh = Resources::manager.getTriMeshResource("cube");
     ent->baseColor = Resources::manager.getTextureResource("sample");
+
+    Entity::printAllEntities();
 
     //Camera
 	manager.camera.position = {0, 5, 5};
@@ -26,8 +25,8 @@ void Entity::init_entities(WindowInfo windowInfo) {
 	manager.camera.updateProjectionMatrix(windowInfo);
 }
 
-EntityBase* Entity::createNewEntity(int* id) {
-    int IDval = registerEntity();
+EntityBase* Entity::createNewEntity(EntityTypes type, int* id) {
+    int IDval = registerEntity(type);
     if (id != NULL)
         *id = IDval;
     return Entity::lookup_entity_by_id(IDval);
@@ -104,7 +103,7 @@ void Entity::printAllEntities() {
     printf("--------------------------------------------------\n\n");
 }
 
-int Entity::registerEntity(LoadOptions* opts) {
+int Entity::registerEntity(EntityTypes type, LoadOptions* opts) {
     //Ensure array is big enough
     if (manager.numEntries < manager.maxSize) {
         //there is still room in the array
@@ -164,16 +163,32 @@ int Entity::registerEntity(LoadOptions* opts) {
         //manager.VBOs.push_back(ent->mesh.VBOnorm);
         //manager.EBOs.push_back(ent->mesh.EBO);
     } else {
-        manager.pointerList[manager.numEntries] = new EntityBase;
+        switch(type) {
+            case ENT_Base: {
+                manager.pointerList[manager.numEntries] = new EntityBase;
+                //printf("Adding new EntityBase\n");
+            } break;
+            case ENT_Player: {
+                manager.pointerList[manager.numEntries] = new PlayerEnt;
+                //printf("Adding new EntityPlayer\n");
+            } break;
+            case ENT_Static: {
+                manager.pointerList[manager.numEntries] = new StaticEnt;
+                //printf("Adding new EntityStatic\n");
+            } break;
+            default: {
+                manager.pointerList[manager.numEntries] = new EntityBase;
+                //printf("Adding new EntityBase\n");
+            } break;
+        }
         ent = manager.pointerList[manager.numEntries];
         ent->ID = manager.numEntries;
-        ent->subType = ENT_Base;
-        printf("Adding new EntityBase\n");
+        ent->subType = type;
     }
 
     //increment entry count
-    printf("Inserting entry into position %d of %d\n\n", 
-            manager.numEntries, manager.maxSize);
+    //printf("Inserting entry into position %d of %d\n\n", 
+    //        manager.numEntries, manager.maxSize);
     manager.numEntries++;
 
     Matrix::buildFromTRS(&ent->modelMatrix, ent->position, ent->orientation, ent->scale);
