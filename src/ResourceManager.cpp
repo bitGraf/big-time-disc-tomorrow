@@ -32,6 +32,23 @@ void ResourceManager::loadTriMeshResource(std::string filename, std::string file
     }
 }
 
+void ResourceManager::loadTerrainResource(std::string filename, std::string fileType) {
+    if (TerrainResources.find(filename) == TerrainResources.end()) {
+        printf("Loading new terrain resource [%s].\n", filename.c_str());
+
+        std::string resourcePath = "../data/textures/";
+        std::string fullPath = resourcePath + filename + fileType;
+
+        TerrainResource* newResource = new TerrainResource;
+        
+        //load image, parse data, and create terrain from heightmap.
+
+        TerrainResources[filename] = newResource;
+    } else {
+        //printf("Model resource [%s] already exists.\n", filename.c_str());
+    }
+}
+
 TextureResource* ResourceManager::getTextureResource(std::string lookup) {
     if (TextureResources.find(lookup) == TextureResources.end()) {
         printf("Texture resource [%s] not loaded yet, loading it now...\n", lookup.c_str());
