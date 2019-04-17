@@ -14,13 +14,12 @@ class Texture {
 public:
 	Texture();
 
-	void loadImage(std::string filename, std::string _type = "DEFAULT");
+	void loadImage(std::string filename);
 	void loadImage2(std::string filename);
 	void bind(GLuint offset);
 	void bindCube(GLuint offset);
 
 	GLuint textureID;
-	std::string type;
 	int width, height, nrChannels;
 };
 

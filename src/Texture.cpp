@@ -3,8 +3,7 @@
 Texture::Texture() {
 }
 
-void Texture::loadImage(std::string filename, std::string _type) {
-	type = _type;
+void Texture::loadImage(std::string filename) {
 	//Generate OpenGL Texture
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
