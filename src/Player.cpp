@@ -38,6 +38,16 @@ void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
     if (grounded && (key == GLFW_KEY_I) && (action == GLFW_PRESS)) {
         Resources::manager.printAllResources();
 	}
+
+    if (grounded && (key == GLFW_KEY_U) && (action == GLFW_PRESS)) {
+        printf("nut...\n");
+        EntityBase* ent = Entity::createNewEntity(ENT_Temporary);
+        ent->position = this->position;
+        ent->mesh = Resources::manager.getTriMeshResource("sphere");
+        ent->baseColor = Resources::manager.getTextureResource("sample");
+        ent->Color = {1, 5, 5};
+        ent->scale = {.1f, .3f, .1f};
+	}
 }
 
 void PlayerEnt::update(double dt) {

@@ -23,12 +23,32 @@ struct PlayerEnt : EntityBase {
 
 struct StaticEnt : EntityBase {
     void update(double dt) override {
-      EntityBase::update(dt);
+        EntityBase::update(dt);
     };
     void preRender() override {
-      EntityBase::preRender();
+        EntityBase::preRender();
     }
     void handleInput(int key, int scancode, int action, int mods) override {
-      EntityBase::handleInput(key, scancode, action, mods);
+        EntityBase::handleInput(key, scancode, action, mods);
+    }
+};
+
+struct TemporaryEnt : EntityBase {
+    float lifetime = 3.0f;
+    float vel = 2.0f;
+    void update(double dt) override {
+        lifetime -= dt;
+        if (lifetime < 0)
+        Remove = true;
+
+        position.y += vel * dt;
+
+        EntityBase::update(dt);
+    };
+    void preRender() override {
+        EntityBase::preRender();
+    }
+    void handleInput(int key, int scancode, int action, int mods) override {
+        EntityBase::handleInput(key, scancode, action, mods);
     }
 };

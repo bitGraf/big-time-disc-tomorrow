@@ -134,6 +134,10 @@ int Entity::registerEntity(EntityTypes type, LoadOptions* opts) {
                 manager.pointerList[manager.numEntries] = new StaticEnt;
                 printf("Adding new EntityStatic\n");
             } break;
+            case ENT_Temporary: {
+                manager.pointerList[manager.numEntries] = new TemporaryEnt;
+                printf("Adding new TemporaryEnt\n");
+            } break;
             default: {
                 manager.pointerList[manager.numEntries] = new EntityBase;
                 printf("Adding new EntityBase\n");
@@ -174,6 +178,10 @@ int Entity::registerEntity(EntityTypes type, LoadOptions* opts) {
             } break;
             case ENT_Static: {
                 manager.pointerList[manager.numEntries] = new StaticEnt;
+                //printf("Adding new EntityStatic\n");
+            } break;
+            case ENT_Temporary: {
+                manager.pointerList[manager.numEntries] = new TemporaryEnt;
                 //printf("Adding new EntityStatic\n");
             } break;
             default: {

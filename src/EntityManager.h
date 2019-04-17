@@ -10,7 +10,8 @@
 enum EntityTypes {
     ENT_Base = 0,
     ENT_Player,
-    ENT_Static
+    ENT_Static,
+    ENT_Temporary
 };
 
 struct LoadOptions {
