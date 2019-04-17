@@ -216,7 +216,7 @@ void ProcessInput(GLFWwindow *window) {
 		Entity::manager.camera.position = Entity::manager.camera.position + velocity * (Timer.deltaTime*speed);
 		Entity::manager.camera.position.print("Position: ");
 
-		Entity::manager.camera.lookAt({0, 0, -3});
+		//Entity::manager.camera.lookAt({0, 0, -3});
 		Entity::manager.camera.updateVectors();
 	}
 

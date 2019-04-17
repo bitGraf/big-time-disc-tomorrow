@@ -116,11 +116,17 @@
     <Link>
       <AdditionalDependencies>glew32.lib;glew32s.lib;glfw3.lib;glfw3dll.lib;OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <ClCompile>
+      <ShowIncludes>true</ShowIncludes>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Link>
       <AdditionalDependencies>glew32.lib;glew32s.lib;glfw3.lib;glfw3dll.lib;OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <ClCompile>
+      <ShowIncludes>true</ShowIncludes>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\DynamicFont.cpp" />
@@ -133,6 +139,7 @@
     <ClCompile Include="src\ModelLoader.cpp" />
     <ClCompile Include="src\Platform.cpp" />
     <ClCompile Include="src\Player.cpp" />
+    <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />
     <ClCompile Include="src\stb_implementation.c" />
     <ClCompile Include="src\Texture.cpp" />
@@ -152,6 +159,7 @@
     <ClInclude Include="src\Platform.h" />
     <ClInclude Include="src\Player.h" />
     <ClInclude Include="src\Quaternion.h" />
+    <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\ShaderProgram.h" />
     <ClInclude Include="src\stb_image.h" />
     <ClInclude Include="src\stb_truetype.h" />
