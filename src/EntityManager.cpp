@@ -8,12 +8,13 @@ void Entity::init_entities(WindowInfo windowInfo) {
 	//
 
     // Entities
-    //Level::loadLevel(" ");
     Resources::manager.loadTriMeshResource("cube", ".modl");
     Resources::manager.loadTextureResource("sample", ".jpg");
     EntityBase* ent = Entity::createNewEntity(ENT_Player);
     ent->mesh = Resources::manager.getTriMeshResource("cube");
     ent->baseColor = Resources::manager.getTextureResource("sample");
+
+    Level::loadLevel(" ");
 
     Entity::printAllEntities();
 
