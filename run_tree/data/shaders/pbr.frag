@@ -41,8 +41,8 @@ void main()
     Light lights[NUMLIGHTS];
     lights[0].position = vec3(0, 3, -3);
     lights[0].color = vec3(1, .3, .1) * 25;
-    lights[1].position = vec3(5, 5, 2);
-    lights[1].color = vec3(1, 1, 1) * 50;
+    lights[1].position = vec3(50, 30, 50);
+    lights[1].color = vec3(1, 1, 1) * 500;
     
     
 	//Read all texture information

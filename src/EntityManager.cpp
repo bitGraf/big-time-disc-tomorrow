@@ -14,6 +14,8 @@ void Entity::init_entities(WindowInfo windowInfo) {
     ent->mesh = Resources::manager.getTriMeshResource("cube");
     ent->baseColor = Resources::manager.getTextureResource("sample");
 
+    Level::loadLevel("");
+
     Entity::printAllEntities();
 
     //Camera
@@ -207,6 +209,10 @@ int Entity::registerEntity(EntityTypes type, LoadOptions* opts) {
             } break;
             case ENT_Temporary: {
                 manager.pointerList[manager.numEntries] = new TemporaryEnt;
+                //printf("Adding new EntityStatic\n");
+            } break;
+            case ENT_Terrain: {
+                manager.pointerList[manager.numEntries] = new TerrainEnt;
                 //printf("Adding new EntityStatic\n");
             } break;
             default: {

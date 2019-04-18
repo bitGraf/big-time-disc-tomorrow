@@ -18,7 +18,7 @@ struct ResourceManager {
     void loadTextureResource(std::string filename, std::string fileType);
     void loadTriMeshResource(std::string filename, std::string fileType);
     TriMeshResource* loadTriMeshResource(std::string filename, int numVerts, int numFaces);
-    void loadTerrainResource(std::string filename, std::string fileType);
+    unsigned char* loadTerrainResource(std::string filename, std::string fileType);
     
     TextureResource* getTextureResource(std::string lookup);
     TriMeshResource* getTriMeshResource(std::string lookup);

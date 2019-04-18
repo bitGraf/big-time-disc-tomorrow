@@ -36,10 +36,10 @@ void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
 
         if (Entity::manager.pointRender) {
             glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-            //glDisable(GL_CULL_FACE);
+            glDisable(GL_CULL_FACE);
         } else {
             glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-            //glEnable(GL_CULL_FACE);
+            glEnable(GL_CULL_FACE);
         }
 	}
 
@@ -60,14 +60,12 @@ void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
 
     if (!levelLoaded && (key == GLFW_KEY_M) && (action == GLFW_PRESS)) {
         printf("load level...\n");
-        //Level::loadLevel(" ");
 
         //Resources::manager.loadTerrainResource("smallMap", ".png");
         Resources::manager.loadTerrainResource("mountains512", ".png");
         EntityBase* terr = Entity::createNewEntity(ENT_Static);
         terr->mesh = Resources::manager.getTriMeshResource("mountains512");
         terr->baseColor = Resources::manager.getTextureResource("wall");
-        //terr->Remove = true;
         levelLoaded = true;
 	}
 }

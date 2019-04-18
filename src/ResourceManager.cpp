@@ -58,7 +58,7 @@ TriMeshResource* ResourceManager::loadTriMeshResource(std::string filename, int 
     return TriMeshResources[filename];
 }
 
-void ResourceManager::loadTerrainResource(std::string filename, std::string fileType) {
+unsigned char* ResourceManager::loadTerrainResource(std::string filename, std::string fileType) {
     if (TriMeshResources.find(filename) == TriMeshResources.end()) {
         printf("Loading new terrain resource [%s].\n", filename.c_str());
 
@@ -99,9 +99,9 @@ void ResourceManager::loadTerrainResource(std::string filename, std::string file
                 float ly = ((float)i / (N)) * imgHeight;
                 float yHeight = getHeight(data, lx, ly, imgComps, imgWidth);
 
-                vec3 position = {x, yHeight*height - 20, z};
+                vec3 position = {x, yHeight*height, z};
                 vec3 normal   = {0, 1, 0};
-                vec2 tex      = {0, 0};
+                vec2 tex      = {x / length, z / width};
 
                 mesh->vertices[currentVert]  = position;
                 mesh->normals[currentVert]   = normal;
@@ -120,8 +120,6 @@ void ResourceManager::loadTerrainResource(std::string filename, std::string file
         }
 
         printf("Done loading verts\n");
-
-        stbi_image_free(data);
 
         int currentIndex = 0;
         int offset = 0;
@@ -163,6 +161,9 @@ void ResourceManager::loadTerrainResource(std::string filename, std::string file
         //r->data = *mesh;
 
         TriMeshResources[filename] = ret;
+
+        //stbi_image_free(data);
+        return data;
     } else {
         //printf("Model resource [%s] already exists.\n", filename.c_str());
     }

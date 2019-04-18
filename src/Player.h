@@ -10,7 +10,7 @@ struct PlayerEnt : EntityBase {
     float angle = 0;
     float speed = 3;
     bool grounded = false;
-    bool levelLoaded = false;
+    bool levelLoaded = true;
 
     vec3 vel = {0, 10, 0};
     vec3 acc;
@@ -49,6 +49,18 @@ struct TemporaryEnt : EntityBase {
 
         position.y += vel * dt;
 
+        EntityBase::update(dt);
+    };
+    void preRender() override {
+        EntityBase::preRender();
+    }
+    void handleInput(int key, int scancode, int action, int mods) override {
+        EntityBase::handleInput(key, scancode, action, mods);
+    }
+};
+
+struct TerrainEnt : EntityBase {
+    void update(double dt) override {
         EntityBase::update(dt);
     };
     void preRender() override {
