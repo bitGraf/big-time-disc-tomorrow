@@ -25,7 +25,7 @@ struct Camera {
     //Projection matrix settings
     float currentFov = 70;
     float clipNear = .01;
-    float clipFar  = 100;
+    float clipFar  = 1000;
 
     void lookAt(vec3 location) {
         vec3 F = Vector::normalized(location - position);

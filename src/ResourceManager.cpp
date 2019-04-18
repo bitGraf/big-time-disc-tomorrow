@@ -70,19 +70,21 @@ void ResourceManager::loadTerrainResource(std::string filename, std::string file
         float length = 100;
         float width  = 100;
         float height = 10;
-        int N = 20;
-        int M = 10;
+        int N = 513;
+        int M = 513;
 
         //load image, parse data, and create terrain from heightmap.
         int imgWidth, imgHeight, imgComps;
         unsigned char *data = stbi_load(fullPath.c_str(), 
 		    &imgWidth, &imgHeight, &imgComps, 0);
 
-        float delx = length / M;
-        float delz = width / N;
+        float delx = length / (M-1);
+        float delz = width / (N-1);
 
-        int numVerts = (N+1)*(M+1);
-        int numFaces = N*M*2;
+        int numVerts = N*M;
+        int numFaces = (N-1)*(M-1)*2;
+
+        printf("NumVerts: %d, NumFaces: %d\n", numVerts, numFaces);
 
         TriMeshResource* ret = loadTriMeshResource(filename, numVerts, numFaces);
         TriangleMesh* mesh = &ret->data;
@@ -93,8 +95,8 @@ void ResourceManager::loadTerrainResource(std::string filename, std::string file
             for (int j = 0; j < M; j++) {
                 float x = j * delx;
                 float z = i * delz;
-                float lx = ((float)j / M) * imgWidth;
-                float ly = ((float)i / N) * imgHeight;
+                float lx = ((float)j / (M)) * imgWidth;
+                float ly = ((float)i / (N)) * imgHeight;
                 float yHeight = getHeight(data, lx, ly, imgComps, imgWidth);
 
                 vec3 position = {x, yHeight*height - 20, z};
@@ -106,13 +108,15 @@ void ResourceManager::loadTerrainResource(std::string filename, std::string file
                 mesh->texcoords[currentVert] = tex;
                 currentVert++;
 
+                //position.print("Adding vert: ");
+
                 int pH = (int)(yHeight * 10);
 
-                printf("%2d ", pH);
+                //printf("%2d ", pH);
 
                 //printf("Height at %d,%d = %f\n", i, j, getHeight(data, j, i, imgComps, imgWidth));
             }
-            printf("\n");
+            //printf("\n");
         }
 
         printf("Done loading verts\n");
@@ -122,14 +126,15 @@ void ResourceManager::loadTerrainResource(std::string filename, std::string file
         int currentIndex = 0;
         int offset = 0;
 
-        for (int xnum = 0; xnum < M; xnum++) {
+        for (int ynum = 0; ynum < N-1; ynum++) {
             int A1 = 0 + offset;
-            int A2 = M+1 + offset;
+            int A2 = M + offset;
             int A3 = 1 + offset;
             int B1 = 1 + offset;
-            int B2 = M+1 + offset;
-            int B3 = M+2 + offset;
-            for (int ynum = 0; ynum < N; ynum++) {
+            int B2 = M + offset;
+            int B3 = M+1 + offset;
+            for (int xnum = 0; xnum < M-1; xnum++) {
+                //printf("Adding triangles (%d %d %d) and (%d %d %d)\n", A1, A2, A3, B1, B2, B3);
                 mesh->indices[currentIndex++] = A1;
                 mesh->indices[currentIndex++] = A2;
                 mesh->indices[currentIndex++] = A3;
@@ -146,7 +151,7 @@ void ResourceManager::loadTerrainResource(std::string filename, std::string file
                 B3++;
             }
 
-            offset += M+1;
+            offset += M;
         }
 
         printf("Done loading indices\n");

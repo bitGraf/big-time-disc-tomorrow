@@ -31,16 +31,15 @@ void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
 	}
 
     if (grounded && (key == GLFW_KEY_O) && (action == GLFW_PRESS)) {
-		printf("load pillar...\n");
-        Resources::manager.loadTriMeshResource("pillar", ".modl");
+		printf("Toggle wireframe...\n");
         Entity::manager.pointRender = !Entity::manager.pointRender;
 
         if (Entity::manager.pointRender) {
             glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-            glDisable(GL_CULL_FACE);
+            //glDisable(GL_CULL_FACE);
         } else {
             glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-            glEnable(GL_CULL_FACE);
+            //glEnable(GL_CULL_FACE);
         }
 	}
 
@@ -63,9 +62,10 @@ void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
         printf("load level...\n");
         //Level::loadLevel(" ");
 
-        Resources::manager.loadTerrainResource("smallMap", ".png");
+        //Resources::manager.loadTerrainResource("smallMap", ".png");
+        Resources::manager.loadTerrainResource("mountains512", ".png");
         EntityBase* terr = Entity::createNewEntity(ENT_Static);
-        terr->mesh = Resources::manager.getTriMeshResource("smallMap");
+        terr->mesh = Resources::manager.getTriMeshResource("mountains512");
         terr->baseColor = Resources::manager.getTextureResource("wall");
         //terr->Remove = true;
         levelLoaded = true;
