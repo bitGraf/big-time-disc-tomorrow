@@ -1,7 +1,7 @@
 #ifndef _TEXTURE_H_
 #define _TEXTURE_H_
 
-#include "glad\glad.h"
+#include "glad/glad.h"
 #include "stb_image.h"
 //#include "stb_image_write.h"
 
