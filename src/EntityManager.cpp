@@ -73,6 +73,9 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
         }
 
         if (!ent->Remove) {
+            shader->use();
+            shader->setMat4("view", &Entity::manager.camera.viewMatrix);
+            shader->setvec3("camPos", &Entity::manager.camera.position);
             if (manager.logData) {
                 if (ent == NULL)
                     printf("uh oh.\n");
@@ -89,13 +92,10 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
 
             ent->preRender();
 
-            //if (manager.pointRender)
-            //    glDrawArrays(GL_POINTS, ent->mesh->data.numVerts, GL_UNSIGNED_INT);
-            //else
-                glDrawElements(GL_TRIANGLES, ent->mesh->data.numFaces*3, GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, ent->mesh->data.numFaces*3, GL_UNSIGNED_INT, 0);
 
             if (manager.showFrames) {
-                printf("printing frames\n");
+                //printf("printing frames\n");
                 glDisable(GL_DEPTH_TEST);
                 manager.lineShader->use();
                 manager.lineShader->setMat4("model", &ent->modelMatrix);
