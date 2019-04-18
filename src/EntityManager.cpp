@@ -7,6 +7,8 @@ void Entity::init_entities(WindowInfo windowInfo) {
 	// Load assets from file
 	//
 
+    ModelLoader::loadFile(&manager.axis, "../data/models/axis.modl");
+
     // Entities
     Resources::manager.loadTriMeshResource("cube", ".modl");
     Resources::manager.loadTextureResource("sample", ".jpg");
@@ -91,6 +93,18 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
             //    glDrawArrays(GL_POINTS, ent->mesh->data.numVerts, GL_UNSIGNED_INT);
             //else
                 glDrawElements(GL_TRIANGLES, ent->mesh->data.numFaces*3, GL_UNSIGNED_INT, 0);
+
+            if (manager.showFrames) {
+                printf("printing frames\n");
+                glDisable(GL_DEPTH_TEST);
+                manager.lineShader->use();
+                manager.lineShader->setMat4("model", &ent->modelMatrix);
+                manager.lineShader->setMat4("view", &Entity::manager.camera.viewMatrix);
+                glBindVertexArray(manager.axis.VAO);
+                glDrawElements(GL_LINES, manager.axis.numFaces*2, GL_UNSIGNED_INT, 0);
+                glBindVertexArray(0);
+                glEnable(GL_DEPTH_TEST);
+            }
         }
     }
     glBindVertexArray(0);

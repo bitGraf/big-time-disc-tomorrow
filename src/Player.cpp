@@ -68,6 +68,12 @@ void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
         terr->baseColor = Resources::manager.getTextureResource("wall");
         levelLoaded = true;
 	}
+
+    if (grounded && (key == GLFW_KEY_F) && (action == GLFW_PRESS)) {
+        printf("toggle frame rendering...\n");
+
+        Entity::manager.showFrames = !Entity::manager.showFrames;
+	}
 }
 
 void PlayerEnt::update(double dt) {

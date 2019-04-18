@@ -31,11 +31,16 @@ struct LoadOptions {
 struct EntityManager {
     bool logData = false;
     bool pointRender = false;
+    bool showFrames = false;
     //Entity list data
     EntityBase** pointerList = NULL;    //list of pointerList
     GLuint maxSize = 0;                 //amount of memory reserved
     GLuint numEntries = 0;              //amount of currently filled pointers
     GLuint entryGrowthAmount = 64;      //amount to **ADD** to maxSize when full
+
+    TriangleMesh axis;
+
+    ShaderProgram* lineShader;
 
     //Render objects
     //std::vector<GLuint> VAOs;

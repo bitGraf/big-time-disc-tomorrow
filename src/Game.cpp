@@ -13,6 +13,7 @@ void initialize_game(GLFWwindow* window) {
 	lineShader.smartLoad("axisSymbol.vert", "axisSymbol.frag", "lineShader");
 	lineShader.use();
 	lineShader.setMat4("projection", &Entity::manager.camera.projectionMatrix);
+	Entity::manager.lineShader = &lineShader;
 
 	//Fonts
 	Font::InitTextRendering(windowInfo);
@@ -129,10 +130,14 @@ void Render() {
 	shader.setvec3("camPos", &Entity::manager.camera.position);
 	Entity::renderAllEntities(&shader);
 
+	mat4 m;
+	Matrix::identity(&m);
+
 	//Render line entities
 	glDisable(GL_DEPTH_TEST);
 	lineShader.use();
 	lineShader.setMat4("view", &Entity::manager.camera.viewMatrix);
+	lineShader.setMat4("model", &m);
 	glBindVertexArray(axis.VAO);
 	glDrawElements(GL_LINES, axis.numFaces*2, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
