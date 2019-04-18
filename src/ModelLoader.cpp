@@ -10,7 +10,7 @@ void ModelLoader::bufferModel(TriangleMesh* mesh, bool lineRender) {
     //buffer Vertex position data;
     glGenBuffers(1, &VBOpos);
     glBindBuffer(GL_ARRAY_BUFFER, VBOpos);
-    glBufferData(GL_ARRAY_BUFFER, mesh->numVerts * sizeof(vec3), &(mesh->vertices[0].x), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, mesh->numVerts * sizeof(vec3), mesh->vertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
     glEnableVertexAttribArray(0);
     
@@ -24,7 +24,7 @@ void ModelLoader::bufferModel(TriangleMesh* mesh, bool lineRender) {
 	//buffer Vertex texture data
 	glGenBuffers(1, &VBOtex);
 	glBindBuffer(GL_ARRAY_BUFFER, VBOtex);
-	glBufferData(GL_ARRAY_BUFFER, mesh->numVerts * sizeof(vec2), &(mesh->texture[0].x), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, mesh->numVerts * sizeof(vec2), mesh->texcoords, GL_STATIC_DRAW);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(vec2), (void*)0);
 	glEnableVertexAttribArray(2);
 
@@ -150,9 +150,9 @@ void ModelLoader::loadFile(TriangleMesh* triMesh, char* filename) {
                 } break;
 				case 'u': {
 					vec2 result = parseVec2(lineContents);
-					assert(triMesh->texture != NULL);
+					assert(triMesh->texcoords != NULL);
 					assert(currentTexture < triMesh->numVerts);
-					triMesh->texture[currentTexture] = result;
+					triMesh->texcoords[currentTexture] = result;
 					currentTexture++;
 				} break;
                 default: {
@@ -273,9 +273,9 @@ void ModelLoader::parseCommand(char* line, TriangleMesh* mesh) {
         mesh->numVerts = value;
         //printf("\tSetting mesh->numVerts to %d\n", value);
         //allocate memory for vertices
-        mesh->vertices = (vec3*)malloc(mesh->numVerts * sizeof(vec3));
-        mesh->normals  = (vec3*)malloc(mesh->numVerts * sizeof(vec3));
-		mesh->texture = (vec2*)malloc(mesh->numVerts * sizeof(vec2));
+        mesh->vertices  = (vec3*)malloc(mesh->numVerts * sizeof(vec3));
+        mesh->normals   = (vec3*)malloc(mesh->numVerts * sizeof(vec3));
+		mesh->texcoords = (vec2*)malloc(mesh->numVerts * sizeof(vec2));
 
     } else if (!strcmp(varName, "numFaces")) {
         int value = (int)strtol(pstr+2, NULL, 10);

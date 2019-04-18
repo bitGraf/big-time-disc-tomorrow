@@ -32,21 +32,146 @@ void ResourceManager::loadTriMeshResource(std::string filename, std::string file
     }
 }
 
+TriMeshResource* ResourceManager::loadTriMeshResource(std::string filename, int numVerts, int numFaces) {
+    if (TriMeshResources.find(filename) == TriMeshResources.end()) {
+        printf("Creating new model resource [%s].\n", filename.c_str());
+
+        TriMeshResource* newResource = new TriMeshResource;
+
+        //newResource->data.
+        TriangleMesh* mesh = &newResource->data;
+        mesh->numVerts = numVerts;
+        //allocate memory for vertices
+        mesh->vertices = (vec3*)malloc(mesh->numVerts * sizeof(vec3));
+        mesh->normals  = (vec3*)malloc(mesh->numVerts * sizeof(vec3));
+		mesh->texcoords = (vec2*)malloc(mesh->numVerts * sizeof(vec2));
+
+        mesh->numFaces = numFaces;
+        //allocate memory for indices
+        mesh->indices = (GLuint*)malloc(3 * mesh->numFaces * sizeof(int));//3 indices per triangle
+
+        TriMeshResources[filename] = newResource;
+    } else {
+        //printf("Model resource [%s] already exists.\n", filename.c_str());
+    }
+
+    return TriMeshResources[filename];
+}
+
 void ResourceManager::loadTerrainResource(std::string filename, std::string fileType) {
-    if (TerrainResources.find(filename) == TerrainResources.end()) {
+    if (TriMeshResources.find(filename) == TriMeshResources.end()) {
         printf("Loading new terrain resource [%s].\n", filename.c_str());
 
         std::string resourcePath = "../data/textures/";
         std::string fullPath = resourcePath + filename + fileType;
 
-        TerrainResource* newResource = new TerrainResource;
-        
-        //load image, parse data, and create terrain from heightmap.
+        //TriMeshResource* r = new TriMeshResource;
 
-        TerrainResources[filename] = newResource;
+        float length = 100;
+        float width  = 100;
+        float height = 10;
+        int N = 20;
+        int M = 10;
+
+        //load image, parse data, and create terrain from heightmap.
+        int imgWidth, imgHeight, imgComps;
+        unsigned char *data = stbi_load(fullPath.c_str(), 
+		    &imgWidth, &imgHeight, &imgComps, 0);
+
+        float delx = length / M;
+        float delz = width / N;
+
+        int numVerts = (N+1)*(M+1);
+        int numFaces = N*M*2;
+
+        TriMeshResource* ret = loadTriMeshResource(filename, numVerts, numFaces);
+        TriangleMesh* mesh = &ret->data;
+
+        int currentVert = 0;
+
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                float x = j * delx;
+                float z = i * delz;
+                float lx = ((float)j / M) * imgWidth;
+                float ly = ((float)i / N) * imgHeight;
+                float yHeight = getHeight(data, lx, ly, imgComps, imgWidth);
+
+                vec3 position = {x, yHeight*height - 20, z};
+                vec3 normal   = {0, 1, 0};
+                vec2 tex      = {0, 0};
+
+                mesh->vertices[currentVert]  = position;
+                mesh->normals[currentVert]   = normal;
+                mesh->texcoords[currentVert] = tex;
+                currentVert++;
+
+                int pH = (int)(yHeight * 10);
+
+                printf("%2d ", pH);
+
+                //printf("Height at %d,%d = %f\n", i, j, getHeight(data, j, i, imgComps, imgWidth));
+            }
+            printf("\n");
+        }
+
+        printf("Done loading verts\n");
+
+        stbi_image_free(data);
+
+        int currentIndex = 0;
+        int offset = 0;
+
+        for (int xnum = 0; xnum < M; xnum++) {
+            int A1 = 0 + offset;
+            int A2 = M+1 + offset;
+            int A3 = 1 + offset;
+            int B1 = 1 + offset;
+            int B2 = M+1 + offset;
+            int B3 = M+2 + offset;
+            for (int ynum = 0; ynum < N; ynum++) {
+                mesh->indices[currentIndex++] = A1;
+                mesh->indices[currentIndex++] = A2;
+                mesh->indices[currentIndex++] = A3;
+                mesh->indices[currentIndex++] = B1;
+                mesh->indices[currentIndex++] = B2;
+                mesh->indices[currentIndex++] = B3;
+
+                A1++;
+                A2++;
+                A3++;
+
+                B1++;
+                B2++;
+                B3++;
+            }
+
+            offset += M+1;
+        }
+
+        printf("Done loading indices\n");
+
+        ModelLoader::bufferModel(mesh);
+
+        printf("Done buffering model\n");
+
+        //r->data = *mesh;
+
+        TriMeshResources[filename] = ret;
     } else {
         //printf("Model resource [%s] already exists.\n", filename.c_str());
     }
+}
+
+float ResourceManager::getHeight(unsigned char* data, float x, float y, int nComps, int stride) {
+    int lookupX = (int)x;
+    int lookupY = (int)y;
+
+    //fetch just the red component, and convert from [0->255] to [0->1]
+    int lookup = nComps * (lookupX + lookupY*stride);
+    float value = ((float)data[lookup]) / 255.0f;
+
+    return value;
 }
 
 TextureResource* ResourceManager::getTextureResource(std::string lookup) {
@@ -70,6 +195,17 @@ TriMeshResource* ResourceManager::getTriMeshResource(std::string lookup) {
         return TriMeshResources.at(lookup);
     }
 }
+
+/*TerrainResource* ResourceManager::getTerrainResource(std::string lookup) {
+    if (TerrainResources.find(lookup) == TerrainResources.end()) {
+        printf("Terrain resource [%s] not loaded yet, loading it now...\n", lookup.c_str());
+        loadTerrainResource(lookup, ".png");
+        return TerrainResources.at(lookup);
+    } else {
+        //printf("Model resource [%s] succesfully accessed.\n", lookup.c_str());
+        return TerrainResources.at(lookup);
+    }
+}*/
 
 void ResourceManager::printAllResources() {
     for (auto tex : TextureResources) {

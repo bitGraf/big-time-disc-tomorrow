@@ -34,7 +34,15 @@ LevelData* Level::loadLevel(char* filename) {
         ent->scale = level->buildings[i].scale;
     }
 
-    level->groundHeightmap.loadImage("sample.jpg");
+    //level->groundHeightmap.loadImage("sample.jpg");
+    Resources::manager.loadTerrainResource("smallMap", ".png");
+    EntityBase* terr = Entity::createNewEntity(ENT_Static);
+    terr->mesh = Resources::manager.getTriMeshResource("smallMap");
+    terr->Remove = true;
+
+    Resources::manager.printAllResources();
+    //TerrainResource* ptr = Resources::manager.getTerrainResource("smallMap");
+    //terr->mesh->data = Resources::manager.getTerrainResource("smallMap")->mesh;
 
     level->name = "Test Level";
 

@@ -28,6 +28,8 @@ struct LoadOptions {
 };
 
 struct EntityManager {
+    bool logData = false;
+    bool pointRender = false;
     //Entity list data
     EntityBase** pointerList = NULL;    //list of pointerList
     GLuint maxSize = 0;                 //amount of memory reserved

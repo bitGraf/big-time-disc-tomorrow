@@ -7,9 +7,10 @@
 #include "ResourceManager.h"
 
 struct PlayerEnt : EntityBase {
-    int angle = 0;
+    float angle = 0;
     float speed = 3;
     bool grounded = false;
+    bool levelLoaded = false;
 
     vec3 vel = {0, 10, 0};
     vec3 acc;

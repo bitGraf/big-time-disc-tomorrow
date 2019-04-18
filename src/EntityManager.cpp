@@ -14,8 +14,6 @@ void Entity::init_entities(WindowInfo windowInfo) {
     ent->mesh = Resources::manager.getTriMeshResource("cube");
     ent->baseColor = Resources::manager.getTextureResource("sample");
 
-    Level::loadLevel(" ");
-
     Entity::printAllEntities();
 
     //Camera
@@ -34,6 +32,9 @@ EntityBase* Entity::createNewEntity(EntityTypes type, int* id) {
 }
 
 void Entity::handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if (manager.logData) {
+        printf("Handling input.\n");
+    }
     for (int i = 0; i < manager.numEntries; i++) {//don't render ID 0
         EntityBase* ent = (manager.pointerList[i]);
 
@@ -43,6 +44,9 @@ void Entity::handleInputEvent(GLFWwindow* window, int key, int scancode, int act
 }
 
 void Entity::fixedUpdateAllEntities(double dt) {
+    if (manager.logData) {
+        printf("Updating entities.\n");
+    }
     for (int i = 0; i < manager.numEntries; i++) {//don't render ID 0
         EntityBase* ent = (manager.pointerList[i]);
         
@@ -52,10 +56,27 @@ void Entity::fixedUpdateAllEntities(double dt) {
 }
 
 void Entity::renderAllEntities(ShaderProgram* shader) {
+    if (manager.logData) {
+        printf("Rendering all.\n");
+        Entity::printAllEntities();
+    }
     for (int i = 0; i < manager.numEntries; i++) {
         EntityBase* ent = (manager.pointerList[i]);
+        if (manager.logData) {
+            printf("rendering entity %d/%d\n", i, manager.numEntries);
+            if (ent == NULL)
+                printf("uh oh\n");
+        }
 
         if (!ent->Remove) {
+            if (manager.logData) {
+                if (ent == NULL)
+                    printf("uh oh.\n");
+                if (ent->mesh == NULL)
+                    printf("mesh null\n");
+                if (ent->mesh->data.VAO == 0)
+                    printf("VAO = 0\n");
+            }
             shader->setMat4("model", &ent->modelMatrix);
             shader->setvec3("color", &ent->Color);
             shader->setInt("baseColor", 0);
@@ -64,7 +85,10 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
 
             ent->preRender();
 
-            glDrawElements(GL_TRIANGLES, ent->mesh->data.numFaces*3, GL_UNSIGNED_INT, 0);
+            //if (manager.pointRender)
+            //    glDrawArrays(GL_POINTS, ent->mesh->data.numVerts, GL_UNSIGNED_INT);
+            //else
+                glDrawElements(GL_TRIANGLES, ent->mesh->data.numFaces*3, GL_UNSIGNED_INT, 0);
         }
     }
     glBindVertexArray(0);

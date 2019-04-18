@@ -2,5 +2,5 @@
 
 call build.bat
 rem pushd run_tree
-call run_tree/run.exe
+call run_tree/Release/run.exe
 rem popd

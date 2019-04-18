@@ -18,7 +18,7 @@ struct TriangleMesh {
     //Vertex data
     vec3 *vertices = NULL;
     vec3 *normals = NULL;
-	vec2 *texture = NULL;
+	vec2 *texcoords = NULL;
 
     //Face data
     GLuint *indices = NULL;
@@ -42,7 +42,7 @@ struct TriangleMesh {
         free(vertices);
         free(indices);
         free(normals);
-		free(texture);
+		free(texcoords);
     }
 };
 

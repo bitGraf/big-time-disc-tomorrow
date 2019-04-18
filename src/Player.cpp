@@ -33,10 +33,20 @@ void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
     if (grounded && (key == GLFW_KEY_O) && (action == GLFW_PRESS)) {
 		printf("load pillar...\n");
         Resources::manager.loadTriMeshResource("pillar", ".modl");
+        Entity::manager.pointRender = !Entity::manager.pointRender;
+
+        if (Entity::manager.pointRender) {
+            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+            glDisable(GL_CULL_FACE);
+        } else {
+            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+            glEnable(GL_CULL_FACE);
+        }
 	}
 
     if (grounded && (key == GLFW_KEY_I) && (action == GLFW_PRESS)) {
         Resources::manager.printAllResources();
+        Entity::printAllEntities();
 	}
 
     if (grounded && (key == GLFW_KEY_U) && (action == GLFW_PRESS)) {
@@ -48,10 +58,22 @@ void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
         ent->Color = {1, 5, 5};
         ent->scale = {.1f, .3f, .1f};
 	}
+
+    if (!levelLoaded && (key == GLFW_KEY_M) && (action == GLFW_PRESS)) {
+        printf("load level...\n");
+        //Level::loadLevel(" ");
+
+        Resources::manager.loadTerrainResource("smallMap", ".png");
+        EntityBase* terr = Entity::createNewEntity(ENT_Static);
+        terr->mesh = Resources::manager.getTriMeshResource("smallMap");
+        terr->baseColor = Resources::manager.getTextureResource("wall");
+        //terr->Remove = true;
+        levelLoaded = true;
+	}
 }
 
 void PlayerEnt::update(double dt) {
-	angle += 90 * dt;
+	angle += 9 * dt;
 
     if (angle > 360)
         angle = 0;

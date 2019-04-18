@@ -34,6 +34,7 @@ void initialize_game(GLFWwindow* window) {
 	glCullFace(GL_BACK);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+	glPointSize(10);
     //glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 	glClearColor(0.716f, 0.68f, 0.652f, 1.0f);
@@ -185,12 +186,12 @@ void ProcessInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 	
-	if ((glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) && updateMove != true) {
+	if ((glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS) && updateMove != true) {
 		//velocity = velocity + Entity::manager.camera.Forward;//velocity = {0, 0, -1};
 		velocity = velocity + Entity::manager.camera.Up;
 		updateMove = true;
 	}
-	if ((glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) && updateMove != true) {
+	if ((glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS) && updateMove != true) {
 		//velocity = velocity - Entity::manager.camera.Forward;//velocity = {0, 0, 1};
 		velocity = velocity - Entity::manager.camera.Up;
 		updateMove = true;
@@ -203,18 +204,18 @@ void ProcessInput(GLFWwindow *window) {
 		velocity = velocity + Entity::manager.camera.Right;//velocity = {1, 0, 0};
 		updateMove = true;
 	}
-	if ((glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS) && updateMove != true) {
+	if ((glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) && updateMove != true) {
 		velocity = velocity + Entity::manager.camera.Forward;
 		updateMove = true;
 	}
-	if ((glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS) && updateMove != true) {
+	if ((glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) && updateMove != true) {
 		velocity = velocity - Entity::manager.camera.Forward;
 		updateMove = true;
 	}
 	if (updateMove) {
 		Vector::normalize(velocity);
 		Entity::manager.camera.position = Entity::manager.camera.position + velocity * (Timer.deltaTime*speed);
-		Entity::manager.camera.position.print("Position: ");
+		//Entity::manager.camera.position.print("Position: ");
 
 		//Entity::manager.camera.lookAt({0, 0, -3});
 		Entity::manager.camera.updateVectors();
