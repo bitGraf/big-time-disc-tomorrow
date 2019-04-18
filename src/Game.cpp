@@ -191,29 +191,29 @@ void ProcessInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 	
-	if ((glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS) && updateMove != true) {
+	if ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) && updateMove != true) {
 		//velocity = velocity + Entity::manager.camera.Forward;//velocity = {0, 0, -1};
 		velocity = velocity + Entity::manager.camera.Up;
 		updateMove = true;
 	}
-	if ((glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS) && updateMove != true) {
+	if ((glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) && updateMove != true) {
 		//velocity = velocity - Entity::manager.camera.Forward;//velocity = {0, 0, 1};
 		velocity = velocity - Entity::manager.camera.Up;
 		updateMove = true;
 	}
-	if ((glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) && updateMove != true) {
+	if ((glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) && updateMove != true) {
 		velocity = velocity - Entity::manager.camera.Right;//velocity = {-1, 0, 0};
 		updateMove = true;
 	}
-	if ((glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) && updateMove != true) {
+	if ((glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) && updateMove != true) {
 		velocity = velocity + Entity::manager.camera.Right;//velocity = {1, 0, 0};
 		updateMove = true;
 	}
-	if ((glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) && updateMove != true) {
+	if ((glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) && updateMove != true) {
 		velocity = velocity + Entity::manager.camera.Forward;
 		updateMove = true;
 	}
-	if ((glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) && updateMove != true) {
+	if ((glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) && updateMove != true) {
 		velocity = velocity - Entity::manager.camera.Forward;
 		updateMove = true;
 	}
