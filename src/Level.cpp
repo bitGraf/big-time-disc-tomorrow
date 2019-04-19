@@ -1,17 +1,15 @@
 #include "Level.h"
 
-LevelData* Level::loadLevel(char* filename) {
+LevelData* Level::loadLevel(char* filename, char* filetype, char* texturename, char* texturetype) {
     printf("Loading level: %s\n", filename);
     LevelData *level = (LevelData*)malloc(sizeof(LevelData));
 
     // Load terrain from heightmap
-    auto data = Resources::manager.loadTerrainResource("mountains512", ".png");
+    auto data = Resources::manager.loadTerrainResource(filename, filetype);
     EntityBase* terr = Entity::createNewEntity(ENT_Terrain);
-    terr->mesh = Resources::manager.getTriMeshResource("mountains512");
-    Resources::manager.loadTextureResource("mColor", ".png");
-    terr->baseColor = Resources::manager.getTextureResource("mColor");
-    terr->Color = {0.8235294117647059f,0.4117647058823529f,0.1176470588235294f};
-    terr->Color = terr->Color * 2;
+    terr->mesh = Resources::manager.getTriMeshResource(filename);
+    Resources::manager.loadTextureResource(texturename, texturetype);
+    terr->baseColor = Resources::manager.getTextureResource(texturename);
     terr->Color = {1,1,1};
 
     level->numBuildings = 50;
