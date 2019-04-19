@@ -14,7 +14,7 @@ set files=Main.cpp Game.cpp glad.c ShaderProgram.cpp Player.cpp
 set files=%files% VMQMath.cpp ModelLoader.cpp EntityManager.cpp
 set files=%files% Platform.cpp Input.cpp Texture.cpp Level.cpp
 set files=%files% stb_implementation.c DynamicFont.cpp
-set files=%files% ResourceManager.cpp
+set files=%files% ResourceManager.cpp Crawler.cpp
 
 set opts=/MD /nologo /EHsc
 

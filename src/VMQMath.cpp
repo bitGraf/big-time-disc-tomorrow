@@ -194,3 +194,11 @@ void Matrix::fromRoll(mat4* m, float x) {
     m->a32 = 0;
     m->a33 = 1;
 }
+
+vec3 Matrix::transformVector(mat3* m, vec3* v) {
+    vec3 ret;
+
+    ret = *v;
+
+    return ret;
+}

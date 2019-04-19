@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "Camera.h"
 #include "Level.h"
+#include "Crawler.h"
 #include "DynamicFont.h"
 
 #include <string>
@@ -13,7 +14,8 @@ enum EntityTypes {
     ENT_Player,
     ENT_Static,
     ENT_Temporary,
-    ENT_Terrain
+    ENT_Terrain,
+    ENT_Crawler
 };
 
 struct LoadOptions {

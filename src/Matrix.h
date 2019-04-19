@@ -157,4 +157,6 @@ namespace Matrix {
     void fromYaw(mat4*, float x);
     void fromPitch(mat4*, float x);
     void fromRoll(mat4*, float x);
+
+    vec3 transformVector(mat3*, vec3*);
 }

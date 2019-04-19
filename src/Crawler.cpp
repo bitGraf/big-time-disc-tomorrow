@@ -12,6 +12,31 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
 
         Entity::manager.showFrames = !Entity::manager.showFrames;
 	}
+
+    if (!loaded && (key == GLFW_KEY_P) && (action == GLFW_PRESS)) {
+        printf("loading panel...\n");
+
+        Resources::manager.loadTriMeshResource("plane", ".modl");
+        Resources::manager.loadTextureResource("wall", ".jpg");
+        EntityBase* flo = Entity::createNewEntity(ENT_Static);
+        flo->mesh = Resources::manager.getTriMeshResource("plane");
+        flo->baseColor = Resources::manager.getTextureResource("wall");
+        flo->position = {0, 10, 0};
+        flo->orientation = {1, 2, 10, 4};
+        Quaternion::normalize(flo->orientation);
+
+        panel = new Panel;
+        panel->position = flo->position;
+        panel->orientation = flo->orientation;
+
+        loaded = true;
+	}
+
+    if (loaded && (key == GLFW_KEY_E) && (action == GLFW_PRESS)) {
+        printf("toggle attachment panel...\n");
+
+        attached = !attached;
+	}
 }
 
 void CrawlerEnt::update(double dt) {
@@ -34,7 +59,13 @@ void CrawlerEnt::update(double dt) {
 
     vel = {0, 0, 0};
     vel = vel + Forward * forwardBackward;
-    position = position + vel * dt;
+    localPos = localPos + vel * dt;
+
+    mat3 DCM;
+    if (loaded && attached)
+        position = panel->position + Matrix::transformVector(&DCM, &localPos);
+    else
+        position = localPos;
 
     EntityBase::update(dt);
 }

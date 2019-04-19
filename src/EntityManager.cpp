@@ -12,11 +12,11 @@ void Entity::init_entities(WindowInfo windowInfo) {
     // Entities
     Resources::manager.loadTriMeshResource("cube", ".modl");
     Resources::manager.loadTextureResource("sample", ".jpg");
-    EntityBase* ent = Entity::createNewEntity(ENT_Player);
+    EntityBase* ent = Entity::createNewEntity(ENT_Crawler);
     ent->mesh = Resources::manager.getTriMeshResource("cube");
     ent->baseColor = Resources::manager.getTextureResource("sample");
 
-    Level::loadLevel("mountains512", ".png", "mColor", ".png");
+    //Level::loadLevel("mountains512", ".png", "mColor", ".png");
 
     manager.font = Font::newDynamicFont("../data/fonts/Consolas.ttf", 20);
 
@@ -229,6 +229,10 @@ int Entity::registerEntity(EntityTypes type, LoadOptions* opts) {
             } break;
             case ENT_Terrain: {
                 manager.pointerList[manager.numEntries] = new TerrainEnt;
+                //printf("Adding new EntityStatic\n");
+            } break;
+            case ENT_Crawler: {
+                manager.pointerList[manager.numEntries] = new CrawlerEnt;
                 //printf("Adding new EntityStatic\n");
             } break;
             default: {
