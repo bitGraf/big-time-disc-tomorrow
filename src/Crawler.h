@@ -16,6 +16,8 @@ struct CrawlerEnt : EntityBase {
     Panel* panel = NULL;
 
     vec3 localPos = {0, 0, 0};
+    quat localOrientation;
+
     vec3 vel = {0, 10, 0};
     vec3 acc;
     vec3 impulse;

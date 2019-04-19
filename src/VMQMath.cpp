@@ -202,3 +202,36 @@ vec3 Matrix::transformVector(mat3* m, vec3* v) {
 
     return ret;
 }
+
+quat Quaternion::mul(quat q1, quat q2) {
+    quat ret;
+
+    float a1 = q1.w;
+    float b1 = q1.x;
+    float c1 = q1.y;
+    float d1 = q1.z;
+
+    float a2 = q2.w;
+    float b2 = q2.x;
+    float c2 = q2.y;
+    float d2 = q2.z;
+
+    ret.w = a1*a2 - b1*b2 - c1*c2 - d1*d2;
+    ret.x = a1*b2 + b1*a2 + c1*d2 - d1*c2;
+    ret.y = a1*c2 - b1*d2 + c1*a2 + d1*b2;
+    ret.z = a1*d2 + b1*c2 - c1*b2 + d1*a2;
+
+    return ret;
+}
+
+vec3 Quaternion::transformVector(quat q, vec3 v) {
+    vec3 ret;
+
+    quat p = {v.x, v.y, v.z, 0};
+    quat q_conj = {-q.x, -q.y, -q.z, q.w};
+    quat p2 = Quaternion::mul(Quaternion::mul(q, p), q_conj);
+
+    ret = {p2.x, p2.y, p2.z};
+
+    return ret;
+}

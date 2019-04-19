@@ -53,7 +53,7 @@ void CrawlerEnt::update(double dt) {
     if (angle > 360)
         angle = 0;
 
-    Quaternion::buildFromAxisAngleD(orientation, {0, 1, 0}, angle);
+    Quaternion::buildFromAxisAngleD(localOrientation, {0, 1, 0}, angle);
 
 	acc = { 0, 0, 0 };
 
@@ -61,11 +61,13 @@ void CrawlerEnt::update(double dt) {
     vel = vel + Forward * forwardBackward;
     localPos = localPos + vel * dt;
 
-    mat3 DCM;
-    if (loaded && attached)
-        position = panel->position + Matrix::transformVector(&DCM, &localPos);
-    else
+    if (loaded && attached) {
+        position = panel->position + Quaternion::transformVector(panel->orientation, localPos);
+        orientation = Quaternion::mul(panel->orientation, localOrientation);
+    } else {
         position = localPos;
+        orientation = localOrientation;
+    }
 
     EntityBase::update(dt);
 }
