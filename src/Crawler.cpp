@@ -24,16 +24,35 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
 
         Resources::manager.loadTriMeshResource("plane", ".modl");
         Resources::manager.loadTextureResource("wall", ".jpg");
-        EntityBase* flo = Entity::createNewEntity(ENT_Static);
-        flo->mesh = Resources::manager.getTriMeshResource("plane");
-        flo->baseColor = Resources::manager.getTextureResource("wall");
-        flo->position = {0, 10, 0};
-        flo->orientation = {1, 2, 10, 4};
-        Quaternion::normalize(flo->orientation);
+        p1 = Entity::createNewEntity(ENT_Static);
+        p1->mesh = Resources::manager.getTriMeshResource("plane");
+        p1->baseColor = Resources::manager.getTextureResource("wall");
+        p1->position = {0, 5, -5};
+        Quaternion::buildFromAxisAngleD(p1->orientation, {1, 0, 0}, 90);
+        Quaternion::normalize(p1->orientation);
+        StaticEnt* se = (StaticEnt*)p1;
+        se->Rainbow = false;
 
-        panel = new Panel;
-        panel->position = flo->position;
-        panel->orientation = flo->orientation;
+        panel1 = new Panel;
+        panel1->position = p1->position;
+        panel1->orientation = p1->orientation;
+        panel1->update();
+
+
+        p2 = Entity::createNewEntity(ENT_Static);
+        p2->mesh = Resources::manager.getTriMeshResource("plane");
+        p2->baseColor = Resources::manager.getTextureResource("wall");
+        p2->position = {5, 5, 0};
+        Quaternion::buildFromAxisAngleD(p2->orientation, {0, 0, 1}, 90);
+        //Quaternion::normalize(p2->orientation);
+        se = (StaticEnt*)p2;
+        se->Rainbow = false;
+
+        panel2 = new Panel;
+        panel2->position = p2->position;
+        panel2->orientation = p2->orientation;
+        panel2->update();
+
 
         loaded = true;
 	}
@@ -41,15 +60,55 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
     if (loaded && (key == GLFW_KEY_E) && (action == GLFW_PRESS)) {
         printf("toggle attachment panel...\n");
 
-        attached = !attached;
-
-        if (attached) {
-            localPos = {0, 0, 0};
-            localOrientation = {0, 0, 0, 1};
+        float d = 0;
+        if (d1 < d2) {
+            currentPanel = panel1;
+            d = d1;
         } else {
-            localPos = position;
-            localOrientation = orientation;
-            grounded = false;
+            currentPanel = panel2;
+            d = d2;
+        }
+
+        if (attached == 0 && d < attachRadius) {
+            //on ground -> panel
+            vec3 worldPos = position;
+            localPos = worldPos - currentPanel->position;
+            quat invQ = {-currentPanel->orientation.x, -currentPanel->orientation.y, -currentPanel->orientation.z, currentPanel->orientation.w};
+            localPos = Quaternion::transformVector(invQ, localPos);
+            localPos.y = 0;
+            //localOrientation = {0, 0, 0, 1};
+            attached = 1;
+            grounded = true;
+        } else if (attached == 1) {
+
+            bool swap = false;
+            Panel* next;
+            if (currentPanel == panel1 && d2 < attachRadius) {
+                //switch to panel 2
+                swap = true;
+                next = panel2;
+            } else if (currentPanel == panel2 && d1 < attachRadius) {
+                //switch to panel 1
+                swap = true;
+                next = panel1;
+            }
+
+            if (swap) {
+                currentPanel = next;
+                vec3 worldPos = position;
+                localPos = worldPos - currentPanel->position;
+                quat invQ = {-currentPanel->orientation.x, -currentPanel->orientation.y, -currentPanel->orientation.z, currentPanel->orientation.w};
+                localPos = Quaternion::transformVector(invQ, localPos);
+                localPos.y = 0;
+                //localOrientation = {0, 0, 0, 1};
+            attached = 1;
+            grounded = true;
+            } else {
+                localPos = position;
+                //localOrientation = orientation;
+                grounded = false;
+                attached = 0;
+            }
         }
 	}
 }
@@ -91,8 +150,8 @@ void CrawlerEnt::update(double dt) {
     localPos = localPos + vel * dt;
 
     if (loaded && attached) {
-        position = panel->position + Quaternion::transformVector(panel->orientation, localPos);
-        orientation = Quaternion::mul(panel->orientation, localOrientation);
+        position = currentPanel->position + Quaternion::transformVector(currentPanel->orientation, localPos);
+        orientation = Quaternion::mul(currentPanel->orientation, localOrientation);
         //orientation = localOrientation;
     } else {
         position = localPos;
@@ -104,6 +163,21 @@ void CrawlerEnt::update(double dt) {
 		vel.y = 0;
 		acc.y = 0;
         grounded = true;
+    }
+
+    if (loaded) {
+        d1 = panel1->distanceToPoint(position);
+        if (d1 < attachRadius) {
+            p1->Color = {1, 1.5, 1};
+        } else {
+            p1->Color = {1.5, 1, 1};
+        }
+        d2 = panel2->distanceToPoint(position);
+        if (d2 < attachRadius) {
+            p2->Color = {1, 1.5, 1};
+        } else {
+            p2->Color = {1.5, 1, 1};
+        }
     }
 
     EntityBase::update(dt);
@@ -119,6 +193,15 @@ void CrawlerEnt::preRender() {
     Font::drawText(Entity::manager.font, 0, 72, {1, 1, 0, 1}, text);
     sprintf(text, "Local orientation: [%5.2f %5.2f %5.2f %5.2f]", localOrientation.x, localOrientation.y, localOrientation.z, localOrientation.w);
     Font::drawText(Entity::manager.font, 0, 92, {1, 1, 0, 1}, text);
+    if (attached == 0)
+        sprintf(text, "Panel: Not attached");
+    if (attached == 1)
+        sprintf(text, "Panel: 1");
+    if (attached == 2)
+        sprintf(text, "Panel: 2");
+    Font::drawText(Entity::manager.font, 0, 112, {1, 1, 0, 1}, text);
+    sprintf(text, "   [%5.2f %5.2f]", d1, d2);
+    Font::drawText(Entity::manager.font, 0, 132, {1, 1, 0, 1}, text);
 
     //sprintf(text, "Left:      [%5.2f %5.2f %5.2f]", Left.x, Left.y, Left.z);
     //Font::drawText(Entity::manager.font, 0, 112, {1, 1, 0, 1}, text);

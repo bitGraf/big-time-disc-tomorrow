@@ -22,4 +22,11 @@ struct Panel {
         Up      = {C21, C22, C23};
         Forward = {-C31, C32, C33};
     }
+
+    float distanceToPoint(vec3 Py) {
+        vec3 r = Py - position;
+        float d = Vector::dot(r, Up);
+
+        return abs(d);
+    }
 };

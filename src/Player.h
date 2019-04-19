@@ -24,12 +24,16 @@ struct PlayerEnt : EntityBase {
 };
 
 struct StaticEnt : EntityBase {
+    bool Rainbow = true;
     float time = 0;
     void update(double dt) override {
-        time += dt;
-        float f = (float)(2 + sin(time));
-        float c = (float)(2 + cos(time));
-        Color = {f, c, c*f};
+        if (Rainbow) {
+            time += dt;
+            float f = (float)(2 + sin(time));
+            float c = (float)(2 + cos(time));
+            Color = {f, c, c*f};
+        }
+        
         EntityBase::update(dt);
     };
     void preRender() override {

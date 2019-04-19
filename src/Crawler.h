@@ -11,10 +11,17 @@ struct CrawlerEnt : EntityBase {
     float angle = 0;
     float speed = 3;
 
-    bool attached = false;
+    int attached = 0;
     bool loaded = false;
     bool grounded = false;
-    Panel* panel = NULL;
+    Panel* panel1 = NULL;
+    Panel* panel2 = NULL;
+    Panel* currentPanel = NULL;
+    EntityBase* p1 = NULL;
+    EntityBase* p2 = NULL;
+    float d1 = -1;
+    float d2 = -1;
+    float attachRadius = 2;
 
     vec3 localPos = {0, 0, 0};
     quat localOrientation;
