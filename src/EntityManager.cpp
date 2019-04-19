@@ -18,6 +18,8 @@ void Entity::init_entities(WindowInfo windowInfo) {
 
     Level::loadLevel("");
 
+    manager.font = Font::newDynamicFont("../data/fonts/Consolas.ttf", 20);
+
     Entity::printAllEntities();
 
     //Camera
@@ -73,6 +75,8 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
         }
 
         if (!ent->Remove) {
+            ent->preRender();
+            
             shader->use();
             shader->setMat4("view", &Entity::manager.camera.viewMatrix);
             shader->setvec3("camPos", &Entity::manager.camera.position);
@@ -89,8 +93,6 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
             shader->setInt("baseColor", 0);
             glBindVertexArray(ent->mesh->data.VAO);
             ent->baseColor->data.bind(GL_TEXTURE0);
-
-            ent->preRender();
 
             glDrawElements(GL_TRIANGLES, ent->mesh->data.numFaces*3, GL_UNSIGNED_INT, 0);
 

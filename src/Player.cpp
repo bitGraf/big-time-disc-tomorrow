@@ -74,15 +74,17 @@ void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
 
         Entity::manager.showFrames = !Entity::manager.showFrames;
 	}
+
+    if (grounded && (key == GLFW_KEY_R) && (action == GLFW_PRESS)) {
+        printf("toggle rotation...\n");
+
+        rotate = !rotate;
+	}
 }
 
 void PlayerEnt::update(double dt) {
-	angle += 9 * dt;
-
-    if (angle > 360)
-        angle = 0;
-
-    Quaternion::buildFromAxisAngleD(orientation, {0, 1, 0}, angle);
+    //if (rotate)
+	//    angle += 9 * dt;
     
     float vf = Input::manager.move_forward.value;
     float vb = Input::manager.move_backward.value;
@@ -92,8 +94,19 @@ void PlayerEnt::update(double dt) {
     float forwardBackward = vf - vb;
     float rightLeft = vr - vl;
 
+    angle -= 50*dt*rightLeft;
+
+    if (angle > 360)
+        angle = 0;
+
+    Quaternion::buildFromAxisAngleD(orientation, {0, 1, 0}, angle);
+
 	acc = { 0, !grounded ? -9.81f : 0, 0 };
-	vel = { rightLeft, (vel.y + acc.y * float(dt)), -forwardBackward };
+
+    vel = {0, (vel.y + acc.y * float(dt)), 0};
+    vel = vel + Forward * forwardBackward;
+    //vel = vel + Left    * -rightLeft;
+	//vel = { rightLeft, (vel.y + acc.y * float(dt)), -forwardBackward };
     position = position + vel * dt;
     if (position.y < 0) {
         position.y = 0;
@@ -107,5 +120,18 @@ void PlayerEnt::update(double dt) {
 }
 
 void PlayerEnt::preRender() {
+    char text[64];
+    sprintf(text, "player position:    [%5.2f %5.2f %5.2f]", position.x, position.y, position.z);
+    Font::drawText(Entity::manager.font, 0, 32, {1, 1, 0, 1}, text);
+    sprintf(text, "player orientation: [%5.2f %5.2f %5.2f %5.2f]", orientation.x, orientation.y, orientation.z, orientation.w);
+    Font::drawText(Entity::manager.font, 0, 52, {1, 1, 0, 1}, text);
+
+    sprintf(text, "Left:      [%5.2f %5.2f %5.2f]", Left.x, Left.y, Left.z);
+    Font::drawText(Entity::manager.font, 0, 72, {1, 1, 0, 1}, text);
+    sprintf(text, "Up:        [%5.2f %5.2f %5.2f]", Up.x, Up.y, Up.z);
+    Font::drawText(Entity::manager.font, 0, 92, {1, 1, 0, 1}, text);
+    sprintf(text, "Forward:   [%5.2f %5.2f %5.2f]", Forward.x, Forward.y, Forward.z);
+    Font::drawText(Entity::manager.font, 0, 112, {1, 1, 0, 1}, text);
+
     EntityBase::preRender();
 }

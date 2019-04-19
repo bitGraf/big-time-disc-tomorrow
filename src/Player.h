@@ -11,6 +11,7 @@ struct PlayerEnt : EntityBase {
     float speed = 3;
     bool grounded = false;
     bool levelLoaded = true;
+    bool rotate = true;
 
     vec3 vel = {0, 10, 0};
     vec3 acc;

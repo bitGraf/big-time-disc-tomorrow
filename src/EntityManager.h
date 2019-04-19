@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "Camera.h"
 #include "Level.h"
+#include "DynamicFont.h"
 
 #include <string>
 
@@ -41,6 +42,8 @@ struct EntityManager {
     TriangleMesh axis;
 
     ShaderProgram* lineShader;
+
+    DynamicFont* font;
 
     //Render objects
     //std::vector<GLuint> VAOs;
