@@ -7,6 +7,12 @@
 void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
     EntityBase::handleInput(key, scancode, action, mods);
 
+    if (grounded && !attached && (key == GLFW_KEY_SPACE) && (action == GLFW_PRESS)) {
+        printf("Jumping...\n");
+        vel.y += 5;
+        grounded = false;
+    }
+
     if ((key == GLFW_KEY_F) && (action == GLFW_PRESS)) {
         printf("toggle frame rendering...\n");
 
@@ -36,6 +42,15 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
         printf("toggle attachment panel...\n");
 
         attached = !attached;
+
+        if (attached) {
+            localPos = {0, 0, 0};
+            localOrientation = {0, 0, 0, 1};
+        } else {
+            localPos = position;
+            localOrientation = orientation;
+            grounded = false;
+        }
 	}
 }
 
@@ -69,9 +84,9 @@ void CrawlerEnt::update(double dt) {
     vec3 localUp      = { C21,  C22,  C23};
     vec3 localForward = {-C31,  C32,  C33};
 
-	acc = { 0, 0, 0 };
+	acc = { 0, !grounded ? -9.81f : 0, 0 };
 
-    vel = {0, 0, 0};
+    vel = {0, vel.y + acc.y * (float)dt, 0};
     vel = vel + localForward * forwardBackward;
     localPos = localPos + vel * dt;
 
@@ -82,6 +97,13 @@ void CrawlerEnt::update(double dt) {
     } else {
         position = localPos;
         orientation = localOrientation;
+    }
+
+    if (position.y < 0) {
+        position.y = 0;
+		vel.y = 0;
+		acc.y = 0;
+        grounded = true;
     }
 
     EntityBase::update(dt);

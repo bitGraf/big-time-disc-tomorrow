@@ -13,6 +13,7 @@ struct CrawlerEnt : EntityBase {
 
     bool attached = false;
     bool loaded = false;
+    bool grounded = false;
     Panel* panel = NULL;
 
     vec3 localPos = {0, 0, 0};
