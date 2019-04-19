@@ -1,0 +1,22 @@
+#Cube model -> smooth vertices
+:numVerts = 4
+:numFaces = 2
+:calcNormals = true
+:index1
+
+#Verts
+v  5.000000 0  5.000000
+v  5.000000 0 -5.000000
+v -5.000000 0 -5.000000
+v -5.000000 0  5.000000
+
+
+u 0 1
+u 0 0
+u 1 0
+u 1 1
+
+
+#Faces
+f 1 2 4
+f 4 2 3
