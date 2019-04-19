@@ -61,7 +61,7 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
         printf("toggle attachment panel...\n");
 
         float d = 0;
-        if (d1 < d2) {
+        if (d1 <= d2) {
             currentPanel = panel1;
             d = d1;
         } else {
@@ -168,15 +168,15 @@ void CrawlerEnt::update(double dt) {
     if (loaded) {
         d1 = panel1->distanceToPoint(position);
         if (d1 < attachRadius) {
-            p1->Color = {1, 1.5, 1};
+            p1->Color = {1, 2.5, 1};
         } else {
-            p1->Color = {1.5, 1, 1};
+            p1->Color = {2.5, 1, 1};
         }
         d2 = panel2->distanceToPoint(position);
         if (d2 < attachRadius) {
-            p2->Color = {1, 1.5, 1};
+            p2->Color = {1, 2.5, 1};
         } else {
-            p2->Color = {1.5, 1, 1};
+            p2->Color = {2.5, 1, 1};
         }
     }
 
@@ -185,20 +185,15 @@ void CrawlerEnt::update(double dt) {
 
 void CrawlerEnt::preRender() {
     char text[64];
-    sprintf(text, "World position:    [%5.2f %5.2f %5.2f]", position.x, position.y, position.z);
+    sprintf(text, "Velocity: [%5.2f %5.2f %5.2f]", vel.x, vel.y, vel.z);
     Font::drawText(Entity::manager.font, 0, 32, {1, 1, 0, 1}, text);
-    sprintf(text, "Local position:    [%5.2f %5.2f %5.2f]", localPos.x, localPos.y, localPos.z);
+    sprintf(text, "World position:    [%5.2f %5.2f %5.2f]", position.x, position.y, position.z);
     Font::drawText(Entity::manager.font, 0, 52, {1, 1, 0, 1}, text);
-    sprintf(text, "World orientation: [%5.2f %5.2f %5.2f %5.2f]", orientation.x, orientation.y, orientation.z, orientation.w);
+    sprintf(text, "Local position:    [%5.2f %5.2f %5.2f]", localPos.x, localPos.y, localPos.z);
     Font::drawText(Entity::manager.font, 0, 72, {1, 1, 0, 1}, text);
-    sprintf(text, "Local orientation: [%5.2f %5.2f %5.2f %5.2f]", localOrientation.x, localOrientation.y, localOrientation.z, localOrientation.w);
+    sprintf(text, "World orientation: [%5.2f %5.2f %5.2f %5.2f]", orientation.x, orientation.y, orientation.z, orientation.w);
     Font::drawText(Entity::manager.font, 0, 92, {1, 1, 0, 1}, text);
-    if (attached == 0)
-        sprintf(text, "Panel: Not attached");
-    if (attached == 1)
-        sprintf(text, "Panel: 1");
-    if (attached == 2)
-        sprintf(text, "Panel: 2");
+    sprintf(text, "Local orientation: [%5.2f %5.2f %5.2f %5.2f]", localOrientation.x, localOrientation.y, localOrientation.z, localOrientation.w);
     Font::drawText(Entity::manager.font, 0, 112, {1, 1, 0, 1}, text);
     sprintf(text, "   [%5.2f %5.2f]", d1, d2);
     Font::drawText(Entity::manager.font, 0, 132, {1, 1, 0, 1}, text);
