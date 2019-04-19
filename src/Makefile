@@ -14,16 +14,18 @@ ifeq ($(UNAME_S), Darwin)
 endif
 
 FILES = $(wildcard *.cpp) $(wildcard *.c)
-OUTPUT_NAME = dindin
+OUTPUT_NAME = game
 
 all: main
+	mkdir -p ../run_tree/run_here && cp game ../run_tree/run_here
 
 main: $(FILES)
 	$(COMPILER) -I../deps/OpenGL/headers $(FLAGS) $(FILES) -o $(OUTPUT_NAME) $(GL_FLAGS) $(GLAD_FLAGS)
 
 .PHONY: clean run
 clean:
-	rm dindin
+	rm game
 
-run: dindin
-	./dindin
+run: game
+	cd ../run_tree/run_here
+	./game

@@ -16,7 +16,7 @@ void Entity::init_entities(WindowInfo windowInfo) {
     ent->mesh = Resources::manager.getTriMeshResource("cube");
     ent->baseColor = Resources::manager.getTextureResource("sample");
 
-    Level::loadLevel("");
+    Level::loadLevel("mountains512", ".png", "mColor", ".png");
 
     manager.font = Font::newDynamicFont("../data/fonts/Consolas.ttf", 20);
 
