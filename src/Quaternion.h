@@ -48,6 +48,7 @@ namespace Quaternion {
     void buildFromAxisAngle(quat& q, const vec3 axis, const float angle);
 
     quat mul(quat q1, quat q2);
+    quat succ(quat q1, quat q2);
 
     vec3 transformVector(quat, vec3);
 }

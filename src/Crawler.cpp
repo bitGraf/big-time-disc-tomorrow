@@ -63,7 +63,8 @@ void CrawlerEnt::update(double dt) {
 
     if (loaded && attached) {
         position = panel->position + Quaternion::transformVector(panel->orientation, localPos);
-        orientation = Quaternion::mul(panel->orientation, localOrientation);
+        //orientation = Quaternion::mul(panel->orientation, localOrientation);
+        orientation = localOrientation;
     } else {
         position = localPos;
         orientation = localOrientation;

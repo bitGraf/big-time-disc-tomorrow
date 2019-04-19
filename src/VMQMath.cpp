@@ -224,6 +224,12 @@ quat Quaternion::mul(quat q1, quat q2) {
     return ret;
 }
 
+quat Quaternion::succ(quat q1, quat q2) {
+    quat ret;
+
+    return ret;
+}
+
 vec3 Quaternion::transformVector(quat q, vec3 v) {
     vec3 ret;
 
