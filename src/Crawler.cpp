@@ -55,16 +55,30 @@ void CrawlerEnt::update(double dt) {
 
     Quaternion::buildFromAxisAngleD(localOrientation, {0, 1, 0}, angle);
 
+    float C11 = 1 - 2*localOrientation.y*localOrientation.y - 2*localOrientation.z*localOrientation.z;
+    float C12 = 2*(localOrientation.x*localOrientation.y - localOrientation.z*localOrientation.w);
+    float C13 = 2*(localOrientation.z*localOrientation.x + localOrientation.y*localOrientation.w);
+    float C21 = 2*(localOrientation.x*localOrientation.y + localOrientation.z*localOrientation.w);
+    float C22 = 1 - 2*localOrientation.z*localOrientation.z - 2*localOrientation.x*localOrientation.x;
+    float C23 = 2*(localOrientation.y*localOrientation.z - localOrientation.x*localOrientation.w);
+    float C31 = 2*(localOrientation.z*localOrientation.x - localOrientation.y*localOrientation.w);
+    float C32 = 2*(localOrientation.y*localOrientation.z + localOrientation.x*localOrientation.w);
+    float C33 = 1 - 2*localOrientation.x*localOrientation.x - 2*localOrientation.y*localOrientation.y;
+    
+    vec3 localLeft    = {C11, C12, -C13};
+    vec3 localUp      = {C21, C22, C23};
+    vec3 localForward = {-C31, C32, C33};
+
 	acc = { 0, 0, 0 };
 
     vel = {0, 0, 0};
-    vel = vel + Forward * forwardBackward;
+    vel = vel + localForward * forwardBackward;
     localPos = localPos + vel * dt;
 
     if (loaded && attached) {
         position = panel->position + Quaternion::transformVector(panel->orientation, localPos);
-        //orientation = Quaternion::mul(panel->orientation, localOrientation);
-        orientation = localOrientation;
+        orientation = Quaternion::mul(panel->orientation, localOrientation);
+        //orientation = localOrientation;
     } else {
         position = localPos;
         orientation = localOrientation;
