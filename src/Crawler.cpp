@@ -65,9 +65,9 @@ void CrawlerEnt::update(double dt) {
     float C32 = 2*(localOrientation.y*localOrientation.z + localOrientation.x*localOrientation.w);
     float C33 = 1 - 2*localOrientation.x*localOrientation.x - 2*localOrientation.y*localOrientation.y;
     
-    vec3 localLeft    = {C11, C12, -C13};
-    vec3 localUp      = {C21, C22, C23};
-    vec3 localForward = {-C31, C32, C33};
+    vec3 localLeft    = { C11,  C12, -C13};
+    vec3 localUp      = { C21,  C22,  C23};
+    vec3 localForward = {-C31,  C32,  C33};
 
 	acc = { 0, 0, 0 };
 
@@ -89,17 +89,21 @@ void CrawlerEnt::update(double dt) {
 
 void CrawlerEnt::preRender() {
     char text[64];
-    sprintf(text, "player position:    [%5.2f %5.2f %5.2f]", position.x, position.y, position.z);
+    sprintf(text, "World position:    [%5.2f %5.2f %5.2f]", position.x, position.y, position.z);
     Font::drawText(Entity::manager.font, 0, 32, {1, 1, 0, 1}, text);
-    sprintf(text, "player orientation: [%5.2f %5.2f %5.2f %5.2f]", orientation.x, orientation.y, orientation.z, orientation.w);
+    sprintf(text, "Local position:    [%5.2f %5.2f %5.2f]", localPos.x, localPos.y, localPos.z);
     Font::drawText(Entity::manager.font, 0, 52, {1, 1, 0, 1}, text);
-
-    sprintf(text, "Left:      [%5.2f %5.2f %5.2f]", Left.x, Left.y, Left.z);
+    sprintf(text, "World orientation: [%5.2f %5.2f %5.2f %5.2f]", orientation.x, orientation.y, orientation.z, orientation.w);
     Font::drawText(Entity::manager.font, 0, 72, {1, 1, 0, 1}, text);
-    sprintf(text, "Up:        [%5.2f %5.2f %5.2f]", Up.x, Up.y, Up.z);
+    sprintf(text, "Local orientation: [%5.2f %5.2f %5.2f %5.2f]", localOrientation.x, localOrientation.y, localOrientation.z, localOrientation.w);
     Font::drawText(Entity::manager.font, 0, 92, {1, 1, 0, 1}, text);
-    sprintf(text, "Forward:   [%5.2f %5.2f %5.2f]", Forward.x, Forward.y, Forward.z);
-    Font::drawText(Entity::manager.font, 0, 112, {1, 1, 0, 1}, text);
+
+    //sprintf(text, "Left:      [%5.2f %5.2f %5.2f]", Left.x, Left.y, Left.z);
+    //Font::drawText(Entity::manager.font, 0, 112, {1, 1, 0, 1}, text);
+    //sprintf(text, "Up:        [%5.2f %5.2f %5.2f]", Up.x, Up.y, Up.z);
+    //Font::drawText(Entity::manager.font, 0, 132, {1, 1, 0, 1}, text);
+    //sprintf(text, "Forward:   [%5.2f %5.2f %5.2f]", Forward.x, Forward.y, Forward.z);
+    //Font::drawText(Entity::manager.font, 0, 152, {1, 1, 0, 1}, text);
 
     EntityBase::preRender();
 }

@@ -66,7 +66,7 @@ GLFWwindow* createWindow() {
 
 	//set window position
 	const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-	glfwSetWindowPos(window, mode->width * .55, mode->height/2 - windowInfo.height/2);
+	glfwSetWindowPos(window, mode->width * .32, mode->height/2 - windowInfo.height/2);
 
     return window;
 }

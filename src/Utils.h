@@ -12,8 +12,8 @@ struct TimeInfo {
 };
 
 struct WindowInfo {
-    GLuint width = 800;        //Window size (also render target size)
-    GLuint height = 600;
+    GLuint width = 1280;        //Window size (also render target size)
+    GLuint height = 960;
     float lastX = width / 2;    //Cursor position
     float lastY = height / 2;
 };
