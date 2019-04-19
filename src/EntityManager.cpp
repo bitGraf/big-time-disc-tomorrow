@@ -10,11 +10,19 @@ void Entity::init_entities(WindowInfo windowInfo) {
     ModelLoader::loadFile(&manager.axis, "../data/models/axis.modl");
 
     // Entities
-    Resources::manager.loadTriMeshResource("cube", ".modl");
+    //Resources::manager.loadTriMeshResource("cube", ".modl");
+    //Resources::manager.loadTriMeshResource("bigBot", ".ply");   //very large file lmao
+    Resources::manager.loadTriMeshResource("bot", ".ply");
+
+    Resources::manager.loadTextureResource("wall", ".jpg");
     Resources::manager.loadTextureResource("sample", ".jpg");
+    Resources::manager.loadTextureResource("blank", ".png");    //just a white texture
+
+
     EntityBase* ent = Entity::createNewEntity(ENT_Crawler);
-    ent->mesh = Resources::manager.getTriMeshResource("cube");
-    ent->baseColor = Resources::manager.getTextureResource("sample");
+    ent->mesh = Resources::manager.getTriMeshResource("bot");
+    ent->baseColor = Resources::manager.getTextureResource("wall");
+    ent->Color = {5, 5, 7};
 
     //Level::loadLevel("mountains512", ".png", "mColor", ".png");
 

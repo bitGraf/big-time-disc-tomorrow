@@ -226,7 +226,7 @@ void ProcessInput(GLFWwindow *window) {
 		Entity::manager.camera.updateVectors();
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
+/*	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
 		Entity::manager.camera.updateOrientation(-100*Timer.deltaTime, 0);
 		//printf("Pitch: %.2f\tYaw: %.2f\n", Entity::manager.camera.pitch, Entity::manager.camera.yaw);
 	}
@@ -241,7 +241,7 @@ void ProcessInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
 		Entity::manager.camera.updateOrientation(0, -100*Timer.deltaTime);
 		//printf("Pitch: %.2f\tYaw: %.2f\n", Entity::manager.camera.pitch, Entity::manager.camera.yaw);
-	}
+	}*/
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {

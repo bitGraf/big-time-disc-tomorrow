@@ -48,6 +48,7 @@ struct TriangleMesh {
 
 namespace ModelLoader {
     void loadFile(TriangleMesh* triMesh, char* filename);
+    void loadFileStanford(TriangleMesh* triMesh, char* filename);
     void bufferModel(TriangleMesh* mesh, bool lineRender = false);
     
     vec3 parseVec3(char* line, bool normalise = false);

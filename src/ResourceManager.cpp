@@ -25,10 +25,15 @@ void ResourceManager::loadTriMeshResource(std::string filename, std::string file
         std::string fullPath = resourcePath + filename + fileType;
 
         TriMeshResource* newResource = new TriMeshResource;
-        ModelLoader::loadFile(&newResource->data, (char*)fullPath.c_str());
+        if (fileType == ".modl")
+            ModelLoader::loadFile(&newResource->data, (char*)fullPath.c_str());
+        else if (fileType == ".ply") {
+            printf("ply time\n");
+            ModelLoader::loadFileStanford(&newResource->data, (char*)fullPath.c_str());
+        }
         TriMeshResources[filename] = newResource;
     } else {
-        //printf("Model resource [%s] already exists.\n", filename.c_str());
+        printf("Model resource [%s] already exists.\n", filename.c_str());
     }
 }
 

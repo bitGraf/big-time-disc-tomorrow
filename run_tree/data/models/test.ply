@@ -1,0 +1,21 @@
+ply
+format ascii 1.0
+comment Created by Blender 2.80 (sub 41) - www.blender.org, source file: 'bot.blend'
+element vertex 3
+property float x
+property float y
+property float z
+property float nx
+property float ny
+property float nz
+property float s
+property float t
+element face 3
+property list uchar uint vertex_indices
+end_header
+-0.195089 0.980786 1.063767 -0.097995 0.995178 0.000000 0.031250 0.576656
+-0.195089 0.980786 1.479792 -0.097995 0.995178 0.000000 0.031250 0.923344
+0.000000 1.000000 1.479792 -0.097995 0.995178 0.000000 0.000000 0.923344
+3 0 1 2
+3 0 2 3
+3 4 5 6

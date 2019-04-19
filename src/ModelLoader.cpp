@@ -60,6 +60,118 @@ void ModelLoader::bufferModel(TriangleMesh* mesh, bool lineRender) {
     printf("\n");*/
 }
 
+void ModelLoader::loadFileStanford(TriangleMesh* triMesh, char* filename) {
+    FILE* modelFile = fopen(filename, "rb");
+    if (modelFile == NULL) {
+        printf("Failed to open file [%s]\n", filename);
+        return;
+    }
+    printf("Reading file: \"%s\"\n", filename);
+    
+    fseek(modelFile, 0, SEEK_END);
+	long fileLength = ftell(modelFile);
+	fseek(modelFile, 0, SEEK_SET);
+
+	char *fileContents = (char *)malloc(fileLength + 1);
+	fread(fileContents, fileLength, 1, modelFile);
+	fclose(modelFile);
+	fileContents[fileLength] = 0;
+
+    char* lineContents;
+    bool header = true;
+    lineContents = strtok(fileContents, "\r\n");
+
+    lineContents = strtok(NULL, "\r\n");
+    lineContents = strtok(NULL, "\r\n");
+    lineContents = strtok(NULL, "\r\n");
+
+    char* pstr = lineContents + 15;
+    triMesh->numVerts = strtod(pstr, NULL);
+    printf("NumVerts = %d\n", triMesh->numVerts);
+
+    lineContents = strtok(NULL, "\r\n");
+    lineContents = strtok(NULL, "\r\n");
+    lineContents = strtok(NULL, "\r\n");
+    lineContents = strtok(NULL, "\r\n");
+    lineContents = strtok(NULL, "\r\n");
+    lineContents = strtok(NULL, "\r\n");
+    lineContents = strtok(NULL, "\r\n");
+    lineContents = strtok(NULL, "\r\n");
+    lineContents = strtok(NULL, "\r\n");
+    pstr = lineContents + 13;
+    triMesh->numFaces = strtod(pstr, NULL);
+    printf("NumFaces = %d\n", triMesh->numFaces);
+
+    lineContents = strtok(NULL, "\r\n");
+    lineContents = strtok(NULL, "\r\n");
+    
+    triMesh->vertices  = (vec3*)malloc(triMesh->numVerts * sizeof(vec3));
+    triMesh->normals   = (vec3*)malloc(triMesh->numVerts * sizeof(vec3));
+    triMesh->texcoords = (vec2*)malloc(triMesh->numVerts * sizeof(vec2));
+    triMesh->indices = (GLuint*)malloc(3 * triMesh->numFaces * sizeof(int));//3 indices per triangle
+
+    lineContents = strtok(NULL, "\r\n");
+
+    int lineNum = 0;
+    while (lineNum < triMesh->numVerts) {
+        char* pstr = lineContents;
+        float x = strtof(pstr, &pstr);  //split the string into three floats
+        float y = strtof(pstr, &pstr);
+        float z = strtof(pstr, &pstr);
+
+        float nx = strtof(pstr, &pstr);
+        float ny = strtof(pstr, &pstr);
+        float nz = strtof(pstr, &pstr);
+
+        float s = strtof(pstr, &pstr);
+        float t = strtof(pstr, NULL);
+
+        triMesh->vertices[lineNum] = {x, y, z};
+        triMesh->normals[lineNum] = {nx, ny, nz};
+        triMesh->texcoords[lineNum] = {s, t};
+
+        //printf("Reading data: (%f %f %f) (%f %f %f) (%f %f)\n",
+        //        x, y, z, nx, ny, nz, s, t);
+
+        lineNum++;
+
+        lineContents = strtok(NULL, "\r\n");
+    }
+    //printf("Done loading verts.\n");
+
+    //lineContents = strtok(NULL, "\r\n");
+
+    lineNum = 0;
+    int index = 0;
+    while (lineNum < triMesh->numFaces) {
+        char* pstr = lineContents;
+
+        int n = strtod(pstr, &pstr);
+        int i = strtod(pstr, &pstr);
+        int j = strtod(pstr, &pstr);
+        int k = strtod(pstr, NULL);
+
+        triMesh->indices[index++] = i;
+        triMesh->indices[index++] = j;
+        triMesh->indices[index++] = k;
+
+        //printf("Reading data: %d [%d %d %d]\n",
+        //        n, i, j, k);
+
+        lineNum++;
+
+        lineContents = strtok(NULL, "\r\n");
+    }
+    //printf("Done loading indices.\n");
+
+    //free the memory we malloc'd
+    free(fileContents);
+
+    bufferModel(triMesh);
+
+    printf("Done loading .ply\n");
+}
+
 void ModelLoader::loadFile(TriangleMesh* triMesh, char* filename) {
     //printf(" Loading model from \"%s\"\n", filename);
     //
