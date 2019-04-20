@@ -42,13 +42,25 @@ EntityBase* Entity::createNewEntity(EntityTypes type, int* id) {
     int IDval = registerEntity(type);
     if (id != NULL)
         *id = IDval;
-    return Entity::lookup_entity_by_id(IDval);
+
+    EntityBase* newEnt = Entity::lookup_entity_by_id(IDval);
+
+    newEnt->onCreate();
+
+    return newEnt;
 }
 
 void Entity::handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (manager.logData) {
         printf("Handling input.\n");
     }
+
+    if ((key == GLFW_KEY_F) && (action == GLFW_PRESS)) {
+        printf("toggle frame rendering...\n");
+
+        Entity::manager.showFrames = !Entity::manager.showFrames;
+	}
+
     for (int i = 0; i < manager.numEntries; i++) {//don't render ID 0
         EntityBase* ent = (manager.pointerList[i]);
 
@@ -241,6 +253,10 @@ int Entity::registerEntity(EntityTypes type, LoadOptions* opts) {
             } break;
             case ENT_Crawler: {
                 manager.pointerList[manager.numEntries] = new CrawlerEnt;
+                //printf("Adding new EntityStatic\n");
+            } break;
+            case ENT_Panel: {
+                manager.pointerList[manager.numEntries] = new PanelEnt;
                 //printf("Adding new EntityStatic\n");
             } break;
             default: {

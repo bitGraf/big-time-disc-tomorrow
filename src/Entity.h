@@ -47,13 +47,14 @@ struct EntityBase {
         float C32 = 2*(orientation.y*orientation.z + orientation.x*orientation.w);
         float C33 = 1 - 2*orientation.x*orientation.x - 2*orientation.y*orientation.y;
         
-        Left    = {C11, C12, -C13};
-        Up      = {C21, C22, C23};
-        Forward = {-C31, C32, C33};
+        Left    = {C11, C21, C31};
+        Up      = {C12, C22, C32};
+        Forward = {C13, C23, C33};
     }
 
     virtual void preRender() {}
     virtual void handleInput(int key, int scancode, int action, int mods) {}
+    virtual void onCreate() {}
 
     virtual ~EntityBase() {
         printf("\tFreeing Entity [%2d]...\n", ID);

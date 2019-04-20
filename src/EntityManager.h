@@ -15,7 +15,8 @@ enum EntityTypes {
     ENT_Static,
     ENT_Temporary,
     ENT_Terrain,
-    ENT_Crawler
+    ENT_Crawler,
+    ENT_Panel
 };
 
 struct LoadOptions {
