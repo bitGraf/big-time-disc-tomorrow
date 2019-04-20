@@ -8,9 +8,8 @@
 #include "Panel.h"
 
 struct CrawlerEnt : EntityBase {
-    float angle = 0;
     float speed = 1.3f;
-    float attachRadius = 2;
+    float attachRadius = 2.5f;
 
     // States
     bool attached = false;

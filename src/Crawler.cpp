@@ -56,12 +56,11 @@ void CrawlerEnt::update(double dt) {
     float forwardBackward = vf - vb;
     float rightLeft = vr - vl;
 
-    angle -= 50*dt*rightLeft;
+    float delAngle = -50*dt*rightLeft;
+    quat transQ;
 
-    if (angle > 360)
-        angle = 0;
-
-    Quaternion::buildFromAxisAngleD(localOrientation, {0, 1, 0}, angle);
+    Quaternion::buildFromAxisAngleD(transQ, {0, 1, 0}, delAngle);
+    localOrientation = Quaternion::mul(localOrientation, transQ);
 
     float C11 = 1 - 2*localOrientation.y*localOrientation.y - 2*localOrientation.z*localOrientation.z;
     float C12 = 2*(localOrientation.x*localOrientation.y - localOrientation.z*localOrientation.w);
@@ -108,6 +107,11 @@ void CrawlerEnt::update(double dt) {
         }
     }
 
+    PanelEnt* clp = getClosestPanel(currentPanel);
+    if (clp->d < attachRadius) {
+        clp->Color = {1, 4, 1};
+    }
+
     EntityBase::update(dt);
 }
 
@@ -152,6 +156,9 @@ void CrawlerEnt::onCreate() {
 
     allPanels[1]->position = {0, 5, -5};
     Quaternion::buildFromAxisAngleD(allPanels[1]->orientation, {1, 0, 0}, 90);
+    quat q2;
+    Quaternion::buildFromAxisAngleD(q2, {0, 1, 0}, -90);
+    allPanels[1]->orientation = Quaternion::mul(allPanels[1]->orientation, q2);
     allPanels[1]->orientation.print();
 
     allPanels[2]->position = {-1.4645f, 13.536f, 0.0f};
@@ -160,6 +167,16 @@ void CrawlerEnt::onCreate() {
 }
 
 void CrawlerEnt::transitionToPanel(PanelEnt* newPanel) {
+    vec3 tUp = {0, 1, 0};
+    if (currentPanel != NULL) {
+        tUp = currentPanel->Up;
+    }
+
+    float theta = acos(Vector::dot(newPanel->Up, tUp)) * 180 / 3.14159f;
+    vec3 rotAxis = Vector::normalized(Vector::cross(tUp, newPanel->Up));
+    printf("Transition angle: %f\n", theta);
+    rotAxis.print("Rotation Axis: ");
+
     currentPanel = newPanel;
 
     vec3 worldPos = position;
@@ -167,9 +184,19 @@ void CrawlerEnt::transitionToPanel(PanelEnt* newPanel) {
     quat invQ = {-currentPanel->orientation.x, -currentPanel->orientation.y, -currentPanel->orientation.z, currentPanel->orientation.w};
     localPos = Quaternion::transformVector(invQ, localPos);
     localPos.y = 0;
-    //localOrientation = {0, 0, 0, 1};
     attached = true;
     grounded = true;
+
+    // Set the new local orientation
+    quat currentWorld = orientation;
+
+    //This is still wrong...
+    quat panel2panel;
+    Quaternion::buildFromAxisAngleD(panel2panel, rotAxis, theta);
+    quat newWorld = Quaternion::mul(panel2panel, currentWorld);
+    quat newLocal = Quaternion::mul(currentWorld, invQ);
+
+    //localOrientation = newLocal;  //in the end just leave localOrientation the same
 }
 
 PanelEnt* CrawlerEnt::getClosestPanel(PanelEnt* curr) {
@@ -181,19 +208,19 @@ PanelEnt* CrawlerEnt::getClosestPanel(PanelEnt* curr) {
             closest = allPanels[i]->d;
             ret = allPanels[i];
 
-            printf("Closest panel is %f away\n", closest);
+            //printf("Closest panel is %f away\n", closest);
         }
     }
 
     if ((curr != NULL) && (ret == curr)) {
         // the current panel IS the closest
-        printf("  recursing\n");
+        //printf("  recursing\n");
         float temp = closest;
         ret->d = realmax; //push to back of list and resort
         PanelEnt* newRet = getClosestPanel(curr);
         ret->d = temp;
         ret = newRet;
-        printf("  Next closest panel found %f\n", ret->d);
+        //printf("  Next closest panel found %f\n", ret->d);
     }
 
     return ret;
