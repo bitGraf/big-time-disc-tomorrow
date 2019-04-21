@@ -20,7 +20,7 @@ struct EntityBase {
     mat4 modelMatrix;
 
     //Actual mesh data (verts, norms, ...)
-    TriMeshResource* mesh;
+    TriMeshResource* mesh = NULL;
 
     //Entity information
     int ID = -1;//array[ID] to lookup pointer to this in manager
@@ -28,7 +28,7 @@ struct EntityBase {
     bool Remove = false;    //whether to remove next update cycle
 
     //Textures
-    TextureResource* baseColor;
+    TextureResource* baseColor = NULL;
 
     //Other information
     vec3 Color = {1, 1, 1};

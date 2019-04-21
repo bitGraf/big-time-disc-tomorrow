@@ -8,6 +8,8 @@ void Entity::init_entities(WindowInfo windowInfo) {
 	//
 
     ModelLoader::loadFile(&manager.axis, "../data/models/axis.modl");
+    ModelLoader::loadFileStanford(&manager.questionMark, "../data/models/unknownModel.ply");
+    manager.default_baseColor.loadImage("DEFAULT_baseColor.png");
 
     // Entities
     //Resources::manager.loadTriMeshResource("cube", ".modl");
@@ -47,17 +49,13 @@ EntityBase* Entity::createNewEntity(EntityTypes type, int* id) {
 }
 
 void Entity::handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    if (manager.logData) {
-        printf("Handling input.\n");
-    }
-
     if ((key == GLFW_KEY_F) && (action == GLFW_PRESS)) {
         printf("toggle frame rendering...\n");
 
         Entity::manager.showFrames = !Entity::manager.showFrames;
 	}
 
-    for (int i = 0; i < manager.numEntries; i++) {//don't render ID 0
+    for (int i = 0; i < manager.numEntries; i++) {
         EntityBase* ent = (manager.pointerList[i]);
 
         if (!ent->Remove)
@@ -66,10 +64,7 @@ void Entity::handleInputEvent(GLFWwindow* window, int key, int scancode, int act
 }
 
 void Entity::fixedUpdateAllEntities(double dt) {
-    if (manager.logData) {
-        printf("Updating entities.\n");
-    }
-    for (int i = 0; i < manager.numEntries; i++) {//don't render ID 0
+    for (int i = 0; i < manager.numEntries; i++) {
         EntityBase* ent = (manager.pointerList[i]);
         
         if (!ent->Remove)
@@ -78,17 +73,8 @@ void Entity::fixedUpdateAllEntities(double dt) {
 }
 
 void Entity::renderAllEntities(ShaderProgram* shader) {
-    if (manager.logData) {
-        printf("Rendering all.\n");
-        Entity::printAllEntities();
-    }
     for (int i = 0; i < manager.numEntries; i++) {
         EntityBase* ent = (manager.pointerList[i]);
-        if (manager.logData) {
-            printf("rendering entity %d/%d\n", i, manager.numEntries);
-            if (ent == NULL)
-                printf("uh oh\n");
-        }
 
         if (!ent->Remove) {
             ent->preRender();
@@ -96,24 +82,26 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
             shader->use();
             shader->setMat4("view", &Entity::manager.camera.viewMatrix);
             shader->setvec3("camPos", &Entity::manager.camera.position);
-            if (manager.logData) {
-                if (ent == NULL)
-                    printf("uh oh.\n");
-                if (ent->mesh == NULL)
-                    printf("mesh null\n");
-                if (ent->mesh->data.VAO == 0)
-                    printf("VAO = 0\n");
-            }
             shader->setMat4("model", &ent->modelMatrix);
-            shader->setvec3("color", &ent->Color);
             shader->setInt("baseColor", 0);
-            glBindVertexArray(ent->mesh->data.VAO);
-            ent->baseColor->data.bind(GL_TEXTURE0);
+            int verts2render = 0;
+            if (ent->mesh == NULL) {
+                glBindVertexArray(manager.questionMark.VAO);
+                verts2render = manager.questionMark.numFaces*3;
+                ent->Color = {3, 3, 0};
+            } else {
+                glBindVertexArray(ent->mesh->data.VAO);
+                verts2render = ent->mesh->data.numFaces*3;
+                if (ent->baseColor == NULL)
+                    manager.default_baseColor.bind(GL_TEXTURE0);
+                else 
+                    ent->baseColor->data.bind(GL_TEXTURE0);
+            }
+            shader->setvec3("color", &ent->Color);
 
-            glDrawElements(GL_TRIANGLES, ent->mesh->data.numFaces*3, GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, verts2render, GL_UNSIGNED_INT, 0);
 
             if (manager.showFrames) {
-                //printf("printing frames\n");
                 glDisable(GL_DEPTH_TEST);
                 manager.lineShader->use();
                 manager.lineShader->setMat4("model", &ent->modelMatrix);
@@ -137,7 +125,7 @@ void Entity::printAllEntities() {
         if (manager.pointerList[i]) {
             EntityBase* ent = manager.pointerList[i];
 
-            printf("%p\t%d\t%d\t%s\n", ent, ent->ID, ent->mesh->data.VAO,
+            printf("%p\t%d\t%d\t%s\n", ent, ent->ID, ent->mesh == NULL ? -1 : ent->mesh->data.VAO,
                 ent->subType==ENT_Base ? " " : (
                 ent->subType==ENT_Player ? "Player" : (
                 ent->subType==ENT_Crawler ? "Crawler" : (

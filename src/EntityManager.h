@@ -43,6 +43,8 @@ struct EntityManager {
     GLuint entryGrowthAmount = 64;      //amount to **ADD** to maxSize when full
 
     TriangleMesh axis;
+    TriangleMesh questionMark;
+    Texture default_baseColor;
 
     ShaderProgram* lineShader;
 

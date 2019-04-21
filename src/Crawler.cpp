@@ -35,6 +35,7 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
                 //localOrientation = orientation;
                 grounded = false;
                 attached = false;
+                attachCooldown = 0.999f;
             } else {
                 printf("Transitioning to a new panel.\n");
                 transitionToPanel(clp);
@@ -213,7 +214,6 @@ void CrawlerEnt::onCreate() {
     Quaternion::buildFromAxisAngleD(allPanels[2]->orientation, {0, 0, 1}, -135);
     allPanels[2]->length = 30;
     allPanels[2]->scale = {allPanels[2]->length, 1, allPanels[2]->width};
-    allPanels[2]->baseColor = Resources::manager.getTextureResource("blank");
 
     allPanels[3]->position = {-1.4645f + 6.0f + 7.0710678f, 13.536f + 7.0710678f + 8.0f, 14.0f};
     Quaternion::buildFromAxisAngleD(allPanels[3]->orientation, {0, 0, 1}, -160);

@@ -10,18 +10,14 @@ struct Light {
 	vec3 color;
 };
 
-/*struct PBRMaterial {
- sampler2D albedoMap;
- sampler2D amrMap;
- sampler2D normalMap;
-};*/
-
 //uniform Light lights[4];
 //uniform PBRMaterial material;
 uniform vec3 camPos;
 
 uniform vec3 color;
 uniform sampler2D baseColor;
+uniform sampler2D normalMap;
+uniform sampler2D amrMap;
 
 //uniform samplerCube irradianceMap;
 //uniform samplerCube prefilterMap;
