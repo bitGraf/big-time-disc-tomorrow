@@ -63,7 +63,7 @@ TriMeshResource* ResourceManager::loadTriMeshResource(std::string filename, int 
     return TriMeshResources[filename];
 }
 
-unsigned char* ResourceManager::loadTerrainResource(std::string filename, std::string fileType) {
+TerrainData ResourceManager::loadTerrainResource(std::string filename, std::string fileType, TerrainData inDat) {
     if (TriMeshResources.find(filename) == TriMeshResources.end()) {
         printf("Loading new terrain resource [%s].\n", filename.c_str());
 
@@ -72,11 +72,27 @@ unsigned char* ResourceManager::loadTerrainResource(std::string filename, std::s
 
         //TriMeshResource* r = new TriMeshResource;
 
-        float length = 100;
-        float width  = 100;
-        float height = 10;
-        int N = 513;
-        int M = 513;
+        float length, width, height, offX, offZ, offY;
+        int N, M;
+        if (inDat.width) {
+            length = inDat.length;
+            width  = inDat.width;
+            height = inDat.height;
+            N = inDat.N;
+            M = inDat.M;
+            offX = inDat.originX;
+            offY = inDat.originY;
+            offZ = inDat.originZ;
+        } else {
+            length = 100;
+            width  = 100;
+            height = 10;
+            N = 513;
+            M = 513;
+            offX = 0;
+            offY = 0;
+            offZ = 0;
+        }
 
         //load image, parse data, and create terrain from heightmap.
         int imgWidth, imgHeight, imgComps;
@@ -104,7 +120,7 @@ unsigned char* ResourceManager::loadTerrainResource(std::string filename, std::s
                 float ly = ((float)i / (N)) * imgHeight;
                 float yHeight = getHeight(data, lx, ly, imgComps, imgWidth);
 
-                vec3 position = {x, yHeight*height, z};
+                vec3 position = {x + offX, yHeight*height + offY, z + offZ};
                 vec3 normal   = {0, 1, 0};
                 vec2 tex      = {x / length, z / width};
 
@@ -168,7 +184,21 @@ unsigned char* ResourceManager::loadTerrainResource(std::string filename, std::s
         TriMeshResources[filename] = ret;
 
         //stbi_image_free(data);
-        return data;
+        TerrainData retData;
+        retData.data = data;
+        retData.height = height;
+        retData.width = width;
+        retData.length = length;
+        retData.M = M;
+        retData.N = N;
+        retData.imgHeight = imgHeight;
+        retData.imgWidth = imgWidth;
+        retData.imgComps = imgComps;
+        retData.originX = offX;
+        retData.originY = offY;
+        retData.originZ = offZ;
+
+        return retData;
     } else {
         //printf("Model resource [%s] already exists.\n", filename.c_str());
     }
@@ -183,6 +213,15 @@ float ResourceManager::getHeight(unsigned char* data, float x, float y, int nCom
     float value = ((float)data[lookup]) / 255.0f;
 
     return value;
+}
+
+float ResourceManager::getHeight(TerrainData data, float xPos, float zPos) {
+    float xScale = data.imgWidth / data.length;
+    float zScale = data.imgHeight / data.width;
+    float x = (xPos - data.originX) * xScale;
+    float z = (zPos - data.originZ) * zScale;
+    float height = data.height * getHeight(data.data, x, z, data.imgComps, data.imgWidth);
+    return height + data.originY;
 }
 
 TextureResource* ResourceManager::getTextureResource(std::string lookup) {

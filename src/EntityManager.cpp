@@ -24,7 +24,7 @@ void Entity::init_entities(WindowInfo windowInfo) {
     ent->baseColor = Resources::manager.getTextureResource("wall");
     ent->Color = {5, 5, 7};
 
-    //Level::loadLevel("mountains512", ".png", "mColor", ".png");
+    Level::loadLevel("smallMap", ".png", "mColor", ".png");
 
     manager.font = Font::newDynamicFont("../data/fonts/Consolas.ttf", 20);
 

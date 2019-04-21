@@ -62,8 +62,8 @@ void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
         printf("load level...\n");
 
         //Resources::manager.loadTerrainResource("smallMap", ".png");
-        Resources::manager.loadTerrainResource("mountains512", ".png");
-        EntityBase* terr = Entity::createNewEntity(ENT_Static);
+        TerrainEnt* terr = (TerrainEnt*)Entity::createNewEntity(ENT_Terrain);
+        Resources::manager.loadTerrainResource("mountains512", ".png", terr->terrainInfo);
         terr->mesh = Resources::manager.getTriMeshResource("mountains512");
         terr->baseColor = Resources::manager.getTextureResource("wall");
         levelLoaded = true;

@@ -5,8 +5,18 @@ LevelData* Level::loadLevel(char* filename, char* filetype, char* texturename, c
     LevelData *level = (LevelData*)malloc(sizeof(LevelData));
 
     // Load terrain from heightmap
-    auto data = Resources::manager.loadTerrainResource(filename, filetype);
-    EntityBase* terr = Entity::createNewEntity(ENT_Terrain);
+    TerrainEnt* terr = (TerrainEnt*)Entity::createNewEntity(ENT_Terrain);
+
+    terr->terrainInfo.length = 100;
+    terr->terrainInfo.width  = 100;
+    terr->terrainInfo.height = 10;
+    terr->terrainInfo.N = 513;
+    terr->terrainInfo.M = 513;
+    terr->terrainInfo.originX = -50;    //more like offset from the origin
+    terr->terrainInfo.originZ = -50;
+    terr->terrainInfo.originY = -10;
+
+    terr->terrainInfo = Resources::manager.loadTerrainResource(filename, filetype, terr->terrainInfo);
     terr->mesh = Resources::manager.getTriMeshResource(filename);
     Resources::manager.loadTextureResource(texturename, texturetype);
     terr->baseColor = Resources::manager.getTextureResource(texturename);
@@ -15,21 +25,16 @@ LevelData* Level::loadLevel(char* filename, char* filetype, char* texturename, c
     level->numBuildings = 50;
     level->buildings = (Building*)malloc(level->numBuildings*sizeof(Building));
     for (int i = 0; i < level->numBuildings; i++) {
-        float D = 100;
+        float D = 50;
 
         level->buildings[i].scale = {
             randomFloat(.3, .6),
             randomFloat(.7, 2),
             randomFloat(.3, .6)};
 
-        float xPos = randomFloat(0, D);
-        float zPos = randomFloat(0, D);
-
-        int x = (int)(xPos * 5.12f);
-        int z = (int)(zPos * 5.12f);
-        float height = 10 * Resources::manager.getHeight(data, x, z, 1, 512);
-
-        printf("world pos: (%f,%f) | terrain index: (%d,%d) | height: %f\n", xPos, zPos, x, z, height);
+        float xPos = randomFloat(0, 2*D) + terr->terrainInfo.originX;
+        float zPos = randomFloat(0, 2*D) + terr->terrainInfo.originZ;
+        float height = Resources::manager.getHeight(terr->terrainInfo, xPos, zPos);
 
         level->buildings[i].position = {
             xPos,

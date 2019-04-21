@@ -8,10 +8,13 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
     EntityBase::handleInput(key, scancode, action, mods);
 
     // Jump
-    if (grounded && !attached && (key == GLFW_KEY_SPACE) && (action == GLFW_PRESS)) {
+    if (grounded && (key == GLFW_KEY_SPACE) && (action == GLFW_PRESS)) {
         printf("Jumping...\n");
-        vel.y += 5;
-        grounded = false;
+        
+        if (!attached) {
+            vel.y += 5;
+            grounded = false;
+        }
     }
 
     if ((key == GLFW_KEY_E) && (action == GLFW_PRESS)) {

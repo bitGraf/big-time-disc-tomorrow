@@ -10,6 +10,24 @@ struct TextureResource;
 struct TriMeshResource;
 //struct TerrainResource;
 
+struct TerrainData {
+    float originX = 0;
+    float originY = 0;
+    float originZ = 0;
+
+    float width = 0;
+    float height =0;
+    float length = 0;
+
+    int N = 0;
+    int M = 0;
+
+    int imgWidth = 0;
+    int imgHeight = 0;
+    int imgComps = 0;
+    unsigned char* data;
+};
+
 struct ResourceManager {
     std::unordered_map<std::string, TriMeshResource*> TriMeshResources;
     std::unordered_map<std::string, TextureResource*> TextureResources;
@@ -18,15 +36,18 @@ struct ResourceManager {
     void loadTextureResource(std::string filename, std::string fileType);
     void loadTriMeshResource(std::string filename, std::string fileType);
     TriMeshResource* loadTriMeshResource(std::string filename, int numVerts, int numFaces);
-    unsigned char* loadTerrainResource(std::string filename, std::string fileType);
+    TerrainData loadTerrainResource(std::string filename, std::string fileType, TerrainData inDat);
     
     TextureResource* getTextureResource(std::string lookup);
     TriMeshResource* getTriMeshResource(std::string lookup);
     //TriMeshResource* getTerrainResource(std::string lookup);
 
-    float getHeight(unsigned char* data, float x, float y, int nComps, int stride);
-
     void printAllResources();
+
+    float getHeight(TerrainData, float x, float y);
+
+private:
+    float getHeight(unsigned char* data, float x, float y, int nComps, int stride);
 };
 
 struct TextureResource {

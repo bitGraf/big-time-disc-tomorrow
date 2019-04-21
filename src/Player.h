@@ -65,6 +65,7 @@ struct TemporaryEnt : EntityBase {
 };
 
 struct TerrainEnt : EntityBase {
+    TerrainData terrainInfo;
     void update(double dt) override {
         EntityBase::update(dt);
     };

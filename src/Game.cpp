@@ -219,6 +219,7 @@ void ProcessInput(GLFWwindow *window) {
 	}
 	if (updateMove) {
 		Vector::normalize(velocity);
+		velocity = velocity * 5;
 		Entity::manager.camera.position = Entity::manager.camera.position + velocity * (Timer.deltaTime*speed);
 		//Entity::manager.camera.position.print("Position: ");
 
