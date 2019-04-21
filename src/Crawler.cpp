@@ -21,6 +21,8 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
         // Get the closest panel
         PanelEnt* clp = getClosestPanel(currentPanel);
         bool noOtherPanelsNear = (clp->d > attachRadius);
+        if (!clp->inSector)
+            noOtherPanelsNear = true;
 
         if (attached) {
             printf("Currently on a panel:  ");
@@ -103,7 +105,7 @@ void CrawlerEnt::update(double dt) {
 
     for (int i = 0; i < numPanels; i++) {
         allPanels[i]->distanceToPoint(position);
-        if (allPanels[i]->d < attachRadius) {
+        if (allPanels[i]->d < attachRadius && allPanels[i]->inSector) {
             allPanels[i]->Color = {1, 2.5, 1};
         } else {
             allPanels[i]->Color = {2.5, 1, 1};
@@ -111,7 +113,7 @@ void CrawlerEnt::update(double dt) {
     }
 
     PanelEnt* clp = getClosestPanel(currentPanel);
-    if (clp->d < attachRadius) {
+    if (clp->d < attachRadius && clp->inSector) {
         clp->Color = {1, 4, 1};
     }
 

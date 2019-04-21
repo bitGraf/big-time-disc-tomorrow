@@ -8,7 +8,8 @@
 struct PanelEnt : EntityBase {
     float d = realmax;
     float length = 5;
-    float width = 3;
+    float width = 5;
+    bool inSector = false;
 
     float distanceToPoint(vec3 Py) {
         vec3 r = Py - position;
@@ -22,6 +23,9 @@ struct PanelEnt : EntityBase {
 
         if (abs(u.x) > length || abs(u.z) > width) {
             //The red dot is not inside the panel.
+            inSector = false;
+        } else {
+            inSector = true;
         }
 
         return d;
