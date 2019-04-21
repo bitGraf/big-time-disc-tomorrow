@@ -10,6 +10,8 @@
 struct CrawlerEnt : EntityBase {
     float speed = 3.5f;
     float attachRadius = 2.5f;
+    float autoAttachRadius = 0.5f;
+    float attachCooldown = 0.0f;
 
     // States
     bool attached = false;
@@ -28,8 +30,6 @@ struct CrawlerEnt : EntityBase {
     // These shouldn't be stored in this class
     PanelEnt** allPanels = NULL;
     int numPanels = 0;
-    //EntityBase* p1 = NULL;
-    //EntityBase* p2 = NULL;
 
 
     void update(double dt) override;

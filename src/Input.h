@@ -15,6 +15,7 @@ struct Manager {
     keybind move_left     = {0, GLFW_KEY_A};
     keybind move_right    = {0, GLFW_KEY_D};
     keybind move_strafe   = {0, GLFW_KEY_LEFT_SHIFT};
+    keybind move_jump     = {0, GLFW_KEY_SPACE};
 };
 
 namespace Input {

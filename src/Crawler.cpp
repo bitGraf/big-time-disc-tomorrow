@@ -115,9 +115,18 @@ void CrawlerEnt::update(double dt) {
         }
     }
 
+    if (attachCooldown < 1)
+        attachCooldown -= dt;
+    if (attachCooldown < 0)
+        attachCooldown = 1.5f;
+
     PanelEnt* clp = getClosestPanel(currentPanel);
-    if (clp->d < attachRadius && clp->inSector) {
+    if (clp->d < attachRadius && clp->inSector && attachCooldown > 1.1f) {
         clp->Color = {1, 4, 1};
+        if (clp->d < autoAttachRadius) {
+            transitionToPanel(clp);
+            attachCooldown = 0.999f;
+        }
     }
 
     /*if (currentPanel != NULL && !currentPanel->inSector) {
@@ -148,7 +157,7 @@ void CrawlerEnt::preRender() {
     Font::drawText(Entity::manager.font, 0, 92, {1, 1, 0, 1}, text);
     sprintf(text, "Local orientation: [%5.2f %5.2f %5.2f %5.2f]", localOrientation.x, localOrientation.y, localOrientation.z, localOrientation.w);
     Font::drawText(Entity::manager.font, 0, 112, {1, 1, 0, 1}, text);
-    sprintf(text, "   [%5.2f %5.2f]", allPanels[0]->d, allPanels[1]->d);
+    sprintf(text, "   [%5.2f]", attachCooldown);
     Font::drawText(Entity::manager.font, 0, 132, {1, 1, 0, 1}, text);
 
     EntityBase::preRender();

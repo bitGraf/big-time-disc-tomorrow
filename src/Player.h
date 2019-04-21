@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Entity.h"
-#include "InputBindings.h"
 #include "Input.h"
 
 #include "ResourceManager.h"

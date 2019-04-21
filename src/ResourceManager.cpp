@@ -64,6 +64,7 @@ TriMeshResource* ResourceManager::loadTriMeshResource(std::string filename, int 
 }
 
 TerrainData ResourceManager::loadTerrainResource(std::string filename, std::string fileType, TerrainData inDat) {
+    TerrainData retData;
     if (TriMeshResources.find(filename) == TriMeshResources.end()) {
         printf("Loading new terrain resource [%s].\n", filename.c_str());
 
@@ -184,7 +185,6 @@ TerrainData ResourceManager::loadTerrainResource(std::string filename, std::stri
         TriMeshResources[filename] = ret;
 
         //stbi_image_free(data);
-        TerrainData retData;
         retData.data = data;
         retData.height = height;
         retData.width = width;
@@ -197,11 +197,11 @@ TerrainData ResourceManager::loadTerrainResource(std::string filename, std::stri
         retData.originX = offX;
         retData.originY = offY;
         retData.originZ = offZ;
-
-        return retData;
     } else {
         //printf("Model resource [%s] already exists.\n", filename.c_str());
     }
+
+    return retData;
 }
 
 float ResourceManager::getHeight(unsigned char* data, float x, float y, int nComps, int stride) {

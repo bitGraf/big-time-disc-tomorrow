@@ -19,7 +19,7 @@ enum EntityTypes {
     ENT_Panel
 };
 
-struct LoadOptions {
+/*struct LoadOptions {
     bool quatLoad = false;
     bool degreeLoad = false;
 
@@ -30,7 +30,7 @@ struct LoadOptions {
     quat orientation;
     vec3 scale = {1, 1, 1};
     vec3 color;
-};
+};*/
 
 struct EntityManager {
     bool logData = false;
@@ -89,17 +89,8 @@ namespace Entity {
 
     void init_entities(WindowInfo windowInfo);
 
-    // Loading new entities
-    //void loadEntityFromFile(EntityBase* ent, char* filename);
-    //void loadEntityFromFile(std::string entFilename, int* idLookup = NULL);
-
-    // Helper functions for loading
-    //vec3 parseVec3(char* line, bool normalise = false);
-    //quat parseQuat(char* line, bool normalise = false);
-    //void parseCommand(char* line, LoadOptions* ent);
-
     // Adding entities to the manager
-    int registerEntity(EntityTypes type = ENT_Base, LoadOptions* opts = NULL);
+    int registerEntity(EntityTypes type = ENT_Base);
     void printAllEntities();
     
     // Operating on current entities
@@ -110,25 +101,3 @@ namespace Entity {
     // Entity lookup
     EntityBase* lookup_entity_by_id(int ID);
 }
-
-
-
-
-
-
-
-/*
-void print() {
-        printf("Entity Load Options...\n");
-        printf("\tOrientation: %s\n", quatLoad ? "Quaternion" : "Axis Angle");
-        printf("\tUnits: %s\n", degreeLoad ? "Degree" : "Radian");
-        printf("\tModel File Path: \"%s\"\n", modelFilePath);
-        printf("\tSubtype: %s\n", 
-            subType==ENT_Base ? "Default" : (
-                subType==ENT_Player ? "Player" : (
-                    "Static")));
-        position.print("\tPosition: ");
-        orientation.print(quatLoad ? "\tQuaternion: " : "\tAxis Angle: ");
-        scale.print("\tScale: ");
-    }
-*/

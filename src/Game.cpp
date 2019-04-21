@@ -1,15 +1,6 @@
 #include "Game.h"
 
 void initialize_game(GLFWwindow* window) {
-	// test
-	vec3 position = {5, 5, -5};
-    quat orientation = {0, .7071f, 0, .7071f}; // look along -Z direction
-	mat4 tm;
-	Matrix::buildFromTRSInv(&tm, position, orientation);
-	position.print();
-	orientation.print();
-	tm.print();
-	printf("\n\n\n\n\n");
     // Load entities
     Entity::init_entities(windowInfo);
     ModelLoader::loadFile(&axis, "../data/models/axis.modl");
@@ -30,9 +21,7 @@ void initialize_game(GLFWwindow* window) {
 	otherFont = Font::newDynamicFont("../data/fonts/Consolas.ttf", 32);
     sprintf(fpsText, "Fps: 0");
 
-    //
     // Set OpenGL State
-    //
     glViewport(0, 0, windowInfo.width, windowInfo.height);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
@@ -49,9 +38,7 @@ void initialize_game(GLFWwindow* window) {
 
 	glClearColor(0.716f, 0.68f, 0.652f, 1.0f);
 
-    //
     // Initialize Input state
-    //
     //Input::init();
 }
 
@@ -165,10 +152,8 @@ void Render() {
 	Font::drawText(otherFont, windowInfo.width/2 - b, -b, bg_color, "Running...", ALIGN_TOP_MID);
 	Font::drawText(otherFont, windowInfo.width/2, 0, fg_color, "Running...", ALIGN_TOP_MID);
 
-	//
-	// Render keyboard input
-	//
 
+	// Render keyboard input
 	char kb_text[64];
     float height_padding = 1.0f;
     float dy = fpsFont->fontSize*height_padding;

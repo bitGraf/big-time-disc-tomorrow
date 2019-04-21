@@ -14,7 +14,7 @@ struct Camera {
     vec3 position = {60, 60, -60};
     quat targetOrientation = {0, 0.70710678f, 0, 0.70710678f}; // look along -Z direction
     quat orientation = {0, 0, 0, 1};
-    float rate = 4.0f;
+    float rate = 2.5f;
 
     vec3 Forward;
     vec3 Left;
@@ -67,21 +67,6 @@ struct Camera {
         Quaternion::buildFromAxisAngle(rotYaw, {0, 1, 0}, dYaw);
 
         orientation = Quaternion::mul(orientation, rotYaw);
-
-        //updateVectors();
-
-        //yaw += dYaw;
-        //pitch += dPitch;
-        //if (pitch > 89.0f)
-		//	pitch = 89.0f;
-		//if (pitch < -89.0f)
-		//	pitch = -89.0f;
-        //if (yaw > 360)
-        //    yaw -= 360;
-        //if (yaw < 0)
-        //    yaw += 360;
-        //
-        //updateVectors();
     }
 
     //void buildProjectionMatrix(mat4* m, float fov, float ratio, float znear, float zfar);

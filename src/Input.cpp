@@ -9,6 +9,7 @@ void Input::update(GLFWwindow* window) {
     checkKey(window, &manager.move_left);
     checkKey(window, &manager.move_right);
     checkKey(window, &manager.move_strafe);
+    checkKey(window, &manager.move_jump);
 }
 
 void Input::checkKey(GLFWwindow* window, keybind* kb) {

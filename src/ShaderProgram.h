@@ -16,8 +16,6 @@ struct ShaderProgram {
 	std::unordered_map<std::string, unsigned int> uniformMap;
 	std::string Name;
 
-	//void BuildShader(std::string vShaderPath, 
-	//	std::string fShaderPath, const std::string &name = "UNNAMED SHADER");
 	void smartLoad(std::string vShaderPath, 
 		std::string fShaderPath, const std::string &name = "UNNAMED SHADER");
 	void use();
@@ -29,9 +27,6 @@ struct ShaderProgram {
 	void setMat4(const std::string &name, mat4* value) const;
 	void setvec3(const std::string &name, vec3* value) const;
 	void setVec4(const std::string &name, float a, float b, float c, float d) const;
-
-	//void setLight(const std::string &name, Light light) const;
-	//void initMaterial(const std::string &name) const;
 
 private:
 	void registerUniform(const std::string &name);

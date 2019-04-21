@@ -273,6 +273,7 @@ quat Quaternion::lerp(quat start, quat end, float progress) {
         start.y*(1-progress) + end.y*progress, 
         start.z*(1-progress) + end.z*progress, 
         start.w*(1-progress) + end.w*progress};
+    Quaternion::normalize(ret);
     return ret;
 }
 

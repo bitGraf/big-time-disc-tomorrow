@@ -19,9 +19,6 @@ struct LevelData {
     //Buildings
     int numBuildings;
     Building* buildings = NULL;
-
-    //Ground
-    Texture groundHeightmap;
 };
 
 namespace Level {
