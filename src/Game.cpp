@@ -191,7 +191,7 @@ void ProcessInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 	
-	if ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) && updateMove != true) {
+	if ((glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) && updateMove != true) {
 		//velocity = velocity + Entity::manager.camera.Forward;//velocity = {0, 0, -1};
 		velocity = velocity + Entity::manager.camera.Up;
 		updateMove = true;

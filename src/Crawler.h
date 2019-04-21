@@ -8,7 +8,7 @@
 #include "Panel.h"
 
 struct CrawlerEnt : EntityBase {
-    float speed = 1.3f;
+    float speed = 3.5f;
     float attachRadius = 2.5f;
 
     // States

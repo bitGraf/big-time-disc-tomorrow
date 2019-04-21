@@ -85,6 +85,9 @@ void CrawlerEnt::update(double dt) {
 
     vel = {0, vel.y + acc.y * (float)dt, 0};
     vel = vel + localForward * forwardBackward * speed;
+    if (Input::manager.move_strafe.value > 0.5f) {
+        vel = vel + localLeft * rightLeft * speed;
+    }
     localPos = localPos + vel * dt;
 
     if (attached) {
