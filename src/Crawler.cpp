@@ -50,6 +50,23 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
             }
         }
 	}
+
+    //Adjust camera stickiness
+    if ((key == GLFW_KEY_UP) && (action == GLFW_PRESS)) {
+        if (mods & GLFW_MOD_SHIFT)
+            Entity::manager.camera.rate += 1.0f;
+        else
+            Entity::manager.camera.rate += 0.1f;
+        printf("New camera rate: %f\n", Entity::manager.camera.rate);
+    }
+
+    if ((key == GLFW_KEY_DOWN) && (action == GLFW_PRESS)) {
+        if (mods & GLFW_MOD_SHIFT)
+            Entity::manager.camera.rate -= 1.0f;
+        else
+            Entity::manager.camera.rate -= 0.1f;
+        printf("New camera rate: %f\n", Entity::manager.camera.rate);
+    }
 }
 
 void CrawlerEnt::update(double dt) {
@@ -159,6 +176,8 @@ void CrawlerEnt::preRender() {
     Font::drawText(Entity::manager.font, 0, 112, {1, 1, 0, 1}, text);
     sprintf(text, "   [%5.2f]", attachCooldown);
     Font::drawText(Entity::manager.font, 0, 132, {1, 1, 0, 1}, text);
+    sprintf(text, "Camera rate: %5.3f", Entity::manager.camera.rate);
+    Font::drawText(Entity::manager.font, 0, 152, {1, 1, 0, 1}, text);
 
     EntityBase::preRender();
 }

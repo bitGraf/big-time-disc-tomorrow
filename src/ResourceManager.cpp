@@ -2,6 +2,14 @@
 
 ResourceManager Resources::manager;
 
+int ResourceManager::YXtoIndex(int y, int x, int stride) {
+    return x + y*stride;
+}
+
+vec3 ResourceManager::calcNorm(vec3 v1, vec3 v2, vec3 v3) {
+    return Vector::cross(v2-v1, v3-v2);
+}
+
 void ResourceManager::loadTextureResource(std::string filename, std::string fileType) {
     if (TextureResources.find(filename) == TextureResources.end()) {
         printf("Loading new texture resource [%s].\n", filename.c_str());
@@ -122,7 +130,7 @@ TerrainData ResourceManager::loadTerrainResource(std::string filename, std::stri
                 float yHeight = getHeight(data, lx, ly, imgComps, imgWidth);
 
                 vec3 position = {x + offX, yHeight*height + offY, z + offZ};
-                vec3 normal   = {0, 1, 0};
+                vec3 normal = {0, 1, 0};
                 vec2 tex      = {x / length, z / width};
 
                 mesh->vertices[currentVert]  = position;
@@ -172,6 +180,32 @@ TerrainData ResourceManager::loadTerrainResource(std::string filename, std::stri
             }
 
             offset += M;
+        }
+
+        //Generate correct normals
+        for (int i = 1; i < N-1; i++) {
+            for (int j = 1; j < M-1; j++) {
+                vec3 v1 = mesh->vertices[YXtoIndex(i-1, j-1, M)];
+                vec3 v2 = mesh->vertices[YXtoIndex(i-1, j,   M)];
+                vec3 v3 = mesh->vertices[YXtoIndex(i-1, j+1, M)];
+                vec3 v4 = mesh->vertices[YXtoIndex(i-1, j-1, M)];
+                vec3 v5 = mesh->vertices[YXtoIndex(i,   j,   M)];
+                vec3 v6 = mesh->vertices[YXtoIndex(i+1, j+1, M)];
+                vec3 v7 = mesh->vertices[YXtoIndex(i-1, j-1, M)];
+                vec3 v8 = mesh->vertices[YXtoIndex(i,   j,   M)];
+                vec3 v9 = mesh->vertices[YXtoIndex(i+1, j+1, M)];
+
+                vec3 norm;
+                norm = norm + calcNorm(v4, v5, v2);
+                norm = norm + calcNorm(v2, v5, v3);
+                norm = norm + calcNorm(v3, v5, v6);
+                norm = norm + calcNorm(v6, v5, v8);
+                norm = norm + calcNorm(v8, v5, v7);
+                norm = norm + calcNorm(v7, v5, v4);
+                Vector::normalize(norm);
+
+                mesh->normals[YXtoIndex(i, j, M)] = norm;
+            }
         }
 
         printf("Done loading indices\n");

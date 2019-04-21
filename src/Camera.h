@@ -14,7 +14,7 @@ struct Camera {
     vec3 position = {60, 60, -60};
     quat targetOrientation = {0, 0.70710678f, 0, 0.70710678f}; // look along -Z direction
     quat orientation = {0, 0, 0, 1};
-    float rate = 2.5f;
+    float rate = 6.0f;
 
     vec3 Forward;
     vec3 Left;

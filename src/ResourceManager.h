@@ -48,6 +48,8 @@ struct ResourceManager {
 
 private:
     float getHeight(unsigned char* data, float x, float y, int nComps, int stride);
+    int YXtoIndex(int y, int x, int stride);
+    vec3 calcNorm(vec3 v1, vec3 v2, vec3 v3);
 };
 
 struct TextureResource {
