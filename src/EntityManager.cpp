@@ -31,10 +31,10 @@ void Entity::init_entities(WindowInfo windowInfo) {
     Entity::printAllEntities();
 
     //Camera
-	manager.camera.position = {0, 5, 5};
-	manager.camera.lookAt({0, 0, -3});
-	manager.camera.updateVectors();
-	manager.camera.updateViewMatrix();
+	//manager.camera.position = {0, 5, 5};
+	//manager.camera.lookAt({0, 0, -3});
+	//manager.camera.updateVectors();
+	//manager.camera.updateViewMatrix();
 	manager.camera.updateProjectionMatrix(windowInfo);
 }
 

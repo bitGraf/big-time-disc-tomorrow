@@ -51,4 +51,6 @@ namespace Quaternion {
     quat succ(quat q1, quat q2);
 
     vec3 transformVector(quat, vec3);
+
+    quat lerp(quat start, quat end, float progress);
 }

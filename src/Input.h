@@ -10,10 +10,10 @@ struct keybind {
 };
 
 struct Manager {
-    keybind move_forward  = {0, GLFW_KEY_UP};
-    keybind move_backward = {0, GLFW_KEY_DOWN};
-    keybind move_left     = {0, GLFW_KEY_LEFT};
-    keybind move_right    = {0, GLFW_KEY_RIGHT};
+    keybind move_forward  = {0, GLFW_KEY_W};
+    keybind move_backward = {0, GLFW_KEY_S};
+    keybind move_left     = {0, GLFW_KEY_A};
+    keybind move_right    = {0, GLFW_KEY_D};
     keybind move_strafe   = {0, GLFW_KEY_LEFT_SHIFT};
 };
 

@@ -7,8 +7,8 @@
 
 struct PanelEnt : EntityBase {
     float d = realmax;
-    float length = 5;
-    float width = 5;
+    float length = 7;
+    float width = 7;
     bool inSector = false;
 
     float distanceToPoint(vec3 Py) {

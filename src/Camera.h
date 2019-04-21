@@ -10,12 +10,14 @@
 static vec3 worldUp = {0, 1, 0};
 
 struct Camera {
-    float yaw = 90;    //Set these three vars to drive 
-    float pitch = 0;    //the position/orientation of the camera
-    vec3 position;
+    vec3 targetPosition = {5, 5, -5};
+    vec3 position = {60, 60, -60};
+    quat targetOrientation = {0, 0.70710678f, 0, 0.70710678f}; // look along -Z direction
+    quat orientation = {0, 0, 0, 1};
+    float rate = 4.0f;
 
     vec3 Forward;
-    vec3 Right;
+    vec3 Left;
     vec3 Up;
 
     mat4 viewMatrix;
@@ -28,60 +30,58 @@ struct Camera {
     float clipFar  = 1000;
 
     void lookAt(vec3 location) {
-        vec3 F = Vector::normalized(location - position);
+        //DOES NOTHING
+        //vec3 F = Vector::normalized(location - position);
 
-        pitch = -rad2deg(asin(F.y));
-        yaw = rad2deg(atan2(-F.z, F.x));
+        //pitch = -rad2deg(asin(F.y));
+        //yaw = rad2deg(atan2(-F.z, F.x));
     }
 
-    void updateVectors() {
-        if (pitch > 89.0f)
-			pitch = 89.0f;
-		if (pitch < -89.0f)
-			pitch = -89.0f;
-        if (yaw > 360)
-            yaw -= 360;
-        if (yaw < 0)
-            yaw += 360;
-
+    void update(double dt) {
         //Forward is the driving vector (set by yaw/pitch)
-        float pitchRad = -deg2Rad(pitch);
-        float yawRad = -deg2Rad(yaw);
-        Forward.x = cos(pitchRad) * cos(yawRad);
-        Forward.y = sin(pitchRad);
-        Forward.z = cos(pitchRad) * sin(yawRad);
-        Vector::normalize(Forward);
-        Right = Vector::normalized(Vector::cross(Forward, worldUp));
-        Up = Vector::normalized(Vector::cross(Right, Forward));
-    }
 
-    void updateViewMatrix() {
-        viewMatrix.a11 = Right.x;viewMatrix.a12 = Right.y;viewMatrix.a13 = Right.z;
-        viewMatrix.a14 = -Vector::dot(Right, position);
+        //orientation = targetOrientation;
+        orientation = Quaternion::lerp(orientation, targetOrientation, rate * dt);
+        position = Vector::lerp(position, targetPosition, rate * dt);
 
-        viewMatrix.a21 = Up.x;viewMatrix.a22 = Up.y;viewMatrix.a23 = Up.z;
-        viewMatrix.a24 = -Vector::dot(Up, position);
+        Matrix::buildFromTRSInv(&viewMatrix, position, orientation);
 
-        viewMatrix.a31 = -Forward.x;viewMatrix.a32 = -Forward.y;viewMatrix.a33 = -Forward.z;
-        viewMatrix.a34 = Vector::dot(Forward, position);
-
-        viewMatrix.a41 = 0;  viewMatrix.a42 = 0;  viewMatrix.a43 = 0;
-        viewMatrix.a44 = 1;
+        float C11 = 1 - 2*orientation.y*orientation.y - 2*orientation.z*orientation.z;
+        float C12 = 2*(orientation.x*orientation.y - orientation.z*orientation.w);
+        float C13 = 2*(orientation.z*orientation.x + orientation.y*orientation.w);
+        float C21 = 2*(orientation.x*orientation.y + orientation.z*orientation.w);
+        float C22 = 1 - 2*orientation.z*orientation.z - 2*orientation.x*orientation.x;
+        float C23 = 2*(orientation.y*orientation.z - orientation.x*orientation.w);
+        float C31 = 2*(orientation.z*orientation.x - orientation.y*orientation.w);
+        float C32 = 2*(orientation.y*orientation.z + orientation.x*orientation.w);
+        float C33 = 1 - 2*orientation.x*orientation.x - 2*orientation.y*orientation.y;
+        
+        Left    = {-C11, -C21, -C31};
+        Up      = {-C12, -C22, -C32};
+        Forward = {-C13, -C23, -C33};
     }
 
     void updateOrientation(float dYaw, float dPitch) {
-        yaw += dYaw;
-        pitch += dPitch;
-        if (pitch > 89.0f)
-			pitch = 89.0f;
-		if (pitch < -89.0f)
-			pitch = -89.0f;
-        if (yaw > 360)
-            yaw -= 360;
-        if (yaw < 0)
-            yaw += 360;
-        
-        updateVectors();
+        quat rotYaw, rotPitch;
+
+        Quaternion::buildFromAxisAngle(rotYaw, {0, 1, 0}, dYaw);
+
+        orientation = Quaternion::mul(orientation, rotYaw);
+
+        //updateVectors();
+
+        //yaw += dYaw;
+        //pitch += dPitch;
+        //if (pitch > 89.0f)
+		//	pitch = 89.0f;
+		//if (pitch < -89.0f)
+		//	pitch = -89.0f;
+        //if (yaw > 360)
+        //    yaw -= 360;
+        //if (yaw < 0)
+        //    yaw += 360;
+        //
+        //updateVectors();
     }
 
     //void buildProjectionMatrix(mat4* m, float fov, float ratio, float znear, float zfar);
@@ -99,139 +99,7 @@ struct Camera {
                 Up.print	 ("Up:      ");
             }
             if (key == GLFW_KEY_R && action == GLFW_PRESS) {
-                Right.print	 ("Right:   ");
+                Left.print	 ("Left:   ");
             }
     }
 };
-
-
-
-
-/*
-#include "Vector.h"
-#include "Matrix.h"
-#include "Quaternion.h"
-
-vec3 WorldUp = {0,1,0};
-
-struct Camera {
-    vec3 position;
-    quat orientation;
-
-    mat4 viewMatrix;
-
-    vec3 Front, Right, Up;
-
-    void updateViewMatrix() {
-        float e1 = orientation.x;
-        float e2 = orientation.y;
-        float e3 = orientation.z;
-        float e4 = orientation.w;
-
-        //orientation.print();
-
-        float C11 = 1 - 2*e2*e2 - 2*e3*e3;
-        float C12 = 2*(e1*e2 - e3*e4);
-        float C13 = 2*(e3*e1 + e2*e4);
-        float C21 = 2*(e1*e2 + e3*e4);
-        float C22 = 1 - 2*e3*e3 - 2*e1*e1;
-        float C23 = 2*(e2*e3 - e1*e4);
-        float C31 = 2*(e3*e1 - e2*e4);
-        float C32 = 2*(e2*e3 + e1*e4);
-        float C33 = 1 - 2*e1*e1 - 2*e2*e2;
-
-        //need to update Right, Forward, Up
-        Right = {  C11,  C21,  C31};
-        Up    = {  C12,  C22,  C32};
-        Front = { -C13, -C23, -C33};
-        //Right = {  C11,  C12,  C13};
-        //Up    = {  C21,  C22,  C23};
-        //Front = { -C31, -C32, -C33};
-
-        viewMatrix.a11 = C11;viewMatrix.a12 = C21;viewMatrix.a13 = C31;
-        viewMatrix.a14 = -(C11*position.x + C21*position.y + C31*position.z);
-
-        viewMatrix.a21 = C12;viewMatrix.a22 = C22;viewMatrix.a23 = C32;
-        viewMatrix.a24 = -(C12*position.x + C22*position.y + C32*position.z);
-
-        viewMatrix.a31 = C13;viewMatrix.a32 = C23;viewMatrix.a33 = C33;
-        viewMatrix.a34 = -(C13*position.x + C23*position.y + C33*position.z);
-        
-        viewMatrix.a41 = 0;  viewMatrix.a42 = 0;  viewMatrix.a43 = 0;  
-        viewMatrix.a44 = 1;
-    }
-
-    void updateVectorsFromOrientation() {
-        float e1 = orientation.x;
-        float e2 = orientation.y;
-        float e3 = orientation.z;
-        float e4 = orientation.w;
-
-        //orientation.print();
-
-        float C11 = 1 - 2*e2*e2 - 2*e3*e3;
-        float C12 = 2*(e1*e2 - e3*e4);
-        float C13 = 2*(e3*e1 + e2*e4);
-        float C21 = 2*(e1*e2 + e3*e4);
-        float C22 = 1 - 2*e3*e3 - 2*e1*e1;
-        float C23 = 2*(e2*e3 - e1*e4);
-        float C31 = 2*(e3*e1 - e2*e4);
-        float C32 = 2*(e2*e3 + e1*e4);
-        float C33 = 1 - 2*e1*e1 - 2*e2*e2;
-
-        //need to update Right, Forward, Up
-        Right = {  C11,  C21,  C31};
-        Up    = {  C12,  C22,  C32};
-        Front = { -C13, -C23, -C33};
-        //Right = {  C11,  C12,  C13};
-        //Up    = {  C21,  C22,  C23};
-        //Front = { -C31, -C32, -C33};
-    }
-
-    void lookAt(vec3 pos, vec3 target, vec3 up) {
-        lookInDir(Vector::normalized(target - pos), Vector::normalized(up));
-        position = pos;
-    }
-
-    void lookInDir(vec3 &lookDir, vec3 &upDir) {
-        //lookDir.print();
-        //upDir.print();
-        vec3 forward = lookDir;
-        //vec3 up = upDir;
-	    vec3 right = Vector::normalized(Vector::cross(forward, upDir));
-        vec3 up = Vector::normalized(Vector::cross(right, forward));
-
-        //forward.print("Forward: ");
-        Front = forward;
-        //right.print(  "Right:   ");
-        Right = right;
-        //up.print(     "Up:      ");
-        Up = up;
-
-        //Matrix::identity(&viewMatrix);
-
-        
-
-        orientation.w = sqrtf(1.0f + right.x + up.y + forward.z) * 0.5f;
-        float w4_recip = 1.0f / (4.0f * orientation.w);
-        orientation.x = (up.z - forward.y) * w4_recip;
-        orientation.y = (forward.x - right.z) * w4_recip;
-        orientation.z = (right.y - up.x) * w4_recip;
-        Quaternion::normalize(orientation);
-        //orientation.print("quat:");
-    }
-
-    void updateOrientation(float dYaw, float dPitch) {
-        //create two succ rotations, first the yaw, then the pitch.
-        //yaw axis is WorldUp, pitch axis is BodyRight. Angles are dYaw and dPitch.
-        //new orientation = orientation * yawRot * pitchRot;
-        quat yawRot, pitchRot;
-
-        Quaternion::buildFromAxisAngleD(yawRot, Up, dYaw);
-        //orientation = orientation * yawRot;
-        Quaternion::buildFromAxisAngleD(pitchRot, {1, 0, 0}, dPitch);
-        orientation = orientation * (yawRot * pitchRot);
-        //updateViewMatrix();
-    }
-};
-*/

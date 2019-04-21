@@ -120,11 +120,18 @@ void CrawlerEnt::update(double dt) {
         clp->Color = {1, 4, 1};
     }
 
-    if (currentPanel != NULL && !currentPanel->inSector) {
+    /*if (currentPanel != NULL && !currentPanel->inSector) {
         attached = false;
         grounded = false;
         transitionToPanel(NULL);
-    }
+    }*/
+
+    quat ttt;
+    Quaternion::buildFromAxisAngleD(ttt, {0, 1, 0}, 180);
+    Entity::manager.camera.targetOrientation = Quaternion::mul(orientation, ttt);
+    Quaternion::buildFromAxisAngleD(ttt, {1, 0, 0}, -30);
+    Entity::manager.camera.targetOrientation = Quaternion::mul(Entity::manager.camera.targetOrientation, ttt);
+    Entity::manager.camera.targetPosition = position - Forward*10.0f + Up*10.0f;
 
     EntityBase::update(dt);
 }

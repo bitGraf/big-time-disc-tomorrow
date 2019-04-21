@@ -1,6 +1,15 @@
 #include "Game.h"
 
 void initialize_game(GLFWwindow* window) {
+	// test
+	vec3 position = {5, 5, -5};
+    quat orientation = {0, .7071f, 0, .7071f}; // look along -Z direction
+	mat4 tm;
+	Matrix::buildFromTRSInv(&tm, position, orientation);
+	position.print();
+	orientation.print();
+	tm.print();
+	printf("\n\n\n\n\n");
     // Load entities
     Entity::init_entities(windowInfo);
     ModelLoader::loadFile(&axis, "../data/models/axis.modl");
@@ -107,7 +116,8 @@ void cleanup() {
 }
 
 void FrameUpdate (double dt) {
-    Entity::manager.camera.updateViewMatrix();
+    //Entity::manager.camera.updateViewMatrix();
+	Entity::manager.camera.update(dt);
 	Entity::fixedUpdateAllEntities(PhysicsRate);
 
     //update fps string every fpsUpdateRate
@@ -185,64 +195,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 void ProcessInput(GLFWwindow *window) {	
     Input::update(window);
 
-	vec3 velocity;
-	float speed = 10;
-	bool updateMove = false;
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
-	
-	if ((glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) && updateMove != true) {
-		//velocity = velocity + Entity::manager.camera.Forward;//velocity = {0, 0, -1};
-		velocity = velocity + Entity::manager.camera.Up;
-		updateMove = true;
-	}
-	if ((glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) && updateMove != true) {
-		//velocity = velocity - Entity::manager.camera.Forward;//velocity = {0, 0, 1};
-		velocity = velocity - Entity::manager.camera.Up;
-		updateMove = true;
-	}
-	if ((glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) && updateMove != true) {
-		velocity = velocity - Entity::manager.camera.Right;//velocity = {-1, 0, 0};
-		updateMove = true;
-	}
-	if ((glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) && updateMove != true) {
-		velocity = velocity + Entity::manager.camera.Right;//velocity = {1, 0, 0};
-		updateMove = true;
-	}
-	if ((glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) && updateMove != true) {
-		velocity = velocity + Entity::manager.camera.Forward;
-		updateMove = true;
-	}
-	if ((glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) && updateMove != true) {
-		velocity = velocity - Entity::manager.camera.Forward;
-		updateMove = true;
-	}
-	if (updateMove) {
-		Vector::normalize(velocity);
-		velocity = velocity * 5;
-		Entity::manager.camera.position = Entity::manager.camera.position + velocity * (Timer.deltaTime*speed);
-		//Entity::manager.camera.position.print("Position: ");
-
-		//Entity::manager.camera.lookAt({0, 0, -3});
-		Entity::manager.camera.updateVectors();
-	}
-
-/*	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
-		Entity::manager.camera.updateOrientation(-100*Timer.deltaTime, 0);
-		//printf("Pitch: %.2f\tYaw: %.2f\n", Entity::manager.camera.pitch, Entity::manager.camera.yaw);
-	}
-	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
-		Entity::manager.camera.updateOrientation(100*Timer.deltaTime, 0);
-		//printf("Pitch: %.2f\tYaw: %.2f\n", Entity::manager.camera.pitch, Entity::manager.camera.yaw);
-	}
-	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {
-		Entity::manager.camera.updateOrientation(0, 100*Timer.deltaTime);
-		//printf("Pitch: %.2f\tYaw: %.2f\n", Entity::manager.camera.pitch, Entity::manager.camera.yaw);
-	}
-	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
-		Entity::manager.camera.updateOrientation(0, -100*Timer.deltaTime);
-		//printf("Pitch: %.2f\tYaw: %.2f\n", Entity::manager.camera.pitch, Entity::manager.camera.yaw);
-	}*/
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
@@ -259,5 +213,5 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	windowInfo.lastX = xpos;
 	windowInfo.lastY = ypos;
 
-	Entity::manager.camera.updateOrientation(-xoffset * horizontalSensitivity, -yoffset * verticalSensitivity);
+	//Entity::manager.camera.updateOrientation(-xoffset * horizontalSensitivity, -yoffset * verticalSensitivity);
 }

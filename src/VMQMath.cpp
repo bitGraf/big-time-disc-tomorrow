@@ -51,6 +51,24 @@ void Matrix::buildFromTRS(mat4* m, vec3 T, quat R, vec3 S) {
     m->a41 = 0;m->a42 = 0;m->a43 = 0;m->a44 = 1;
 }
 
+void Matrix::buildFromTRSInv(mat4* m, vec3 T, quat R) {
+    quat invR = {-R.x, -R.y, -R.z, R.w};
+    Matrix::fromQuaternion(m, &invR);
+
+    //m->a14=-T.x;
+    //m->a24=-T.y;
+    //m->a34=-T.z;
+
+    //m->print();
+
+    mat4 mT;
+    mT.a14=-T.x;
+    mT.a24=-T.y;
+    mT.a34=-T.z;
+
+    *m = (*m)*mT;
+}
+
 void Matrix::buildProjectionMatrix(mat4* m, float fov, float ratio, float znear, float zfar) {
     //printf("Building projection matrix:\n\tfov: %.2f\n\tratio: %.2f\n\tzNear: %.2f\n\tzFar: %.2f\n",
         //fov, ratio, znear, zfar);
@@ -239,5 +257,36 @@ vec3 Quaternion::transformVector(quat q, vec3 v) {
 
     ret = {p2.x, p2.y, p2.z};
 
+    return ret;
+}
+
+quat Quaternion::lerp(quat start, quat end, float progress) {
+    float f = progress;
+    if (f > 1)
+        f = 1.0f;
+    if (f < 0)
+        f = 0.0f;
+    float s = 1 - f;
+    float e = f;
+    quat ret = {
+        start.x*(1-progress) + end.x*progress, 
+        start.y*(1-progress) + end.y*progress, 
+        start.z*(1-progress) + end.z*progress, 
+        start.w*(1-progress) + end.w*progress};
+    return ret;
+}
+
+vec3 Vector::lerp(vec3 start, vec3 end, float progress) {
+    float f = progress;
+    if (f > 1)
+        f = 1.0f;
+    if (f < 0)
+        f = 0.0f;
+    float s = 1 - f;
+    float e = f;
+    vec3 ret = {
+        start.x*(1-progress) + end.x*progress, 
+        start.y*(1-progress) + end.y*progress, 
+        start.z*(1-progress) + end.z*progress};
     return ret;
 }

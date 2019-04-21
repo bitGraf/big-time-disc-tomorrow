@@ -20,8 +20,8 @@ static WindowInfo windowInfo;
 static bool firstMouse;
 static int count = 0;
 static float angle = 0;
-static float horizontalSensitivity = 0.05;
-static float verticalSensitivity = 0.05;
+static float horizontalSensitivity = 0.0005;
+static float verticalSensitivity = 0.0005;
 
 static vec3 worldRight   = {1, 0, 0};
 //static vec3 worldUp      = {0, 1, 0};

@@ -148,6 +148,7 @@ namespace Matrix {
     void zero(mat4* m);
     void identity(mat4* m);
     void buildFromTRS(mat4* m, vec3 T, quat R, vec3 S);
+    void buildFromTRSInv(mat4* m, vec3 T, quat R);
     
     void buildProjectionMatrix(mat4* m, float fov, float ratio, float znear, float zfar);
     void buildOrthoProjectionMatrix(mat4* m, float left, float right, float bottom, float top, float znear, float zfar);
