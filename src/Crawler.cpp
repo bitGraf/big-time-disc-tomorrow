@@ -117,6 +117,12 @@ void CrawlerEnt::update(double dt) {
         clp->Color = {1, 4, 1};
     }
 
+    if (currentPanel != NULL && !currentPanel->inSector) {
+        attached = false;
+        grounded = false;
+        transitionToPanel(NULL);
+    }
+
     EntityBase::update(dt);
 }
 
@@ -177,31 +183,36 @@ void CrawlerEnt::transitionToPanel(PanelEnt* newPanel) {
         tUp = currentPanel->Up;
     }
 
-    float theta = acos(Vector::dot(newPanel->Up, tUp)) * 180 / 3.14159f;
-    vec3 rotAxis = Vector::normalized(Vector::cross(tUp, newPanel->Up));
-    printf("Transition angle: %f\n", theta);
-    rotAxis.print("Rotation Axis: ");
-
     currentPanel = newPanel;
 
-    vec3 worldPos = position;
-    localPos = worldPos - currentPanel->position;
-    quat invQ = {-currentPanel->orientation.x, -currentPanel->orientation.y, -currentPanel->orientation.z, currentPanel->orientation.w};
-    localPos = Quaternion::transformVector(invQ, localPos);
-    localPos.y = 0;
-    attached = true;
-    grounded = true;
+    vec3 oldLocal = localPos;
+    localPos = position;
+    if (currentPanel != NULL) {
+        localPos = oldLocal;
+        float theta = acos(Vector::dot(newPanel->Up, tUp)) * 180 / 3.14159f;
+        vec3 rotAxis = Vector::normalized(Vector::cross(tUp, newPanel->Up));
+        printf("Transition angle: %f\n", theta);
+        rotAxis.print("Rotation Axis: ");
 
-    // Set the new local orientation
-    quat currentWorld = orientation;
+        vec3 worldPos = position;
+        localPos = worldPos - currentPanel->position;
+        quat invQ = {-currentPanel->orientation.x, -currentPanel->orientation.y, -currentPanel->orientation.z, currentPanel->orientation.w};
+        localPos = Quaternion::transformVector(invQ, localPos);
+        localPos.y = 0;
+        attached = true;
+        grounded = true;
 
-    //This is still wrong...
-    quat panel2panel;
-    Quaternion::buildFromAxisAngleD(panel2panel, rotAxis, theta);
-    quat newWorld = Quaternion::mul(panel2panel, currentWorld);
-    quat newLocal = Quaternion::mul(currentWorld, invQ);
+        // Set the new local orientation
+        quat currentWorld = orientation;
 
-    //localOrientation = newLocal;  //in the end just leave localOrientation the same
+        //This is still wrong...
+        quat panel2panel;
+        Quaternion::buildFromAxisAngleD(panel2panel, rotAxis, theta);
+        quat newWorld = Quaternion::mul(panel2panel, currentWorld);
+        quat newLocal = Quaternion::mul(currentWorld, invQ);
+
+        //localOrientation = newLocal;  //in the end just leave localOrientation the same
+    }
 }
 
 PanelEnt* CrawlerEnt::getClosestPanel(PanelEnt* curr) {
