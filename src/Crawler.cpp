@@ -161,7 +161,7 @@ void CrawlerEnt::onCreate() {
     Resources::manager.loadTriMeshResource("plane", ".modl");
     Resources::manager.loadTextureResource("wall", ".jpg");
 
-    numPanels = 3;
+    numPanels = 4;
     allPanels = (PanelEnt**)malloc(numPanels * sizeof(PanelEnt*));
 
     for (int i = 0; i < numPanels; i ++) {
@@ -169,22 +169,28 @@ void CrawlerEnt::onCreate() {
         allPanels[i]->mesh = Resources::manager.getTriMeshResource("plane");
         allPanels[i]->baseColor = Resources::manager.getTextureResource("wall");
         allPanels[i]->update(0);
+        allPanels[i]->scale = {allPanels[i]->length, 1, allPanels[i]->width};
     }
 
-    allPanels[0]->position = {-5, 5, 0};
+    allPanels[0]->position = {-7, 5, 0};
     Quaternion::buildFromAxisAngleD(allPanels[0]->orientation, {0, 0, 1}, -90);
-    allPanels[0]->orientation.print();
 
-    allPanels[1]->position = {0, 5, -5};
+    allPanels[1]->position = {0, 5, -7};
     Quaternion::buildFromAxisAngleD(allPanels[1]->orientation, {1, 0, 0}, 90);
     quat q2;
     Quaternion::buildFromAxisAngleD(q2, {0, 1, 0}, -90);
     allPanels[1]->orientation = Quaternion::mul(allPanels[1]->orientation, q2);
-    allPanels[1]->orientation.print();
 
-    allPanels[2]->position = {-1.4645f, 13.536f, 0.0f};
+    allPanels[2]->position = {-1.4645f - 2.0f + 7.0710678f, 13.536f + 7.0710678f, 0.0f};
     Quaternion::buildFromAxisAngleD(allPanels[2]->orientation, {0, 0, 1}, -135);
-    allPanels[2]->orientation.print();
+    allPanels[2]->length = 30;
+    allPanels[2]->scale = {allPanels[2]->length, 1, allPanels[2]->width};
+    allPanels[2]->baseColor = Resources::manager.getTextureResource("blank");
+
+    allPanels[3]->position = {-1.4645f + 6.0f + 7.0710678f, 13.536f + 7.0710678f + 8.0f, 14.0f};
+    Quaternion::buildFromAxisAngleD(allPanels[3]->orientation, {0, 0, 1}, -160);
+    allPanels[3]->length = 30;
+    allPanels[3]->scale = {allPanels[3]->length, 1, allPanels[3]->width};
 }
 
 void CrawlerEnt::transitionToPanel(PanelEnt* newPanel) {

@@ -7,8 +7,8 @@
 
 struct PanelEnt : EntityBase {
     float d = realmax;
-    float length = 7;
-    float width = 7;
+    float length = 10;
+    float width = 14;
     bool inSector = false;
 
     float distanceToPoint(vec3 Py) {
@@ -21,7 +21,7 @@ struct PanelEnt : EntityBase {
             {-orientation.x, -orientation.y, -orientation.z, orientation.w};
         vec3 u = Quaternion::transformVector(invOrientation, u_worldSpace);
 
-        if (abs(u.x) > length || abs(u.z) > width) {
+        if (abs(u.x) > length/2.0f + 1.0f || abs(u.z) > width/2.0f + 1.0f) {
             //The red dot is not inside the panel.
             inSector = false;
         } else {
