@@ -49,6 +49,7 @@ namespace Quaternion {
 
     quat mul(quat q1, quat q2);
     quat succ(quat q1, quat q2);
+    quat inverse(quat q);
 
     vec3 transformVector(quat, vec3);
 

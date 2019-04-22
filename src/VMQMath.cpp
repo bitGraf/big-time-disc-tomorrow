@@ -291,3 +291,7 @@ vec3 Vector::lerp(vec3 start, vec3 end, float progress) {
         start.z*(1-progress) + end.z*progress};
     return ret;
 }
+
+quat Quaternion::inverse(quat q) {
+    return {-q.x, -q.y, -q.z, q.w};
+}
