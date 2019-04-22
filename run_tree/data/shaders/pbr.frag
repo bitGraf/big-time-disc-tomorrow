@@ -4,6 +4,7 @@ out vec4 FragColor;
 in vec3 pass_normal;
 in vec3 pass_fragPos;
 in vec2 pass_tex;
+in mat3 pass_TBN;
 
 struct Light {
 	vec3 position;
@@ -42,30 +43,13 @@ void main()
     
     
 	//Read all texture information
-	vec3 albedo;
-	/*switch(subType) {
-  case 0:
-   albedo = vec3(.5, .2, 0);
-   break;
-  case 1:
-   albedo = vec3(0, .5, .2);
-   break;
-  case 2:
-   albedo = vec3(0, .2, .5);
-   break;
-  default:
-   albedo = vec3(1, 1, 1);
-   break;
- }*/
-	albedo = color * vec3(texture(baseColor, pass_tex));
-	//vec3 albedo = vec3(0, .5, .2);
+	vec3 albedo = color * vec3(texture(baseColor, pass_tex));
 	vec3 normal = pass_normal;
+	vec3 amr = vec3(texture(amrMap, pass_tex));
     
-	//albedo = vec3(1);
-    
-	float ao = 1;
-	float metallic = 0;
-	float roughness = .5;
+	float ao = amr.x;
+	float metallic = amr.y;
+	float roughness = amr.z;
     
 	//Calcualte tangent space normal
 	vec3 N = normal;

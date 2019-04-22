@@ -25,7 +25,7 @@ void initialize_game(GLFWwindow* window) {
     glViewport(0, 0, windowInfo.width, windowInfo.height);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetKeyCallback(window, Entity::handleInputEvent);
 
 	glEnable(GL_DEPTH_TEST);

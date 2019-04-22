@@ -29,6 +29,8 @@ struct EntityBase {
 
     //Textures
     TextureResource* baseColor = NULL;
+    TextureResource* normalMap = NULL;
+    TextureResource* amrMap = NULL;
 
     //Other information
     vec3 Color = {1, 1, 1};

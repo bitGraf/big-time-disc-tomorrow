@@ -10,21 +10,30 @@ void Entity::init_entities(WindowInfo windowInfo) {
     ModelLoader::loadFile(&manager.axis, "../data/models/axis.modl");
     ModelLoader::loadFileStanford(&manager.questionMark, "../data/models/unknownModel.ply");
     manager.default_baseColor.loadImage("DEFAULT_baseColor.png");
+    manager.default_normalMap.loadImage("DEFAULT_normalMap.png");
+    manager.default_amrMap.loadImage("DEFAULT_amrMap.png");
 
     // Entities
     //Resources::manager.loadTriMeshResource("cube", ".modl");
     //Resources::manager.loadTriMeshResource("bigBot", ".ply");   //very large file lmao
-    Resources::manager.loadTriMeshResource("bot", ".ply");
+    Resources::manager.loadTriMeshResource("bot2", ".ply", true);
 
     Resources::manager.loadTextureResource("wall", ".jpg");
     Resources::manager.loadTextureResource("sample", ".jpg");
     Resources::manager.loadTextureResource("blank", ".png");    //just a white texture
 
+    //Texture collection - rustediron2
+    Resources::manager.loadTextureResource("rustediron2_basecolor", ".jpg");
+    Resources::manager.loadTextureResource("rustediron2_normal", ".jpg");
+    Resources::manager.loadTextureResource("rustediron2_amr", ".jpg");
+
 
     EntityBase* ent = Entity::createNewEntity(ENT_Crawler);
-    ent->mesh = Resources::manager.getTriMeshResource("bot");
-    ent->baseColor = Resources::manager.getTextureResource("wall");
-    ent->Color = {5, 5, 7};
+    ent->mesh = Resources::manager.getTriMeshResource("bot2");
+    ent->baseColor = Resources::manager.getTextureResource("rustediron2_basecolor");
+    ent->normalMap = Resources::manager.getTextureResource("rustediron2_normal");
+    ent->amrMap = Resources::manager.getTextureResource("rustediron2_amr");
+    //ent->Color = {5, 5, 7};
 
     Level::loadLevel("mountains512", ".png", "mColor", ".png");
 
@@ -84,6 +93,8 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
             shader->setvec3("camPos", &Entity::manager.camera.position);
             shader->setMat4("model", &ent->modelMatrix);
             shader->setInt("baseColor", 0);
+            shader->setInt("normalMap", 1);
+            shader->setInt("amrMap", 2);
             int verts2render = 0;
             if (ent->mesh == NULL) {
                 glBindVertexArray(manager.questionMark.VAO);
@@ -92,11 +103,24 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
             } else {
                 glBindVertexArray(ent->mesh->data.VAO);
                 verts2render = ent->mesh->data.numFaces*3;
-                if (ent->baseColor == NULL)
-                    manager.default_baseColor.bind(GL_TEXTURE0);
-                else 
-                    ent->baseColor->data.bind(GL_TEXTURE0);
             }
+
+            if (ent->baseColor == NULL)
+                manager.default_baseColor.bind(GL_TEXTURE0);
+            else 
+                ent->baseColor->data.bind(GL_TEXTURE0);
+
+            if (ent->normalMap == NULL)
+                manager.default_normalMap.bind(GL_TEXTURE1);
+            else 
+                ent->normalMap->data.bind(GL_TEXTURE1);
+
+            if (ent->amrMap == NULL)
+                manager.default_amrMap.bind(GL_TEXTURE2);
+            else 
+                ent->amrMap->data.bind(GL_TEXTURE2);
+
+
             shader->setvec3("color", &ent->Color);
 
             glDrawElements(GL_TRIANGLES, verts2render, GL_UNSIGNED_INT, 0);

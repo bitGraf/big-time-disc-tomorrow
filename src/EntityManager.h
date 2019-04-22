@@ -45,6 +45,8 @@ struct EntityManager {
     TriangleMesh axis;
     TriangleMesh questionMark;
     Texture default_baseColor;
+    Texture default_normalMap;
+    Texture default_amrMap;
 
     ShaderProgram* lineShader;
 
