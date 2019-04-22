@@ -16,9 +16,11 @@ struct TriangleMesh {
     int numFaces = 0;
 
     //Vertex data
-    vec3 *vertices = NULL;
-    vec3 *normals = NULL;
-	vec2 *texcoords = NULL;
+    vec3* vertices = NULL;
+    vec3* normals = NULL;
+	vec2* texcoords = NULL;
+    vec3* tangents = NULL;
+    vec3* bitangents = NULL;
 
     //Face data
     GLuint *indices = NULL;
@@ -48,7 +50,7 @@ struct TriangleMesh {
 
 namespace ModelLoader {
     void loadFile(TriangleMesh* triMesh, char* filename);
-    void loadFileStanford(TriangleMesh* triMesh, char* filename);
+    void loadFileStanford(TriangleMesh* triMesh, char* filename, bool hasTangents = false);
     void bufferModel(TriangleMesh* mesh, bool lineRender = false);
     
     vec3 parseVec3(char* line, bool normalise = false);

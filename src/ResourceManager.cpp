@@ -25,7 +25,7 @@ void ResourceManager::loadTextureResource(std::string filename, std::string file
     }
 }
 
-void ResourceManager::loadTriMeshResource(std::string filename, std::string fileType) {
+void ResourceManager::loadTriMeshResource(std::string filename, std::string fileType, bool loadTangents) {
     if (TriMeshResources.find(filename) == TriMeshResources.end()) {
         printf("Loading new model resource [%s].\n", filename.c_str());
 
@@ -37,7 +37,7 @@ void ResourceManager::loadTriMeshResource(std::string filename, std::string file
             ModelLoader::loadFile(&newResource->data, (char*)fullPath.c_str());
         else if (fileType == ".ply") {
             printf("ply time\n");
-            ModelLoader::loadFileStanford(&newResource->data, (char*)fullPath.c_str());
+            ModelLoader::loadFileStanford(&newResource->data, (char*)fullPath.c_str(), loadTangents);
         }
         TriMeshResources[filename] = newResource;
     } else {

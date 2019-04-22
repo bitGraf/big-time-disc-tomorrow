@@ -2,7 +2,7 @@
 
 void ModelLoader::bufferModel(TriangleMesh* mesh, bool lineRender) {
     //printf("buffering model\n");
-    GLuint VAO, VBOpos, VBOnorm, VBOtex, EBO;
+    GLuint VAO, VBOpos, VBOnorm, VBOtex, EBO, VBOtan, VBObtan;
 
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -27,6 +27,20 @@ void ModelLoader::bufferModel(TriangleMesh* mesh, bool lineRender) {
 	glBufferData(GL_ARRAY_BUFFER, mesh->numVerts * sizeof(vec2), mesh->texcoords, GL_STATIC_DRAW);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(vec2), (void*)0);
 	glEnableVertexAttribArray(2);
+
+    //buffer Vertex tangent data
+	glGenBuffers(1, &VBOtan);
+	glBindBuffer(GL_ARRAY_BUFFER, VBOtan);
+	glBufferData(GL_ARRAY_BUFFER, mesh->numVerts * sizeof(vec3), mesh->tangents, GL_STATIC_DRAW);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
+	glEnableVertexAttribArray(3);
+
+    //buffer Vertex bitangent data
+	glGenBuffers(1, &VBObtan);
+	glBindBuffer(GL_ARRAY_BUFFER, VBObtan);
+	glBufferData(GL_ARRAY_BUFFER, mesh->numVerts * sizeof(vec3), mesh->bitangents, GL_STATIC_DRAW);
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
+	glEnableVertexAttribArray(4);
 
     //buffer indexing
     glGenBuffers(1, &EBO);
@@ -60,7 +74,7 @@ void ModelLoader::bufferModel(TriangleMesh* mesh, bool lineRender) {
     printf("\n");*/
 }
 
-void ModelLoader::loadFileStanford(TriangleMesh* triMesh, char* filename) {
+void ModelLoader::loadFileStanford(TriangleMesh* triMesh, char* filename, bool hasTangents) {
     FILE* modelFile = fopen(filename, "rb");
     if (modelFile == NULL) {
         printf("Failed to open file [%s]\n", filename);
@@ -105,17 +119,19 @@ void ModelLoader::loadFileStanford(TriangleMesh* triMesh, char* filename) {
     lineContents = strtok(NULL, "\r\n");
     lineContents = strtok(NULL, "\r\n");
     
-    triMesh->vertices  = (vec3*)malloc(triMesh->numVerts * sizeof(vec3));
-    triMesh->normals   = (vec3*)malloc(triMesh->numVerts * sizeof(vec3));
-    triMesh->texcoords = (vec2*)malloc(triMesh->numVerts * sizeof(vec2));
-    triMesh->indices = (GLuint*)malloc(3 * triMesh->numFaces * sizeof(int));//3 indices per triangle
+    triMesh->vertices   = (vec3*)malloc(triMesh->numVerts * sizeof(vec3));
+    triMesh->normals    = (vec3*)malloc(triMesh->numVerts * sizeof(vec3));
+    triMesh->tangents   = (vec3*)malloc(triMesh->numVerts * sizeof(vec3));
+    triMesh->bitangents = (vec3*)malloc(triMesh->numVerts * sizeof(vec3));
+    triMesh->texcoords  = (vec2*)malloc(triMesh->numVerts * sizeof(vec2));
+    triMesh->indices  = (GLuint*)malloc(3 * triMesh->numFaces * sizeof(int));
 
     lineContents = strtok(NULL, "\r\n");
 
     int lineNum = 0;
     while (lineNum < triMesh->numVerts) {
         char* pstr = lineContents;
-        float x = strtof(pstr, &pstr);  //split the string into three floats
+        float x = strtof(pstr, &pstr);
         float y = strtof(pstr, &pstr);
         float z = strtof(pstr, &pstr);
 
@@ -129,17 +145,13 @@ void ModelLoader::loadFileStanford(TriangleMesh* triMesh, char* filename) {
         triMesh->vertices[lineNum] = {x, y, z};
         triMesh->normals[lineNum] = {nx, ny, nz};
         triMesh->texcoords[lineNum] = {s, t};
-
-        //printf("Reading data: (%f %f %f) (%f %f %f) (%f %f)\n",
-        //        x, y, z, nx, ny, nz, s, t);
+        triMesh->tangents[lineNum] = {1, 0, 0};
+        triMesh->bitangents[lineNum] = {0, 0, 1};
 
         lineNum++;
 
         lineContents = strtok(NULL, "\r\n");
     }
-    //printf("Done loading verts.\n");
-
-    //lineContents = strtok(NULL, "\r\n");
 
     lineNum = 0;
     int index = 0;
@@ -162,7 +174,31 @@ void ModelLoader::loadFileStanford(TriangleMesh* triMesh, char* filename) {
 
         lineContents = strtok(NULL, "\r\n");
     }
-    //printf("Done loading indices.\n");
+    
+    if (hasTangents) {
+        lineNum = 0;
+        while (lineNum < triMesh->numVerts) {
+            char* pstr = lineContents;
+
+            float tx = strtof(pstr, &pstr);
+            float ty = strtof(pstr, &pstr);
+            float tz = strtof(pstr, &pstr);
+
+            float bx = strtof(pstr, &pstr);
+            float by = strtof(pstr, &pstr);
+            float bz = strtof(pstr, NULL);
+
+            triMesh->tangents[lineNum] = {tx, ty, tz};
+            triMesh->bitangents[lineNum] = {bx, by, bz};
+
+            //printf("Reading data: %d [%f %f %f] [%f %f %f]\n",
+            //        lineNum, tx, ty, tz, bx, by, bz);
+
+            lineNum++;
+
+            lineContents = strtok(NULL, "\r\n");
+        }
+    }
 
     //free the memory we malloc'd
     free(fileContents);

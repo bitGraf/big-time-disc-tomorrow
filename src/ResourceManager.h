@@ -34,7 +34,7 @@ struct ResourceManager {
     //std::unordered_map<std::string, TerrainResource*> TerrainResources;
     
     void loadTextureResource(std::string filename, std::string fileType);
-    void loadTriMeshResource(std::string filename, std::string fileType);
+    void loadTriMeshResource(std::string filename, std::string fileType, bool loadTangents = false);
     TriMeshResource* loadTriMeshResource(std::string filename, int numVerts, int numFaces);
     TerrainData loadTerrainResource(std::string filename, std::string fileType, TerrainData inDat);
     
