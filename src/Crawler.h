@@ -8,7 +8,11 @@
 #include "Panel.h"
 
 struct CrawlerEnt : EntityBase {
-    float speed = 3.5f;
+    float max_speed = 3.5f;
+    float move_acc  = 9.81f;//1 G
+    float mass = 10;
+    float F, K;
+
     float attachRadius = 2.5f;
     float autoAttachRadius = 0.5f;
     float attachCooldown = 0.0f;
@@ -24,8 +28,8 @@ struct CrawlerEnt : EntityBase {
     vec3 localPos;
     quat localOrientation;
 
-    vec3 vel;
-    vec3 acc;
+    vec3 velocity;
+    vec3 acceleration;
 
     // These shouldn't be stored in this class
     PanelEnt** allPanels = NULL;

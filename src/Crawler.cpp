@@ -12,7 +12,7 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
         printf("Jumping...\n");
         
         if (!attached) {
-            vel.y += 5;
+            velocity.y += 10;
             grounded = false;
         }
     }
@@ -55,18 +55,18 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
     //Adjust camera stickiness
     if ((key == GLFW_KEY_UP) && (action == GLFW_PRESS)) {
         if (mods & GLFW_MOD_SHIFT)
-            Entity::manager.camera.rate += 1.0f;
+            mass += 1.0f;//Entity::manager.camera.rate += 1.0f;
         else
-            Entity::manager.camera.rate += 0.1f;
-        printf("New camera rate: %f\n", Entity::manager.camera.rate);
+            mass += 0.1f;//Entity::manager.camera.rate += 0.1f;
+        printf("New mass: %f\n", mass);
     }
 
     if ((key == GLFW_KEY_DOWN) && (action == GLFW_PRESS)) {
         if (mods & GLFW_MOD_SHIFT)
-            Entity::manager.camera.rate -= 1.0f;
+            mass -= 1.0f;//Entity::manager.camera.rate -= 1.0f;
         else
-            Entity::manager.camera.rate -= 0.1f;
-        printf("New camera rate: %f\n", Entity::manager.camera.rate);
+            mass -= 0.1f;//Entity::manager.camera.rate -= 0.1f;
+        printf("New mass: %f\n", mass);
     }
 }
 
@@ -86,32 +86,33 @@ void CrawlerEnt::update(double dt) {
     localOrientation = Quaternion::mul(localOrientation, transQ);
 
     float C11 = 1 - 2*localOrientation.y*localOrientation.y - 2*localOrientation.z*localOrientation.z;
-    float C12 = 2*(localOrientation.x*localOrientation.y - localOrientation.z*localOrientation.w);
+    //float C12 = 2*(localOrientation.x*localOrientation.y - localOrientation.z*localOrientation.w);
     float C13 = 2*(localOrientation.z*localOrientation.x + localOrientation.y*localOrientation.w);
     float C21 = 2*(localOrientation.x*localOrientation.y + localOrientation.z*localOrientation.w);
-    float C22 = 1 - 2*localOrientation.z*localOrientation.z - 2*localOrientation.x*localOrientation.x;
+    //float C22 = 1 - 2*localOrientation.z*localOrientation.z - 2*localOrientation.x*localOrientation.x;
     float C23 = 2*(localOrientation.y*localOrientation.z - localOrientation.x*localOrientation.w);
     float C31 = 2*(localOrientation.z*localOrientation.x - localOrientation.y*localOrientation.w);
-    float C32 = 2*(localOrientation.y*localOrientation.z + localOrientation.x*localOrientation.w);
+    //float C32 = 2*(localOrientation.y*localOrientation.z + localOrientation.x*localOrientation.w);
     float C33 = 1 - 2*localOrientation.x*localOrientation.x - 2*localOrientation.y*localOrientation.y;
     
     vec3 localLeft    = {C11, C21, C31};
-    vec3 localUp      = {C12, C22, C32};
+    //vec3 localUp      = {C12, C22, C32};
     vec3 localForward = {C13, C23, C33};
 
-	acc = { 0, !grounded ? -9.81f : 0, 0 };
-
-    vel = {0, vel.y + acc.y * (float)dt, 0};
-    vel = vel + localForward * forwardBackward * speed;
+    vec3 friction = -velocity * K;
+    vec3 propulsion = localForward*forwardBackward*F;
     if (Input::manager.move_strafe.value > 0.5f) {
-        vel = vel + localLeft * rightLeft * speed;
+        propulsion = propulsion - localLeft*rightLeft*F;
     }
-    localPos = localPos + vel * dt;
+    vec3 gravity = { 0, !grounded ? -9.81f : 0, 0 };
+	acceleration = gravity + (propulsion + friction) * (1/mass);
+
+    velocity = velocity + acceleration*dt;
+    localPos = localPos + velocity*dt;
 
     if (attached) {
         position = currentPanel->position + Quaternion::transformVector(currentPanel->orientation, localPos);
         orientation = Quaternion::mul(currentPanel->orientation, localOrientation);
-        //orientation = localOrientation;
     } else {
         position = localPos;
         orientation = localOrientation;
@@ -119,8 +120,8 @@ void CrawlerEnt::update(double dt) {
 
     if (!attached && position.y < 0) {
         position.y = 0;
-		vel.y = 0;
-		acc.y = 0;
+		velocity.y = 0;
+		acceleration.y = 0;
         grounded = true;
     }
 
@@ -165,11 +166,15 @@ void CrawlerEnt::update(double dt) {
 
 void CrawlerEnt::preRender() {
     char text[64];
-    sprintf(text, "Velocity: [%5.2f %5.2f %5.2f]", vel.x, vel.y, vel.z);
+    
+    sprintf(text, "Position:     [%5.2f %5.2f %5.2f]", position.x, position.y, position.z);
     Font::drawText(Entity::manager.font, 0, 32, {1, 1, 0, 1}, text);
-    sprintf(text, "World position:    [%5.2f %5.2f %5.2f]", position.x, position.y, position.z);
+    sprintf(text, "Velocity:     [%5.2f %5.2f %5.2f]", velocity.x, velocity.y, velocity.z);
     Font::drawText(Entity::manager.font, 0, 52, {1, 1, 0, 1}, text);
-    sprintf(text, "Local position:    [%5.2f %5.2f %5.2f]", localPos.x, localPos.y, localPos.z);
+    sprintf(text, "Acceleration: [%5.2f %5.2f %5.2f]", acceleration.x, acceleration.y, acceleration.z);
+    Font::drawText(Entity::manager.font, 0, 72, {1, 1, 0, 1}, text);
+
+    /*sprintf(text, "Local position:    [%5.2f %5.2f %5.2f]", localPos.x, localPos.y, localPos.z);
     Font::drawText(Entity::manager.font, 0, 72, {1, 1, 0, 1}, text);
     sprintf(text, "World orientation: [%5.2f %5.2f %5.2f %5.2f]", orientation.x, orientation.y, orientation.z, orientation.w);
     Font::drawText(Entity::manager.font, 0, 92, {1, 1, 0, 1}, text);
@@ -178,7 +183,7 @@ void CrawlerEnt::preRender() {
     sprintf(text, "   [%5.2f]", attachCooldown);
     Font::drawText(Entity::manager.font, 0, 132, {1, 1, 0, 1}, text);
     sprintf(text, "Camera rate: %5.3f", Entity::manager.camera.rate);
-    Font::drawText(Entity::manager.font, 0, 152, {1, 1, 0, 1}, text);
+    Font::drawText(Entity::manager.font, 0, 152, {1, 1, 0, 1}, text);*/
 
     EntityBase::preRender();
 }
@@ -219,6 +224,11 @@ void CrawlerEnt::onCreate() {
     Quaternion::buildFromAxisAngleD(allPanels[3]->orientation, {0, 0, 1}, -160);
     allPanels[3]->length = 30;
     allPanels[3]->scale = {allPanels[3]->length, 1, allPanels[3]->width};
+
+    F = move_acc * mass;
+    K = F / max_speed;
+
+    printf("F = %f\nK = %f\n", F, K);
 }
 
 void CrawlerEnt::transitionToPanel(PanelEnt* newPanel) {
