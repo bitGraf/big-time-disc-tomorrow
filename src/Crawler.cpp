@@ -99,10 +99,16 @@ void CrawlerEnt::update(double dt) {
     //vec3 localUp      = {C12, C22, C32};
     vec3 localForward = {C13, C23, C33};
 
-    vec3 friction = -velocity * K;
-    vec3 propulsion = localForward*forwardBackward*F;
-    if (Input::manager.move_strafe.value > 0.5f) {
-        propulsion = propulsion - localLeft*rightLeft*F;
+    vec3 friction;
+    if (grounded)
+        friction = -velocity * K;
+    //friction.y = 0;
+    vec3 propulsion;
+    if (grounded) {
+        propulsion = localForward*forwardBackward*F;
+        if (Input::manager.move_strafe.value > 0.5f) {
+            propulsion = propulsion - localLeft*rightLeft*F;
+        }
     }
     vec3 gravity = { 0, !grounded ? -9.81f : 0, 0 };
 	acceleration = gravity + (propulsion + friction) * (1/mass);
