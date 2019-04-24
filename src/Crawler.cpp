@@ -17,56 +17,18 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
         }
     }
 
-    if ((key == GLFW_KEY_E) && (action == GLFW_PRESS)) {
-        // Get the closest panel
-        PanelEnt* clp = getClosestPanel(currentPanel);
-        bool noOtherPanelsNear = (clp->d > attachRadius);
-        if (!clp->inSector)
-            noOtherPanelsNear = true;
+    //Reset all states
+    if ((key == GLFW_KEY_R) && (action == GLFW_PRESS)) {
+        localPos = {0, 1, 0};
+        velocity = {0, 0, 0};
+        acceleration = {0, 0, 0};
+        grounded = false;
+        attached = false;
+        localOrientation = {0, 0, 0, 1};
+        currentPanel = NULL;
 
-        if (attached) {
-            printf("Currently on a panel:  ");
-
-            if (noOtherPanelsNear) {
-                printf("There are no nearby panels. Detaching\n");
-
-                currentPanel = NULL;
-                localPos = position;
-                //localOrientation = orientation;
-                grounded = false;
-                attached = false;
-                attachCooldown = 0.999f;
-            } else {
-                printf("Transitioning to a new panel.\n");
-                transitionToPanel(clp);
-            }
-        } else {
-            printf("Not on a panel:        ");
-            if (noOtherPanelsNear) {
-                printf("There are no nearby panels.\n");
-                attached = false;
-            } else {
-                printf("Attaching to a panel\n");
-                transitionToPanel(clp);
-            }
-        }
-	}
-
-    //Adjust camera stickiness
-    if ((key == GLFW_KEY_UP) && (action == GLFW_PRESS)) {
-        if (mods & GLFW_MOD_SHIFT)
-            mass += 1.0f;//Entity::manager.camera.rate += 1.0f;
-        else
-            mass += 0.1f;//Entity::manager.camera.rate += 0.1f;
-        printf("New mass: %f\n", mass);
-    }
-
-    if ((key == GLFW_KEY_DOWN) && (action == GLFW_PRESS)) {
-        if (mods & GLFW_MOD_SHIFT)
-            mass -= 1.0f;//Entity::manager.camera.rate -= 1.0f;
-        else
-            mass -= 0.1f;//Entity::manager.camera.rate -= 0.1f;
-        printf("New mass: %f\n", mass);
+        position = localPos;
+        orientation = localOrientation;
     }
 }
 
@@ -102,7 +64,7 @@ void CrawlerEnt::update(double dt) {
     vec3 friction;
     if (grounded)
         friction = -velocity * K;
-    //friction.y = 0;
+    friction.y = 0;
     vec3 propulsion;
     if (grounded) {
         propulsion = localForward*forwardBackward*F;
@@ -124,41 +86,31 @@ void CrawlerEnt::update(double dt) {
         orientation = localOrientation;
     }
 
-    if (!attached && position.y < 0) {
-        position.y = 0;
+    if (!attached && position.y < 1) {
+        position.y = 1;
 		velocity.y = 0;
 		acceleration.y = 0;
         grounded = true;
     }
 
+    bool onAPanel = false;
     for (int i = 0; i < numPanels; i++) {
         allPanels[i]->distanceToPoint(position);
-        if (allPanels[i]->d < attachRadius && allPanels[i]->inSector) {
+        if (allPanels[i]->inVolume) {
+            onAPanel = true;
             allPanels[i]->Color = {1, 2.5, 1};
+            if ((currentPanel == NULL) || (allPanels[i]->K2 < currentPanel->K2)) {
+                transitionToPanel(allPanels[i]);
+            }
         } else {
             allPanels[i]->Color = {2.5, 1, 1};
         }
     }
-
-    if (attachCooldown < 1)
-        attachCooldown -= dt;
-    if (attachCooldown < 0)
-        attachCooldown = 1.5f;
-
-    PanelEnt* clp = getClosestPanel(currentPanel);
-    if (clp->d < attachRadius && clp->inSector && attachCooldown > 1.1f) {
-        clp->Color = {1, 4, 1};
-        if (clp->d < autoAttachRadius) {
-            transitionToPanel(clp);
-            attachCooldown = 0.999f;
-        }
-    }
-
-    /*if (currentPanel != NULL && !currentPanel->inSector) {
-        attached = false;
+    if (currentPanel != NULL && !onAPanel) {
         grounded = false;
+        attached = false;
         transitionToPanel(NULL);
-    }*/
+    }
 
     quat ttt;
     Quaternion::buildFromAxisAngleD(ttt, {0, 1, 0}, 180);
@@ -170,7 +122,7 @@ void CrawlerEnt::update(double dt) {
     EntityBase::update(dt);
 }
 
-void CrawlerEnt::preRender() {
+void CrawlerEnt::postRender() {
     char text[64];
     
     sprintf(text, "Position:     [%5.2f %5.2f %5.2f]", position.x, position.y, position.z);
@@ -180,16 +132,14 @@ void CrawlerEnt::preRender() {
     sprintf(text, "Acceleration: [%5.2f %5.2f %5.2f]", acceleration.x, acceleration.y, acceleration.z);
     Font::drawText(Entity::manager.font, 0, 72, {1, 1, 0, 1}, text);
 
-    /*sprintf(text, "Local position:    [%5.2f %5.2f %5.2f]", localPos.x, localPos.y, localPos.z);
-    Font::drawText(Entity::manager.font, 0, 72, {1, 1, 0, 1}, text);
-    sprintf(text, "World orientation: [%5.2f %5.2f %5.2f %5.2f]", orientation.x, orientation.y, orientation.z, orientation.w);
-    Font::drawText(Entity::manager.font, 0, 92, {1, 1, 0, 1}, text);
-    sprintf(text, "Local orientation: [%5.2f %5.2f %5.2f %5.2f]", localOrientation.x, localOrientation.y, localOrientation.z, localOrientation.w);
-    Font::drawText(Entity::manager.font, 0, 112, {1, 1, 0, 1}, text);
-    sprintf(text, "   [%5.2f]", attachCooldown);
-    Font::drawText(Entity::manager.font, 0, 132, {1, 1, 0, 1}, text);
-    sprintf(text, "Camera rate: %5.3f", Entity::manager.camera.rate);
-    Font::drawText(Entity::manager.font, 0, 152, {1, 1, 0, 1}, text);*/
+    for (int i = 0; i < numPanels; i++) {
+        sprintf(text, "Panel %d: [K = %5.2f, In Volume: %s]%s (%5.2f, %5.2f, %5.2f)", 
+            i+1, sqrt(allPanels[i]->K2), 
+            allPanels[i]->inVolume ? "True " : "False",
+            allPanels[i] == currentPanel ? "*" : " ",
+            allPanels[i]->u.x, allPanels[i]->u.y, allPanels[i]->u.z);
+        Font::drawText(Entity::manager.font, 0, 92 + 20*i, {1, 1, 0, 1}, text);
+    }
 
     EntityBase::preRender();
 }
@@ -252,60 +202,17 @@ void CrawlerEnt::transitionToPanel(PanelEnt* newPanel) {
         localPos = oldLocal;
         float theta = acos(Vector::dot(newPanel->Up, tUp)) * 180 / 3.14159f;
         vec3 rotAxis = Vector::normalized(Vector::cross(tUp, newPanel->Up));
-        printf("Transition angle: %f\n", theta);
-        rotAxis.print("Rotation Axis: ");
+        //printf("Transition angle: %f\n", theta);
+        //rotAxis.print("Rotation Axis: ");
 
         vec3 worldPos = position;
         localPos = worldPos - currentPanel->position;
         quat invQ = {-currentPanel->orientation.x, -currentPanel->orientation.y, -currentPanel->orientation.z, currentPanel->orientation.w};
         localPos = Quaternion::transformVector(invQ, localPos);
-        localPos.y = 0;
+        localPos.y = 1;
         attached = true;
         grounded = true;
 
-        // Set the new local orientation
-        quat currentWorld = orientation;
-        currentWorld.print("Current World: ");
-
-        //This is still wrong...
-        quat panel2panel;
-        Quaternion::buildFromAxisAngleD(panel2panel, rotAxis, theta);
-        panel2panel.print("Panel2Panel: ");
-        if (oldPanel != NULL)
-            panel2panel = Quaternion::mul(Quaternion::inverse(oldPanel->orientation), panel2panel);
-        panel2panel.print("Panel2Panel after correction: ");
-        quat newWorld = Quaternion::mul(currentWorld, panel2panel);
-        newWorld.print("New World: ");
-        quat newLocal = Quaternion::mul(Quaternion::inverse(newPanel->orientation), newWorld);
-        newLocal.print("New Local: ");
-
         //localOrientation = newLocal;  //in the end just leave localOrientation the same
     }
-}
-
-PanelEnt* CrawlerEnt::getClosestPanel(PanelEnt* curr) {
-    float closest = realmax;
-    PanelEnt* ret;
-
-    for (int i = 0; i < numPanels; i++) {
-        if (allPanels[i]->d < closest) {
-            closest = allPanels[i]->d;
-            ret = allPanels[i];
-
-            //printf("Closest panel is %f away\n", closest);
-        }
-    }
-
-    if ((curr != NULL) && (ret == curr)) {
-        // the current panel IS the closest
-        //printf("  recursing\n");
-        float temp = closest;
-        ret->d = realmax; //push to back of list and resort
-        PanelEnt* newRet = getClosestPanel(curr);
-        ret->d = temp;
-        ret = newRet;
-        //printf("  Next closest panel found %f\n", ret->d);
-    }
-
-    return ret;
 }

@@ -55,6 +55,7 @@ struct EntityBase {
     }
 
     virtual void preRender() {}
+    virtual void postRender() {}
     virtual void handleInput(int key, int scancode, int action, int mods) {}
     virtual void onCreate() {}
 

@@ -21,6 +21,7 @@ void Entity::init_entities(WindowInfo windowInfo) {
     Resources::manager.loadTextureResource("wall", ".jpg");
     Resources::manager.loadTextureResource("sample", ".jpg");
     Resources::manager.loadTextureResource("blank", ".png");    //just a white texture
+    Resources::manager.loadTextureResource("grid", ".png");    //UV Grid
 
     //Texture collection - rustediron2
     Resources::manager.loadTextureResource("rustediron2_basecolor", ".jpg");
@@ -35,7 +36,14 @@ void Entity::init_entities(WindowInfo windowInfo) {
     ent->amrMap = Resources::manager.getTextureResource("rustediron2_amr");
     //ent->Color = {5, 5, 7};
 
-    Level::loadLevel("mountains512", ".png", "mColor", ".png");
+    //Level::loadLevel("mountains512", ".png", "mColor", ".png");
+    ent = Entity::createNewEntity(ENT_Static);
+    ent->mesh = Resources::manager.getTriMeshResource("plane");
+    ent->baseColor = Resources::manager.getTextureResource("grid");
+    ent->scale = {64, 64, 64};//one block  = 2 units
+    ent->Color = {4, 4, 4};
+    StaticEnt* se = (StaticEnt*)ent;
+    se->Rainbow = false;
 
     manager.font = Font::newDynamicFont("../data/fonts/Consolas.ttf", 20);
 
@@ -137,6 +145,15 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
             }
         }
     }
+
+
+    for (int i = 0; i < manager.numEntries; i++) {
+            EntityBase* ent = (manager.pointerList[i]);
+
+            if (!ent->Remove) {
+                ent->postRender();
+            }
+        }
     glBindVertexArray(0);
 }
 

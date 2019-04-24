@@ -8,14 +8,13 @@
 #include "Panel.h"
 
 struct CrawlerEnt : EntityBase {
-    float max_speed = 3.5f;
+    float max_speed = 5.0f;
     float move_acc  = 9.81f;//1 G
     float mass = 10;
     float F, K;
 
     float attachRadius = 2.5f;
     float autoAttachRadius = 0.5f;
-    float attachCooldown = 0.0f;
 
     // States
     bool attached = false;
@@ -25,7 +24,7 @@ struct CrawlerEnt : EntityBase {
     PanelEnt* closestOtherPanel = NULL;
 
     //Relative to the current panel
-    vec3 localPos;
+    vec3 localPos = {0, 1, 0};
     quat localOrientation;
 
     vec3 velocity;
@@ -37,9 +36,8 @@ struct CrawlerEnt : EntityBase {
 
 
     void update(double dt) override;
-    void preRender() override;
+    void postRender() override;
     void handleInput(int key, int scancode, int action, int mods) override;
     void onCreate() override;
     void transitionToPanel(PanelEnt*);
-    PanelEnt* getClosestPanel(PanelEnt*);
 };
