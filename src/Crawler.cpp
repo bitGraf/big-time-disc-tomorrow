@@ -14,6 +14,11 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
         if (!attached) {
             velocity.y += 10;
             grounded = false;
+        } else {
+            grounded = false;
+            velocity = velocity + currentPanel->Up * 10.0f;
+            attachCoolDown = 2.5f;
+            transitionToPanel(NULL);
         }
     }
 
@@ -33,6 +38,11 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
 }
 
 void CrawlerEnt::update(double dt) {
+    if (attachCoolDown > 0)
+        attachCoolDown -= dt;
+    if (attachCoolDown < 0)
+        attachCoolDown = 0.0f;
+
     float vf = Input::manager.move_forward.value;
     float vb = Input::manager.move_backward.value;
     float vl = Input::manager.move_left.value;
@@ -69,7 +79,7 @@ void CrawlerEnt::update(double dt) {
     if (grounded) {
         propulsion = localForward*forwardBackward*F;
         if (Input::manager.move_strafe.value > 0.5f) {
-            propulsion = propulsion - localLeft*rightLeft*F;
+            propulsion = propulsion + localLeft*rightLeft*F*1.5f;
         }
     }
     vec3 gravity = { 0, !grounded ? -9.81f : 0, 0 };
@@ -86,7 +96,7 @@ void CrawlerEnt::update(double dt) {
         orientation = localOrientation;
     }
 
-    if (!attached && position.y < 1) {
+    if (!attached && position.y < 1 && velocity.y < 0) {
         position.y = 1;
 		velocity.y = 0;
 		acceleration.y = 0;
@@ -100,15 +110,14 @@ void CrawlerEnt::update(double dt) {
             onAPanel = true;
             allPanels[i]->Color = {1, 2.5, 1};
             if ((currentPanel == NULL) || (allPanels[i]->K2 < currentPanel->K2)) {
-                transitionToPanel(allPanels[i]);
+                if (attachCoolDown < 0.001f)
+                    transitionToPanel(allPanels[i]);
             }
         } else {
             allPanels[i]->Color = {2.5, 1, 1};
         }
     }
     if (currentPanel != NULL && !onAPanel) {
-        grounded = false;
-        attached = false;
         transitionToPanel(NULL);
     }
 
@@ -131,14 +140,16 @@ void CrawlerEnt::postRender() {
     Font::drawText(Entity::manager.font, 0, 52, {1, 1, 0, 1}, text);
     sprintf(text, "Acceleration: [%5.2f %5.2f %5.2f]", acceleration.x, acceleration.y, acceleration.z);
     Font::drawText(Entity::manager.font, 0, 72, {1, 1, 0, 1}, text);
+    sprintf(text, "Cooldown: %6.4f", attachCoolDown);
+    Font::drawText(Entity::manager.font, 0, 92, {1, 1, 0, 1}, text);
 
     for (int i = 0; i < numPanels; i++) {
-        sprintf(text, "Panel %d: [K = %5.2f, In Volume: %s]%s (%5.2f, %5.2f, %5.2f)", 
+        sprintf(text, "Panel %d: [K = %5.2f, In Volume: %s]%s (%5.2f, %5.2f)", 
             i+1, sqrt(allPanels[i]->K2), 
             allPanels[i]->inVolume ? "True " : "False",
             allPanels[i] == currentPanel ? "*" : " ",
-            allPanels[i]->u.x, allPanels[i]->u.y, allPanels[i]->u.z);
-        Font::drawText(Entity::manager.font, 0, 92 + 20*i, {1, 1, 0, 1}, text);
+            allPanels[i]->u.x, allPanels[i]->u.z);
+        Font::drawText(Entity::manager.font, 0, 112 + 20*i, {1, 1, 0, 1}, text);
     }
 
     EntityBase::preRender();
@@ -151,7 +162,7 @@ void CrawlerEnt::onCreate() {
     Resources::manager.loadTriMeshResource("plane", ".modl");
     Resources::manager.loadTextureResource("wall", ".jpg");
 
-    numPanels = 4;
+    numPanels = 5;
     allPanels = (PanelEnt**)malloc(numPanels * sizeof(PanelEnt*));
 
     for (int i = 0; i < numPanels; i ++) {
@@ -167,9 +178,11 @@ void CrawlerEnt::onCreate() {
 
     allPanels[1]->position = {0, 5, -7};
     Quaternion::buildFromAxisAngleD(allPanels[1]->orientation, {1, 0, 0}, 90);
-    quat q2;
-    Quaternion::buildFromAxisAngleD(q2, {0, 1, 0}, -90);
-    allPanels[1]->orientation = Quaternion::mul(allPanels[1]->orientation, q2);
+    allPanels[1]->length = 14;  allPanels[1]->width = 10;
+    allPanels[1]->scale = {allPanels[1]->length, 1, allPanels[1]->width};
+    //quat q2;
+    //Quaternion::buildFromAxisAngleD(q2, {0, 1, 0}, -90);
+    //allPanels[1]->orientation = Quaternion::mul(allPanels[1]->orientation, q2);
 
     allPanels[2]->position = {-1.4645f - 2.0f + 7.0710678f, 13.536f + 7.0710678f, 0.0f};
     Quaternion::buildFromAxisAngleD(allPanels[2]->orientation, {0, 0, 1}, -135);
@@ -181,12 +194,59 @@ void CrawlerEnt::onCreate() {
     allPanels[3]->length = 30;
     allPanels[3]->scale = {allPanels[3]->length, 1, allPanels[3]->width};
 
+    printf("4\n");
+    allPanels[4]->position = {0, 2, 10};
+    Quaternion::buildFromAxisAngleD(allPanels[4]->orientation, {1, 0, 0}, -30);
+    printf("5\n");
+
     F = move_acc * mass;
     K = F / max_speed;
 
     printf("F = %f\nK = %f\n", F, K);
 }
 
+void CrawlerEnt::transitionToPanel(PanelEnt* newPanel) {
+    printf("changing panel...\n");
+    vec3 currUp = {0, 1, 0};
+    if (currentPanel != NULL) {
+        currUp = currentPanel->Up;
+    }
+
+    if (newPanel == NULL) {
+        localPos = position;
+        currentPanel = newPanel;
+        grounded = false;
+        attached = false;
+    } else {
+        vec3 Axis = Vector::normalized(Vector::cross(currUp, newPanel->Up));
+        float Angle = acos(Vector::dot(currUp, newPanel->Up));
+        quat qT;Quaternion::buildFromAxisAngle(qT, Axis, Angle);
+
+        //New local position
+        localPos = Quaternion::transformVector(
+            Quaternion::inverse(newPanel->orientation),
+            position - newPanel->position);
+        
+        //Current world orientation
+        //quat currWorld = orientation;
+        //New world orientation
+        //quat newWorld  = Quaternion::mul(qT, orientation);
+        //Transform into newPanel-space
+        localOrientation = Quaternion::mul(
+            Quaternion::inverse(newPanel->orientation), 
+            Quaternion::mul(qT, orientation));
+        
+        //Set attachment to new panel
+        currentPanel = newPanel;
+        localPos.y = 1;
+        velocity.y = 0;
+        attached = true;
+        grounded = true;
+    }
+}
+
+
+/*
 void CrawlerEnt::transitionToPanel(PanelEnt* newPanel) {
     vec3 tUp = {0, 1, 0};
     if (currentPanel != NULL) {
@@ -198,7 +258,7 @@ void CrawlerEnt::transitionToPanel(PanelEnt* newPanel) {
 
     vec3 oldLocal = localPos;
     localPos = position;
-    if (currentPanel != NULL) {
+    if (newPanel != NULL) {
         localPos = oldLocal;
         float theta = acos(Vector::dot(newPanel->Up, tUp)) * 180 / 3.14159f;
         vec3 rotAxis = Vector::normalized(Vector::cross(tUp, newPanel->Up));
@@ -206,8 +266,8 @@ void CrawlerEnt::transitionToPanel(PanelEnt* newPanel) {
         //rotAxis.print("Rotation Axis: ");
 
         vec3 worldPos = position;
-        localPos = worldPos - currentPanel->position;
-        quat invQ = {-currentPanel->orientation.x, -currentPanel->orientation.y, -currentPanel->orientation.z, currentPanel->orientation.w};
+        localPos = worldPos - newPanel->position;
+        quat invQ = Quaternion::inverse(newPanel->orientation);
         localPos = Quaternion::transformVector(invQ, localPos);
         localPos.y = 1;
         attached = true;
@@ -216,3 +276,4 @@ void CrawlerEnt::transitionToPanel(PanelEnt* newPanel) {
         //localOrientation = newLocal;  //in the end just leave localOrientation the same
     }
 }
+*/

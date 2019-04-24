@@ -14,14 +14,14 @@ struct CrawlerEnt : EntityBase {
     float F, K;
 
     float attachRadius = 2.5f;
-    float autoAttachRadius = 0.5f;
+    //float autoAttachRadius = 0.5f;
+    float attachCoolDown = 5.0f;
 
     // States
     bool attached = false;
     bool grounded = false;
 
     PanelEnt* currentPanel = NULL;
-    PanelEnt* closestOtherPanel = NULL;
 
     //Relative to the current panel
     vec3 localPos = {0, 1, 0};
