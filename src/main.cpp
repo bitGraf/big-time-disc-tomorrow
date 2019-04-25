@@ -19,6 +19,8 @@ int main(int argc, char** argv) {
         return -1;
     }
 
+	stbi_set_flip_vertically_on_load(true);
+
 	printf("\n-------------------------------------------\n\n");
 
 	//After GLFW is initialized, init_game

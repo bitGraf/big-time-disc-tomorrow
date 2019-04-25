@@ -15,7 +15,7 @@ void Entity::init_entities(WindowInfo windowInfo) {
 
     // Entities
     //Resources::manager.loadTriMeshResource("cube", ".modl");
-    //Resources::manager.loadTriMeshResource("bigBot", ".ply");   //very large file lmao
+    Resources::manager.loadTriMeshResource("bigBot", ".ply");   //very large file lmao
     Resources::manager.loadTriMeshResource("bot2", ".ply", true);
 
     Resources::manager.loadTextureResource("wall", ".jpg");
@@ -30,7 +30,7 @@ void Entity::init_entities(WindowInfo windowInfo) {
 
 
     EntityBase* ent = Entity::createNewEntity(ENT_Crawler);
-    ent->mesh = Resources::manager.getTriMeshResource("bot2");
+    ent->mesh = Resources::manager.getTriMeshResource("bigBot");
     ent->baseColor = Resources::manager.getTextureResource("rustediron2_basecolor");
     ent->normalMap = Resources::manager.getTextureResource("rustediron2_normal");
     ent->amrMap = Resources::manager.getTextureResource("rustediron2_amr");
@@ -223,6 +223,14 @@ int Entity::registerEntity(EntityTypes type) {
         } break;
         case ENT_Panel: {
             manager.pointerList[manager.numEntries] = new PanelEnt;
+            //printf("Adding new EntityStatic\n");
+        } break;
+        case ENT_Missile: {
+            manager.pointerList[manager.numEntries] = new MissileEnt;
+            //printf("Adding new EntityStatic\n");
+        } break;
+        case ENT_Physics: {
+            manager.pointerList[manager.numEntries] = new PhysicsEnt;
             //printf("Adding new EntityStatic\n");
         } break;
         default: {

@@ -25,9 +25,9 @@ struct quat {
     quat operator*(const quat& q) const {
         //Successive quaternion rotation
         float e1 =  w*q.x - z*q.y + y*q.z + x*q.w;
-        float e2 =  z*q.x + w*q.y - x*q.z + y*q.w;;
-        float e3 = -y*q.x + x*q.y + w*q.z + z*q.w;;
-        float e4 = -x*q.x - y*q.y - z*q.z + w*q.w;;
+        float e2 =  z*q.x + w*q.y - x*q.z + y*q.w;
+        float e3 = -y*q.x + x*q.y + w*q.z + z*q.w;
+        float e4 = -x*q.x - y*q.y - z*q.z + w*q.w;
 
         return {
             e1, e2, e3, e4
@@ -50,6 +50,7 @@ namespace Quaternion {
     quat mul(quat q1, quat q2);
     quat succ(quat q1, quat q2);
     quat inverse(quat q);
+    quat lookAt(vec3 position, vec3 target);
 
     vec3 transformVector(quat, vec3);
 

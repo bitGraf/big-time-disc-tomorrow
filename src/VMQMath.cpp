@@ -295,3 +295,24 @@ vec3 Vector::lerp(vec3 start, vec3 end, float progress) {
 quat Quaternion::inverse(quat q) {
     return {-q.x, -q.y, -q.z, q.w};
 }
+
+quat Quaternion::lookAt(vec3 position, vec3 target) {
+    vec3 forward = Vector::normalized(target - position);
+    vec3 worldUp = {0, 1, 0};
+
+    vec3 left = Vector::cross(worldUp, forward);
+    vec3 up = Vector::cross(forward, left);
+
+    quat ret;
+    ret.w = .5 * sqrt(1 + left.x + up.y + forward.z);
+    float f = 1 / (4*ret.w);
+    ret.x = (up.z - forward.y) * f;
+    ret.y = (forward.x - left.z) * f;
+    ret.z = (left.y - up.x) * f;
+
+    return ret;
+}
+
+float Vector::magnitude(vec3 v) {
+    return v.x*v.x + v.y*v.y + v.z*v.z;
+}

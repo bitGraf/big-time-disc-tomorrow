@@ -71,5 +71,7 @@ namespace Vector {
     vec3 normalized(const vec3& v);
     void normalize(vec3& v);
 
+    float magnitude(vec3 v);
+
     vec3 lerp(vec3 start, vec3 end, float progression);
 }

@@ -6,6 +6,8 @@
 #include "Level.h"
 #include "Crawler.h"
 #include "DynamicFont.h"
+#include "Physics.h"
+#include "Missile.h"
 
 #include <string>
 
@@ -16,7 +18,9 @@ enum EntityTypes {
     ENT_Temporary,
     ENT_Terrain,
     ENT_Crawler,
-    ENT_Panel
+    ENT_Panel,
+    ENT_Physics,
+    ENT_Missile
 };
 
 /*struct LoadOptions {

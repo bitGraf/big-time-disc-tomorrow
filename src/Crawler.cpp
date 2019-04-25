@@ -1,7 +1,5 @@
 #include "Crawler.h"
-
-
-#include "Player.h"
+#include "Physics.h"
 #include "EntityManager.h"
 
 void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
@@ -34,6 +32,18 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
 
         position = localPos;
         orientation = localOrientation;
+    }
+
+    if ((key == GLFW_KEY_E) && (action == GLFW_PRESS)) {
+        MissileEnt* ent = (MissileEnt*)Entity::createNewEntity(ENT_Missile);
+        Resources::manager.loadTextureResource("missile_baseColor", ".png");
+        Resources::manager.loadTriMeshResource("missile", ".ply");
+        ent->baseColor = Resources::manager.getTextureResource("missile_baseColor");
+        ent->mesh = Resources::manager.getTriMeshResource("missile");
+        ent->mass = 200;
+        ent->position = position;
+        ent->orientation = {-.7071f, 0, 0, .7071f};
+        ent->update(0);
     }
 }
 
@@ -180,9 +190,6 @@ void CrawlerEnt::onCreate() {
     Quaternion::buildFromAxisAngleD(allPanels[1]->orientation, {1, 0, 0}, 90);
     allPanels[1]->length = 14;  allPanels[1]->width = 10;
     allPanels[1]->scale = {allPanels[1]->length, 1, allPanels[1]->width};
-    //quat q2;
-    //Quaternion::buildFromAxisAngleD(q2, {0, 1, 0}, -90);
-    //allPanels[1]->orientation = Quaternion::mul(allPanels[1]->orientation, q2);
 
     allPanels[2]->position = {-1.4645f - 2.0f + 7.0710678f, 13.536f + 7.0710678f, 0.0f};
     Quaternion::buildFromAxisAngleD(allPanels[2]->orientation, {0, 0, 1}, -135);
@@ -206,7 +213,6 @@ void CrawlerEnt::onCreate() {
 }
 
 void CrawlerEnt::transitionToPanel(PanelEnt* newPanel) {
-    printf("changing panel...\n");
     vec3 currUp = {0, 1, 0};
     if (currentPanel != NULL) {
         currUp = currentPanel->Up;
