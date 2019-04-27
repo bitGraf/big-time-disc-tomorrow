@@ -21,6 +21,9 @@ struct CrawlerEnt : EntityBase {
     bool attached = false;
     bool grounded = false;
 
+    //Camera mode
+    bool cameraFollow = true;
+
     PanelEnt* currentPanel = NULL;
 
     //Relative to the current panel

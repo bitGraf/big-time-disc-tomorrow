@@ -32,6 +32,12 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
 
         position = localPos;
         orientation = localOrientation;
+
+        Entity::manager.camera.position = {0, 0, 0};
+        Entity::manager.camera.targetPosition = {0, 0, 0};
+        Entity::manager.camera.targetOrientation = {0, 0, 0, 1};
+        Entity::manager.camera.orientation = {0, 0, 0, 1};
+        Entity::manager.camera.update(0);
     }
 
     if ((key == GLFW_KEY_E) && (action == GLFW_PRESS)) {
@@ -43,6 +49,10 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
         ent->position = position;
         ent->orientation = {-.7071f, 0, 0, .7071f};
         ent->update(0);
+    }
+
+    if ((key == GLFW_KEY_C) && (action == GLFW_PRESS)) {
+        cameraFollow = !cameraFollow;
     }
 }
 
@@ -130,12 +140,20 @@ void CrawlerEnt::update(double dt) {
         transitionToPanel(NULL);
     }
 
-    quat ttt;
-    Quaternion::buildFromAxisAngleD(ttt, {0, 1, 0}, 180);
-    Entity::manager.camera.targetOrientation = Quaternion::mul(orientation, ttt);
-    Quaternion::buildFromAxisAngleD(ttt, {1, 0, 0}, -30);
-    Entity::manager.camera.targetOrientation = Quaternion::mul(Entity::manager.camera.targetOrientation, ttt);
-    Entity::manager.camera.targetPosition = position - Forward*10.0f + Up*10.0f;
+    if (cameraFollow) {
+        quat ttt;
+        Quaternion::buildFromAxisAngleD(ttt, {0, 1, 0}, 180);
+        Entity::manager.camera.targetOrientation = Quaternion::mul(orientation, ttt);
+        Quaternion::buildFromAxisAngleD(ttt, {1, 0, 0}, -30);
+        Entity::manager.camera.targetOrientation = Quaternion::mul(Entity::manager.camera.targetOrientation, ttt);
+        Entity::manager.camera.targetPosition = position - Forward*10.0f + Up*10.0f;
+    } else {
+        //Entity::manager.camera.targetPosition = {0, 0, 0};
+        quat ttt = Quaternion::lookAt(Entity::manager.camera.position, position);
+        quat correc;
+        Quaternion::buildFromAxisAngleD(correc, {0, 1, 0}, 180);
+        Entity::manager.camera.targetOrientation = Quaternion::mul(ttt, correc);
+    }
 
     EntityBase::update(dt);
 }
@@ -170,7 +188,7 @@ void CrawlerEnt::onCreate() {
     printf("loading panel...\n");
 
     //Load level from file
-    allPanels = (PanelEnt**)Level::loadFromFile("../data/levels/level2.lvl", &numPanels);
+    allPanels = (PanelEnt**)Level::loadFromFile("../data/levels/level.lvl", &numPanels);
 
     F = move_acc * mass;
     K = F / max_speed;
@@ -189,7 +207,9 @@ void CrawlerEnt::transitionToPanel(PanelEnt* newPanel) {
         currentPanel = newPanel;
         grounded = false;
         attached = false;
+        printf("Panel detach\n");
     } else {
+        printf("Panel change\n");
         vec3 Axis = Vector::normalized(Vector::cross(currUp, newPanel->Up));
         float Angle = acos(Vector::dot(currUp, newPanel->Up));
         quat qT;Quaternion::buildFromAxisAngle(qT, Axis, Angle);
