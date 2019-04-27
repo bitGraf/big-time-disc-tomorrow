@@ -15,7 +15,7 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
         } else {
             grounded = false;
             velocity = velocity + currentPanel->Up * 10.0f;
-            attachCoolDown = 2.5f;
+            attachCoolDown = 0.5f;
             transitionToPanel(NULL);
         }
     }
@@ -170,7 +170,7 @@ void CrawlerEnt::onCreate() {
     printf("loading panel...\n");
 
     //Load level from file
-    allPanels = (PanelEnt**)Level::loadFromFile("../data/levels/level.lvl", &numPanels);
+    allPanels = (PanelEnt**)Level::loadFromFile("../data/levels/level2.lvl", &numPanels);
 
     F = move_acc * mass;
     K = F / max_speed;

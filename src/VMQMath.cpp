@@ -323,6 +323,9 @@ float Vector::magnitude(vec3 v) {
 }
 
 quat Quaternion::fromDCM(vec3 x, vec3 y, vec3 z) {
+    x.print();
+    y.print();
+    z.print();
     float trace = x.x + y.y + z.z;
 
     quat q;
@@ -342,36 +345,38 @@ quat Quaternion::fromDCM(vec3 x, vec3 y, vec3 z) {
         float d2 = y.y;
         float d3 = z.z;
 
-        if ((d2 > d1) && d2 > d3) {
+        printf("d1 = %f, d2 = %f, d3 = %f\n", d1, d2, d3);
+
+        if ((d2 > d1) && (d2 > d3)) {
             printf("  d2>d3 d2>d1\n");
 
             float s = sqrt(d2 - d1 - d3 + 1);
-            q.z = .5*s;
+            q.y = .5*s;
             if (fabsf(s) > tol)
                 s = .5 / s;
-            q.x = (x.z - z.x) * s;
-            q.y = (y.x - x.y) * s;
-            q.w = (z.y - y.z) * s;
+            q.w = (x.z - z.x) * s;
+            q.x = (y.x - x.y) * s;
+            q.z = (z.y - y.z) * s;
         } else if (d3 > d1) {
             printf("  d3>d1\n");
 
             float s = sqrt(d3 - d1 - d2 + 1);
-            q.w = .5*s;
+            q.z = .5*s;
             if (fabsf(s) > tol)
                 s = .5 / s;
-            q.x = (y.x - x.y) * s;
-            q.y = (x.z - z.x) * s;
-            q.z = (z.y - y.z) * s;
+            q.w = (y.x - x.y) * s;
+            q.x = (x.z - z.x) * s;
+            q.y = (z.y - y.z) * s;
         } else {
             printf("  else\n");
 
             float s = sqrt(d1 - d2 - d3 + 1);
-            q.y = .5*s;
+            q.x = .5*s;
             if (fabsf(s) > tol)
                 s = .5 / s;
-            q.x = (z.y - y.z) * s;
-            q.z = (y.x - x.y) * s;
-            q.w = (x.z - z.x) * s;
+            q.w = (z.y - y.z) * s;
+            q.y = (y.x - x.y) * s;
+            q.z = (x.z - z.x) * s;
         }
     }
 

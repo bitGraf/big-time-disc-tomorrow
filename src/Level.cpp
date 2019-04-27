@@ -55,23 +55,59 @@ void** Level::loadFromFile(char* filename, int* retNumPanels) {
 
         float tz = strtof(pstr, &pstr);
         float bz = strtof(pstr, &pstr);
-        float nz = strtof(pstr, NULL);
+        float nz = strtof(pstr, &pstr);
+
+        float sx = strtof(pstr, &pstr);
+        float sy = strtof(pstr, &pstr);
+        float sz = strtof(pstr, NULL);
+
+        printf("\n\nLoading Panel %d\n", i);
 
         if (i == 3) {
             printf("%f %f %f | %f %f %f | %f %f %f | %f %f %f\n",
             x, y, z, tx, ty, tz, bx, by, bz, nx, ny, nz);
         }
 
-        quat ret = Quaternion::fromDCM({tx, ty, tz},{bx, by, bz},{nx, ny, nz});
+        quat blenderOrientation = Quaternion::fromDCM({tx, ty, tz},{bx, by, bz},{nx, ny, nz});
 
-        quat x90;Quaternion::buildFromAxisAngleD(x90, {1, 0, 0}, 90);
+        quat B2D = {-.7071f, 0, 0, .7071f};
+
+        vec3 newAxis = Quaternion::transformVector(B2D, blenderOrientation.axis());
+        quat gameOrientation;
+        Quaternion::buildFromAxisAngleD(gameOrientation, newAxis, blenderOrientation.angle());
+
+        printf("New angle: %f deg\n", blenderOrientation.angle());
+        blenderOrientation.axis().print("Old rotation axis: ");
+        newAxis.print("New rotation axis: ");
+
+        vec3 T = {tx, ty, tz};
+        vec3 B = {bx, by, bz};
+        vec3 N = {nx, ny, nz};
+
+        T.print("T: ");
+        B.print("B: ");
+        N.print("N: ");
+
+        vec3 blenderPos = {x, y, z};
+        vec3 gamePos = Quaternion::transformVector(B2D, blenderPos);
+
+        vec3 worldScale = {sx, sy, sz};
+        vec3 panelScale = Quaternion::transformVector(Quaternion::inverse(gameOrientation), worldScale);
+        worldScale.print("Scale: ");
+
+        B2D.print("Blender to Game: ");
+        blenderOrientation.print("Blender orientation: ");
+        gameOrientation.print   ("Game orientation:    ");
+        blenderPos.print("Blender position: ");
+        gamePos.print   ("Game position:    ");
 
         //allPanels[i]->orientation = Quaternion::mul(ret, x90);
-        allPanels[i]->orientation = ret;
-        printf("Panel %d ", i);
+        allPanels[i]->orientation = gameOrientation;
         allPanels[i]->orientation.print();
-        allPanels[i]->position = {x, y, z};
-        allPanels[i]->scale = {allPanels[i]->length*2, 1, allPanels[i]->width*2};
+        allPanels[i]->position = gamePos;
+        allPanels[i]->length = 2*worldScale.x;
+        allPanels[i]->width = 2*worldScale.z;
+        allPanels[i]->scale = {allPanels[i]->length, 1, allPanels[i]->width};
 
         allPanels[i]->update(0);
     }

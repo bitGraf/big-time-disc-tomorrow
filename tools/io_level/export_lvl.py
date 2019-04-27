@@ -37,6 +37,7 @@ def save_level(filepath,collec, B2D):
         mesh = obj.data
         mesh.calc_tangents()
         m = obj.matrix_world
+        s = obj.scale
         for face in mesh.polygons:
             panelLocalPosition = face.center #-> in local coords, needs to be in world coords
             panelPosition = m @ Vector([panelLocalPosition.x, panelLocalPosition.y, panelLocalPosition.z, 1])
@@ -45,16 +46,17 @@ def save_level(filepath,collec, B2D):
                 B = vert.bitangent
                 panelT_ = m @ Vector([T.x, T.y, T.z, 0])
                 panelB_ = m @ Vector([B.x, B.y, B.z, 0])
-            panelPos = B2D @ Vector([panelPosition.x, panelPosition.y, panelPosition.z])
-            panelT = B2D @ Vector([panelT_.x, panelT_.y, panelT_.z])
+            panelPos = Vector([panelPosition.x, panelPosition.y, panelPosition.z])
+            panelT = Vector([panelT_.x, panelT_.y, panelT_.z])
             panelT.normalize()
-            panelB = B2D @ Vector([panelB_.x, panelB_.y, panelB_.z])
+            panelB = Vector([panelB_.x, panelB_.y, panelB_.z])
             panelB.normalize()
             panelN = panelT.cross(panelB)
-            fw("%.3f %.3f %.3f" % (panelPos.x, panelPos.y, panelPos.z))
-            fw(" %.3f %.3f %.3f"  % (panelT.x, panelB.x, panelN.x))
-            fw(" %.3f %.3f %.3f"   % (panelT.y, panelB.y, panelN.y))
-            fw(" %.3f %.3f %.3f\n"  % (panelT.z, panelB.z, panelN.z))
+            fw("%.6f %.6f %.6f" % (panelPos.x, panelPos.y, panelPos.z))
+            fw(" %.6f %.6f %.6f"   % (panelT.x, panelB.x, panelN.x))
+            fw(" %.6f %.6f %.6f"   % (panelT.y, panelB.y, panelN.y))
+            fw(" %.6f %.6f %.6f"   % (panelT.z, panelB.z, panelN.z))
+            fw(" %.6f %.6f %.6f\n" % (s.z, s.z, s.z))
     fw("DONE\n")
 
     file.close()

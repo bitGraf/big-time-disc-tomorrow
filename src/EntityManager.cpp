@@ -132,17 +132,6 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
             shader->setvec3("color", &ent->Color);
 
             glDrawElements(GL_TRIANGLES, verts2render, GL_UNSIGNED_INT, 0);
-
-            if (manager.showFrames) {
-                glDisable(GL_DEPTH_TEST);
-                manager.lineShader->use();
-                manager.lineShader->setMat4("model", &ent->modelMatrix);
-                manager.lineShader->setMat4("view", &Entity::manager.camera.viewMatrix);
-                glBindVertexArray(manager.axis.VAO);
-                glDrawElements(GL_LINES, manager.axis.numFaces*2, GL_UNSIGNED_INT, 0);
-                glBindVertexArray(0);
-                glEnable(GL_DEPTH_TEST);
-            }
         }
     }
 
@@ -152,6 +141,17 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
 
             if (!ent->Remove) {
                 ent->postRender();
+
+                if (manager.showFrames) {
+                    glDisable(GL_DEPTH_TEST);
+                    manager.lineShader->use();
+                    manager.lineShader->setMat4("model", &ent->modelMatrix);
+                    manager.lineShader->setMat4("view", &Entity::manager.camera.viewMatrix);
+                    glBindVertexArray(manager.axis.VAO);
+                    glDrawElements(GL_LINES, manager.axis.numFaces*2, GL_UNSIGNED_INT, 0);
+                    glBindVertexArray(0);
+                    glEnable(GL_DEPTH_TEST);
+                }
             }
         }
     glBindVertexArray(0);

@@ -6,6 +6,8 @@
 
 #include "Vector.h"
 
+#define r2d 57.2957795131
+
 struct quat {
     float x = 0;    //Axis component
     float y = 0;
@@ -32,6 +34,25 @@ struct quat {
         return {
             e1, e2, e3, e4
         };
+    }
+
+    float angle() {
+        float ang = 2*acos(w)*r2d;
+
+        return ang;
+    }
+
+    vec3 axis() {
+        float ang = angle();
+
+        vec3 ret = {x, y, z};
+        if (fabsf(ang) < .0001f) {
+            //quat = [0,0,0,1]
+            return ret;
+        }
+        ret = ret * (1 / (sin(ang / 2 / r2d)));
+
+        return ret;
     }
 
     void print(char* prepend = NULL) {
