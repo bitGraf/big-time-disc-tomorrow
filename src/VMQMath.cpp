@@ -319,66 +319,41 @@ quat Quaternion::lookAt(vec3 position, vec3 target) {
 }
 
 float Vector::magnitude(vec3 v) {
-    return v.x*v.x + v.y*v.y + v.z*v.z;
+    return sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
 }
 
 quat Quaternion::fromDCM(vec3 x, vec3 y, vec3 z) {
-    x.print();
-    y.print();
-    z.print();
-    float trace = x.x + y.y + z.z;
-
     quat q;
-    q.w = 0;
 
-    if (trace > 0) {
-        q.w = .5*sqrt(1 + trace);
-        float f = 1 / (4*q.w);
-        q.x = (y.z - z.y) * f;
-        q.y = (z.x - x.z) * f;
-        q.z = (x.y - y.x) * f;
-    } else {
-        float tol = .001f;
+    float tr = x.x + y.y + z.z;
 
-        printf("difficult method\n");
-        float d1 = x.x;
-        float d2 = y.y;
-        float d3 = z.z;
-
-        printf("d1 = %f, d2 = %f, d3 = %f\n", d1, d2, d3);
-
-        if ((d2 > d1) && (d2 > d3)) {
-            printf("  d2>d3 d2>d1\n");
-
-            float s = sqrt(d2 - d1 - d3 + 1);
-            q.y = .5*s;
-            if (fabsf(s) > tol)
-                s = .5 / s;
-            q.w = (x.z - z.x) * s;
-            q.x = (y.x - x.y) * s;
-            q.z = (z.y - y.z) * s;
-        } else if (d3 > d1) {
-            printf("  d3>d1\n");
-
-            float s = sqrt(d3 - d1 - d2 + 1);
-            q.z = .5*s;
-            if (fabsf(s) > tol)
-                s = .5 / s;
-            q.w = (y.x - x.y) * s;
-            q.x = (x.z - z.x) * s;
-            q.y = (z.y - y.z) * s;
-        } else {
-            printf("  else\n");
-
-            float s = sqrt(d1 - d2 - d3 + 1);
-            q.x = .5*s;
-            if (fabsf(s) > tol)
-                s = .5 / s;
-            q.w = (z.y - y.z) * s;
-            q.y = (y.x - x.y) * s;
-            q.z = (x.z - z.x) * s;
-        }
+    if (tr > 0) { 
+        float S = sqrt(tr+1.0) * 2; // S=4*qw 
+        q.w = 0.25 * S;
+        q.x = (y.z - z.y) / S;
+        q.y = (z.x - x.z) / S; 
+        q.z = (x.y - y.x) / S; 
+    } else if ((x.x > y.y)&(x.x > z.z)) { 
+        float S = sqrt(1.0 + x.x - y.y - z.z) * 2; // S=4*qx 
+        q.w = (y.z - z.y) / S;
+        q.x = 0.25 * S;
+        q.y = (y.x + x.y) / S; 
+        q.z = (z.x + x.z) / S; 
+    } else if (y.y > z.z) { 
+        float S = sqrt(1.0 + y.y - x.x - z.z) * 2; // S=4*qy
+        q.w = (z.x - x.z) / S;
+        q.x = (y.x + x.y) / S; 
+        q.y = 0.25 * S;
+        q.z = (z.y + y.z) / S; 
+    } else { 
+        float S = sqrt(1.0 + z.z - x.x - y.y) * 2; // S=4*qz
+        q.w = (x.y - y.x) / S;
+        q.x = (z.x + x.z) / S;
+        q.y = (z.y + y.z) / S;
+        q.z = 0.25 * S;
     }
+
+    //q.print("Results: ");
 
     return Quaternion::normalized(q);
 }

@@ -41,72 +41,27 @@ void** Level::loadFromFile(char* filename, int* retNumPanels) {
 
         lineContents = strtok(NULL, "\r\n");
         char* pstr = lineContents;
-        float x = strtof(pstr, &pstr);
-        float y = strtof(pstr, &pstr);
-        float z = strtof(pstr, &pstr);
+        vec3 v1 = {strtof(pstr, &pstr), strtof(pstr, &pstr), strtof(pstr, &pstr)};
+        vec3 v2 = {strtof(pstr, &pstr), strtof(pstr, &pstr), strtof(pstr, &pstr)};
+        vec3 v3 = {strtof(pstr, &pstr), strtof(pstr, &pstr), strtof(pstr, &pstr)};
+        vec3 v4 = {strtof(pstr, &pstr), strtof(pstr, &pstr), strtof(pstr, NULL)};
 
-        float tx = strtof(pstr, &pstr);
-        float bx = strtof(pstr, &pstr);
-        float nx = strtof(pstr, &pstr);
+        vec3 panelPos = (v1 + v2 + v3 + v4) * 0.25f;
+        float xScale = Vector::magnitude(v3-v2);
+        float zScale = Vector::magnitude(v2-v1);
+        vec3 T = Vector::normalized(v3 - v2);
+        vec3 B = Vector::normalized(v2 - v1);
+        vec3 N = Vector::cross(B, T);
+        quat panelRotation = Quaternion::fromDCM(T, N, B);
 
-        float ty = strtof(pstr, &pstr);
-        float by = strtof(pstr, &pstr);
-        float ny = strtof(pstr, &pstr);
+        //panelPos.print("Position: ");
+        //panelRotation.print("Rotation: ");
+        //printf("Scale: (%f %f)\n", xScale, zScale);
 
-        float tz = strtof(pstr, &pstr);
-        float bz = strtof(pstr, &pstr);
-        float nz = strtof(pstr, &pstr);
-
-        float sx = strtof(pstr, &pstr);
-        float sy = strtof(pstr, &pstr);
-        float sz = strtof(pstr, NULL);
-
-        printf("\n\nLoading Panel %d\n", i);
-
-        if (i == 3) {
-            printf("%f %f %f | %f %f %f | %f %f %f | %f %f %f\n",
-            x, y, z, tx, ty, tz, bx, by, bz, nx, ny, nz);
-        }
-
-        quat blenderOrientation = Quaternion::fromDCM({tx, ty, tz},{bx, by, bz},{nx, ny, nz});
-
-        quat B2D = {-.7071f, 0, 0, .7071f};
-
-        vec3 newAxis = Quaternion::transformVector(B2D, blenderOrientation.axis());
-        quat gameOrientation;
-        Quaternion::buildFromAxisAngleD(gameOrientation, newAxis, blenderOrientation.angle());
-
-        printf("New angle: %f deg\n", blenderOrientation.angle());
-        blenderOrientation.axis().print("Old rotation axis: ");
-        newAxis.print("New rotation axis: ");
-
-        vec3 T = {tx, ty, tz};
-        vec3 B = {bx, by, bz};
-        vec3 N = {nx, ny, nz};
-
-        T.print("T: ");
-        B.print("B: ");
-        N.print("N: ");
-
-        vec3 blenderPos = {x, y, z};
-        vec3 gamePos = Quaternion::transformVector(B2D, blenderPos);
-
-        vec3 worldScale = {sx, sy, sz};
-        vec3 panelScale = Quaternion::transformVector(Quaternion::inverse(gameOrientation), worldScale);
-        worldScale.print("Scale: ");
-
-        B2D.print("Blender to Game: ");
-        blenderOrientation.print("Blender orientation: ");
-        gameOrientation.print   ("Game orientation:    ");
-        blenderPos.print("Blender position: ");
-        gamePos.print   ("Game position:    ");
-
-        //allPanels[i]->orientation = Quaternion::mul(ret, x90);
-        allPanels[i]->orientation = gameOrientation;
-        allPanels[i]->orientation.print();
-        allPanels[i]->position = gamePos;
-        allPanels[i]->length = 2*worldScale.x;
-        allPanels[i]->width = 2*worldScale.z;
+        allPanels[i]->orientation = panelRotation;
+        allPanels[i]->position = panelPos;
+        allPanels[i]->length = xScale;
+        allPanels[i]->width = zScale;
         allPanels[i]->scale = {allPanels[i]->length, 1, allPanels[i]->width};
 
         allPanels[i]->update(0);
