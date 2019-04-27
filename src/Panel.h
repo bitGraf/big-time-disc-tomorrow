@@ -15,8 +15,8 @@ inline float max(float a, float b) {
 
 struct PanelEnt : EntityBase {
     float d = realmax;
-    float length = 10; //Panel size from edge to edge
-    float width = 14;
+    float length = 1; //Panel size from edge to edge
+    float width = 1;
     bool inVolume = false;
     float attachRadius2 = pow(1.5f, 2.0f);
 

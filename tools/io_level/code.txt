@@ -1,0 +1,33 @@
+fw = print
+B2D = Matrix([[0, 0, 1], [1, 0, 0], [0, 1, 0]])
+D = bpy.data
+numPanels = 0
+
+for obj in D.collections['EXPORT'].objects:
+    mesh = obj.data
+    mesh.calc_tangents()
+    for face in mesh.polygons:
+        numPanels = numPanels + 1
+
+fw("NumPanels: %d" % numPanels)
+for obj in D.collections['EXPORT'].objects:
+    mesh = obj.data
+    mesh.calc_tangents()
+    m = obj.matrix_world
+    for face in mesh.polygons:
+        panelLocalPosition = face.center #-> in local coords, needs to be in world coords
+        panelPosition = m @ Vector([panelLocalPosition.x, panelLocalPosition.y, panelLocalPosition.z, 1])
+        for vert in [mesh.loops[i] for i in face.loop_indices]:
+            T = vert.tangent
+            B = vert.bitangent
+            panelT_ = m @ Vector([T.x, T.y, T.z, 0])
+            panelB_ = m @ Vector([B.x, B.y, B.z, 0])
+        panelPos = B2D @ Vector([panelPosition.x, panelPosition.y, panelPosition.z])
+        panelT = B2D @ Vector([panelT_.x, panelT_.y, panelT_.z])
+        panelB = B2D @ Vector([panelB_.x, panelB_.y, panelB_.z])
+        panelN = panelT.cross(panelB)
+        fw("Position: (%.3f %.3f %.3f)\n" % (panelPos.x, panelPos.y, panelPos.z))
+        fw("Matrix: /%.3f %.3f %.3f\\\n"  % (panelT.x, panelB.x, panelN.x))
+        fw("        |%.3f %.3f %.3f|\n"   % (panelT.y, panelB.y, panelN.y))
+        fw("        \\%.3f %.3f %.3f/\n"  % (panelT.z, panelB.z, panelN.z))
+fw("DONE")

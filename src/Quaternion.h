@@ -44,6 +44,7 @@ struct quat {
 namespace Quaternion {
     void identity(quat& q);
     void normalize(quat& q);
+    quat normalized(quat& q);
     void buildFromAxisAngleD(quat& q, const vec3 axis, const float angleD);
     void buildFromAxisAngle(quat& q, const vec3 axis, const float angle);
 
@@ -51,6 +52,8 @@ namespace Quaternion {
     quat succ(quat q1, quat q2);
     quat inverse(quat q);
     quat lookAt(vec3 position, vec3 target);
+
+    quat fromDCM(vec3 x, vec3 y, vec3 z);
 
     vec3 transformVector(quat, vec3);
 

@@ -23,4 +23,6 @@ struct LevelData {
 
 namespace Level {
     LevelData *loadLevel(char* filename, char* filetype, char* texturename, char* texturetype);
+    //PanelEnt** loadFromFile(char* filename, int* retNumPanels);
+    void** loadFromFile(char* filename, int* retNumPanels);
 }

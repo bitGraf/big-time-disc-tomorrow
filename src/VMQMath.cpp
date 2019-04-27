@@ -133,6 +133,11 @@ void Quaternion::normalize(quat& v) {
     v.w *= m;
 }
 
+quat Quaternion::normalized(quat& v) {
+    float m = 1/sqrt(v.x*v.x + v.y*v.y + v.z*v.z + v.w*v.w);
+    return {v.x * m, v.y * m, v.z * m, v.w * m};
+}
+
 void Matrix::fromQuaternion(mat4* m, quat* q) {
     //printf("Converting quat:[%.2f, %.2f, %.2f, %.2f] to mat4\n", e1, e2, e3, e4);
     Matrix::identity(m);
@@ -315,4 +320,60 @@ quat Quaternion::lookAt(vec3 position, vec3 target) {
 
 float Vector::magnitude(vec3 v) {
     return v.x*v.x + v.y*v.y + v.z*v.z;
+}
+
+quat Quaternion::fromDCM(vec3 x, vec3 y, vec3 z) {
+    float trace = x.x + y.y + z.z;
+
+    quat q;
+    q.w = 0;
+
+    if (trace > 0) {
+        q.w = .5*sqrt(1 + trace);
+        float f = 1 / (4*q.w);
+        q.x = (y.z - z.y) * f;
+        q.y = (z.x - x.z) * f;
+        q.z = (x.y - y.x) * f;
+    } else {
+        float tol = .001f;
+
+        printf("difficult method\n");
+        float d1 = x.x;
+        float d2 = y.y;
+        float d3 = z.z;
+
+        if ((d2 > d1) && d2 > d3) {
+            printf("  d2>d3 d2>d1\n");
+
+            float s = sqrt(d2 - d1 - d3 + 1);
+            q.z = .5*s;
+            if (fabsf(s) > tol)
+                s = .5 / s;
+            q.x = (x.z - z.x) * s;
+            q.y = (y.x - x.y) * s;
+            q.w = (z.y - y.z) * s;
+        } else if (d3 > d1) {
+            printf("  d3>d1\n");
+
+            float s = sqrt(d3 - d1 - d2 + 1);
+            q.w = .5*s;
+            if (fabsf(s) > tol)
+                s = .5 / s;
+            q.x = (y.x - x.y) * s;
+            q.y = (x.z - z.x) * s;
+            q.z = (z.y - y.z) * s;
+        } else {
+            printf("  else\n");
+
+            float s = sqrt(d1 - d2 - d3 + 1);
+            q.y = .5*s;
+            if (fabsf(s) > tol)
+                s = .5 / s;
+            q.x = (z.y - y.z) * s;
+            q.z = (y.x - x.y) * s;
+            q.w = (x.z - z.x) * s;
+        }
+    }
+
+    return Quaternion::normalized(q);
 }

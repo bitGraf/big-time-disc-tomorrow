@@ -40,7 +40,6 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
         Resources::manager.loadTriMeshResource("missile", ".ply");
         ent->baseColor = Resources::manager.getTextureResource("missile_baseColor");
         ent->mesh = Resources::manager.getTriMeshResource("missile");
-        ent->mass = 200;
         ent->position = position;
         ent->orientation = {-.7071f, 0, 0, .7071f};
         ent->update(0);
@@ -153,6 +152,7 @@ void CrawlerEnt::postRender() {
     sprintf(text, "Cooldown: %6.4f", attachCoolDown);
     Font::drawText(Entity::manager.font, 0, 92, {1, 1, 0, 1}, text);
 
+/*
     for (int i = 0; i < numPanels; i++) {
         sprintf(text, "Panel %d: [K = %5.2f, In Volume: %s]%s (%5.2f, %5.2f)", 
             i+1, sqrt(allPanels[i]->K2), 
@@ -161,6 +161,7 @@ void CrawlerEnt::postRender() {
             allPanels[i]->u.x, allPanels[i]->u.z);
         Font::drawText(Entity::manager.font, 0, 112 + 20*i, {1, 1, 0, 1}, text);
     }
+*/
 
     EntityBase::preRender();
 }
@@ -168,43 +169,8 @@ void CrawlerEnt::postRender() {
 void CrawlerEnt::onCreate() {
     printf("loading panel...\n");
 
-    //Panel resources
-    Resources::manager.loadTriMeshResource("plane", ".modl");
-    Resources::manager.loadTextureResource("wall", ".jpg");
-
-    numPanels = 5;
-    allPanels = (PanelEnt**)malloc(numPanels * sizeof(PanelEnt*));
-
-    for (int i = 0; i < numPanels; i ++) {
-        allPanels[i] = (PanelEnt*)Entity::createNewEntity(ENT_Panel);
-        allPanels[i]->mesh = Resources::manager.getTriMeshResource("plane");
-        allPanels[i]->baseColor = Resources::manager.getTextureResource("wall");
-        allPanels[i]->update(0);
-        allPanels[i]->scale = {allPanels[i]->length, 1, allPanels[i]->width};
-    }
-
-    allPanels[0]->position = {-7, 5, 0};
-    Quaternion::buildFromAxisAngleD(allPanels[0]->orientation, {0, 0, 1}, -90);
-
-    allPanels[1]->position = {0, 5, -7};
-    Quaternion::buildFromAxisAngleD(allPanels[1]->orientation, {1, 0, 0}, 90);
-    allPanels[1]->length = 14;  allPanels[1]->width = 10;
-    allPanels[1]->scale = {allPanels[1]->length, 1, allPanels[1]->width};
-
-    allPanels[2]->position = {-1.4645f - 2.0f + 7.0710678f, 13.536f + 7.0710678f, 0.0f};
-    Quaternion::buildFromAxisAngleD(allPanels[2]->orientation, {0, 0, 1}, -135);
-    allPanels[2]->length = 30;
-    allPanels[2]->scale = {allPanels[2]->length, 1, allPanels[2]->width};
-
-    allPanels[3]->position = {-1.4645f + 6.0f + 7.0710678f, 13.536f + 7.0710678f + 8.0f, 14.0f};
-    Quaternion::buildFromAxisAngleD(allPanels[3]->orientation, {0, 0, 1}, -160);
-    allPanels[3]->length = 30;
-    allPanels[3]->scale = {allPanels[3]->length, 1, allPanels[3]->width};
-
-    printf("4\n");
-    allPanels[4]->position = {0, 2, 10};
-    Quaternion::buildFromAxisAngleD(allPanels[4]->orientation, {1, 0, 0}, -30);
-    printf("5\n");
+    //Load level from file
+    allPanels = (PanelEnt**)Level::loadFromFile("../data/levels/level.lvl", &numPanels);
 
     F = move_acc * mass;
     K = F / max_speed;

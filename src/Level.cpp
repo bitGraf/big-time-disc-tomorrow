@@ -1,5 +1,132 @@
 #include "Level.h"
 
+void** Level::loadFromFile(char* filename, int* retNumPanels) {
+    //Panel resources
+    Resources::manager.loadTriMeshResource("plane", ".modl");
+    Resources::manager.loadTextureResource("wall", ".jpg");
+
+    //Read whole file into array
+    FILE* modelFile = fopen(filename, "rb");
+    if (modelFile == NULL) {
+        printf("Failed to open file [%s]\n", filename);
+        return NULL;
+    }
+    printf("Reading file: \"%s\"\n", filename);
+    
+    fseek(modelFile, 0, SEEK_END);
+	long fileLength = ftell(modelFile);
+	fseek(modelFile, 0, SEEK_SET);
+
+	char *fileContents = (char *)malloc(fileLength + 1);
+	fread(fileContents, fileLength, 1, modelFile);
+	fclose(modelFile);
+	fileContents[fileLength] = 0;
+
+    //start parsing line by line
+    char* lineContents;
+    lineContents = strtok(fileContents, "\r\n");
+    lineContents = strtok(NULL, "\r\n");
+
+    int numPanels = strtod(lineContents + 10, NULL);
+    printf("NumPanels = %d\n", numPanels);
+
+    if (retNumPanels != NULL)
+        *retNumPanels = numPanels;
+    PanelEnt** allPanels = (PanelEnt**)malloc(numPanels * sizeof(PanelEnt*));
+
+    for (int i = 0; i < numPanels; i ++) {
+        allPanels[i] = (PanelEnt*)Entity::createNewEntity(ENT_Panel);
+        allPanels[i]->mesh = Resources::manager.getTriMeshResource("plane");
+        allPanels[i]->baseColor = Resources::manager.getTextureResource("wall");
+
+        lineContents = strtok(NULL, "\r\n");
+        char* pstr = lineContents;
+        float x = strtof(pstr, &pstr);
+        float y = strtof(pstr, &pstr);
+        float z = strtof(pstr, &pstr);
+
+        float tx = strtof(pstr, &pstr);
+        float bx = strtof(pstr, &pstr);
+        float nx = strtof(pstr, &pstr);
+
+        float ty = strtof(pstr, &pstr);
+        float by = strtof(pstr, &pstr);
+        float ny = strtof(pstr, &pstr);
+
+        float tz = strtof(pstr, &pstr);
+        float bz = strtof(pstr, &pstr);
+        float nz = strtof(pstr, NULL);
+
+        if (i == 3) {
+            printf("%f %f %f | %f %f %f | %f %f %f | %f %f %f\n",
+            x, y, z, tx, ty, tz, bx, by, bz, nx, ny, nz);
+        }
+
+        quat ret = Quaternion::fromDCM({tx, ty, tz},{bx, by, bz},{nx, ny, nz});
+
+        quat x90;Quaternion::buildFromAxisAngleD(x90, {1, 0, 0}, 90);
+
+        //allPanels[i]->orientation = Quaternion::mul(ret, x90);
+        allPanels[i]->orientation = ret;
+        printf("Panel %d ", i);
+        allPanels[i]->orientation.print();
+        allPanels[i]->position = {x, y, z};
+        allPanels[i]->scale = {allPanels[i]->length*2, 1, allPanels[i]->width*2};
+
+        allPanels[i]->update(0);
+    }
+
+    free(fileContents);
+
+    return (void**)allPanels;
+
+    return NULL;
+}
+
+/*
+void** Level::loadFromFile(char* filename, int* retNumPanels) {
+    //Panel resources
+    Resources::manager.loadTriMeshResource("plane", ".modl");
+    Resources::manager.loadTextureResource("wall", ".jpg");
+
+    int numPanels = 5;
+    if (retNumPanels != NULL)
+        *retNumPanels = numPanels;
+    PanelEnt** allPanels = (PanelEnt**)malloc(numPanels * sizeof(PanelEnt*));
+
+    for (int i = 0; i < numPanels; i ++) {
+        allPanels[i] = (PanelEnt*)Entity::createNewEntity(ENT_Panel);
+        allPanels[i]->mesh = Resources::manager.getTriMeshResource("plane");
+        allPanels[i]->baseColor = Resources::manager.getTextureResource("wall");
+        allPanels[i]->update(0);
+        allPanels[i]->scale = {allPanels[i]->length, 1, allPanels[i]->width};
+    }
+
+    allPanels[0]->position = {-7, 5, 0};
+    Quaternion::buildFromAxisAngleD(allPanels[0]->orientation, {0, 0, 1}, -90);
+
+    allPanels[1]->position = {0, 5, -7};
+    Quaternion::buildFromAxisAngleD(allPanels[1]->orientation, {1, 0, 0}, 90);
+    allPanels[1]->length = 14;  allPanels[1]->width = 10;
+    allPanels[1]->scale = {allPanels[1]->length, 1, allPanels[1]->width};
+
+    allPanels[2]->position = {-1.4645f - 2.0f + 7.0710678f, 13.536f + 7.0710678f, 0.0f};
+    Quaternion::buildFromAxisAngleD(allPanels[2]->orientation, {0, 0, 1}, -135);
+    allPanels[2]->length = 30;
+    allPanels[2]->scale = {allPanels[2]->length, 1, allPanels[2]->width};
+
+    allPanels[3]->position = {-1.4645f + 6.0f + 7.0710678f, 13.536f + 7.0710678f + 8.0f, 14.0f};
+    Quaternion::buildFromAxisAngleD(allPanels[3]->orientation, {0, 0, 1}, -160);
+    allPanels[3]->length = 30;
+    allPanels[3]->scale = {allPanels[3]->length, 1, allPanels[3]->width};
+
+    allPanels[4]->position = {0, 2, 10};
+    Quaternion::buildFromAxisAngleD(allPanels[4]->orientation, {1, 0, 0}, -30);
+
+    return (void**)allPanels;
+}
+*/
+
 LevelData* Level::loadLevel(char* filename, char* filetype, char* texturename, char* texturetype) {
     printf("Loading level: %s\n", filename);
     LevelData *level = (LevelData*)malloc(sizeof(LevelData));
