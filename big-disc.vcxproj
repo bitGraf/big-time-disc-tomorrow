@@ -129,6 +129,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\AI.cpp" />
     <ClCompile Include="src\Crawler.cpp" />
     <ClCompile Include="src\DynamicFont.cpp" />
     <ClCompile Include="src\EntityManager.cpp" />
@@ -137,7 +138,9 @@
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\Level.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Missile.cpp" />
     <ClCompile Include="src\ModelLoader.cpp" />
+    <ClCompile Include="src\Physics.cpp" />
     <ClCompile Include="src\Platform.cpp" />
     <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
@@ -147,6 +150,7 @@
     <ClCompile Include="src\VMQMath.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\AI.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Crawler.h" />
     <ClInclude Include="src\DynamicFont.h" />
@@ -157,7 +161,10 @@
     <ClInclude Include="src\InputBindings.h" />
     <ClInclude Include="src\Level.h" />
     <ClInclude Include="src\Matrix.h" />
+    <ClInclude Include="src\Missile.h" />
     <ClInclude Include="src\ModelLoader.h" />
+    <ClInclude Include="src\Panel.h" />
+    <ClInclude Include="src\Physics.h" />
     <ClInclude Include="src\Platform.h" />
     <ClInclude Include="src\Player.h" />
     <ClInclude Include="src\Quaternion.h" />

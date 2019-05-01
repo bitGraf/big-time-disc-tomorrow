@@ -45,6 +45,11 @@ void Entity::init_entities(WindowInfo windowInfo) {
     StaticEnt* se = (StaticEnt*)ent;
     se->Rainbow = false;
 
+	ent = Entity::createNewEntity(ENT_AI);
+	ent->mesh = Resources::manager.getTriMeshResource("bot2");
+	ent->baseColor = Resources::manager.getTextureResource("grid");
+	
+
     manager.font = Font::newDynamicFont("../data/fonts/Consolas.ttf", 20);
 
     Entity::printAllEntities();
@@ -170,11 +175,12 @@ void Entity::printAllEntities() {
                 ent->subType==ENT_Base ? " " : (
                 ent->subType==ENT_Player ? "Player" : (
                 ent->subType==ENT_Crawler ? "Crawler" : (
+				ent->subType==ENT_AI ? "AI" : (
                 ent->subType==ENT_Panel ? "Panel" : (
                 ent->subType==ENT_Static ? "Static" : (
                 ent->subType==ENT_Temporary ? "Temporary" : (
                 ent->subType==ENT_Terrain ? "Terrain" : 
-                    "Unknown type")))))));
+                    "Unknown type"))))))));
         } else {
             printf("%p\t%d\t%d\n", manager.pointerList[i],
             0, 0);
@@ -233,6 +239,10 @@ int Entity::registerEntity(EntityTypes type) {
             manager.pointerList[manager.numEntries] = new PhysicsEnt;
             //printf("Adding new EntityStatic\n");
         } break;
+		case ENT_AI: {
+			manager.pointerList[manager.numEntries] = new AIEnt;
+			//printf("Adding new EntityAI\n");
+		} break;
         default: {
             manager.pointerList[manager.numEntries] = new EntityBase;
             //printf("Adding new EntityBase\n");

@@ -8,6 +8,7 @@
 #include "DynamicFont.h"
 #include "Physics.h"
 #include "Missile.h"
+#include "AI.h"
 
 #include <string>
 
@@ -20,7 +21,8 @@ enum EntityTypes {
     ENT_Crawler,
     ENT_Panel,
     ENT_Physics,
-    ENT_Missile
+    ENT_Missile,
+	ENT_AI
 };
 
 /*struct LoadOptions {
