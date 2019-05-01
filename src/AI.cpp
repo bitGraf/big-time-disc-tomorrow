@@ -9,23 +9,27 @@ void AIEnt::onCreate() {
 
 void AIEnt::update(double dt) {
 
-	position.y = position.y + (velocity.y * dt);
+	position = position + (velocity * dt);
 
 	switch (state) {
-	case 0:
-		velocity.y += .1;
-		if (position.y >= 10) {
-			velocity.y = 0;
-			state = 1;
+	case 0: // Patrol
+		
+		if (position.x >= 10) {
+			velocity.x -= 1;
+			orientation = { 0, -.7071f, 0, .7071f };
+		}
+		
+		if (position.x <= 0) {
+			velocity.x += 1;
+			orientation = { 0, .7071f, 0, .7071f };
+
 		}
 		break;
 	case 1:
-		velocity.y -= .1;
-		if (position.y <= 0) {
-			velocity.y = 0;
-			state = 0;
-		}
+
 		break;
+	default:
+		state = 0;
 	}
 	EntityBase::update(dt);
 }
