@@ -29,15 +29,15 @@ void Entity::init_entities(WindowInfo windowInfo) {
     Resources::manager.loadTextureResource("rustediron2_amr", ".jpg");
 
 
-    EntityBase* ent = Entity::createNewEntity(ENT_Crawler);
-    ent->mesh = Resources::manager.getTriMeshResource("bigBot");
-    ent->baseColor = Resources::manager.getTextureResource("rustediron2_basecolor");
-    ent->normalMap = Resources::manager.getTextureResource("rustediron2_normal");
-    ent->amrMap = Resources::manager.getTextureResource("rustediron2_amr");
+    manager.Player = (CrawlerEnt*)Entity::createNewEntity(ENT_Crawler);
+    manager.Player->mesh = Resources::manager.getTriMeshResource("bigBot");
+    manager.Player->baseColor = Resources::manager.getTextureResource("rustediron2_basecolor");
+    manager.Player->normalMap = Resources::manager.getTextureResource("rustediron2_normal");
+    manager.Player->amrMap = Resources::manager.getTextureResource("rustediron2_amr");
     //ent->Color = {5, 5, 7};
 
     //Level::loadLevel("mountains512", ".png", "mColor", ".png");
-    ent = Entity::createNewEntity(ENT_Static);
+    EntityBase* ent = Entity::createNewEntity(ENT_Static);
     ent->mesh = Resources::manager.getTriMeshResource("plane");
     ent->baseColor = Resources::manager.getTextureResource("grid");
     ent->scale = {64, 64, 64};//one block  = 2 units

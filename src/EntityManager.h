@@ -58,6 +58,9 @@ struct EntityManager {
 
     DynamicFont* font;
 
+    //Important entities
+    CrawlerEnt* Player;
+
     //Render objects
     //std::vector<GLuint> VAOs;
     //std::vector<GLuint> VBOs;
