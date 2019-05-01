@@ -1,5 +1,5 @@
 #include "Crawler.h"
-#include "Physics.h"
+//#include "Physics.h"
 #include "EntityManager.h"
 
 void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
@@ -188,7 +188,7 @@ void CrawlerEnt::onCreate() {
     printf("loading panel...\n");
 
     //Load level from file
-    allPanels = (PanelEnt**)Level::loadFromFile("../data/levels/level.lvl", &numPanels);
+    allPanels = (PanelEnt**)Level::loadFromFile("../data/levels/level2.lvl", &numPanels);
 
     F = move_acc * mass;
     K = F / max_speed;
