@@ -15,7 +15,7 @@ set files=%files% VMQMath.cpp ModelLoader.cpp EntityManager.cpp
 set files=%files% Platform.cpp Input.cpp Texture.cpp Level.cpp
 set files=%files% stb_implementation.c DynamicFont.cpp
 set files=%files% ResourceManager.cpp Crawler.cpp
-set files=%files% Physics.cpp Missile.cpp
+set files=%files% Physics.cpp Missile.cpp AI.cpp
 
 set opts=/MD /nologo /EHsc
 
