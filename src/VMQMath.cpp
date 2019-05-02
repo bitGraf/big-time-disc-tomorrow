@@ -322,6 +322,10 @@ float Vector::magnitude(vec3 v) {
     return sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
 }
 
+float Vector::magnitude(vec2 v) {
+	return sqrt(v.x*v.x + v.y*v.y);
+}
+
 quat Quaternion::fromDCM(vec3 x, vec3 y, vec3 z) {
     quat q;
 
