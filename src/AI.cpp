@@ -22,7 +22,7 @@ void AIEnt::update(double dt) {
 
 	switch (state) {
 	case 0: // Patrol
-		// Patrol Loop
+		// Thot Patrol Loop
 		if (position.x > 10) {
 			velocity.x = -speed;
 			orientation = { 0, -.7071f, 0, .7071f };
@@ -50,6 +50,7 @@ void AIEnt::update(double dt) {
 	case 2: // Run away!
 		orientation = Quaternion::lookAt(position, Entity::manager.Player->position);
 		orientation = { 0, orientation.y, 0, orientation.w };
+		Quaternion::normalize(orientation);
 		Quaternion::buildFromAxisAngleD(rot180, { 0,1,0 }, 180);
 		orientation = Quaternion::mul(orientation, rot180);
 		velocity = Forward*speed;
@@ -61,9 +62,7 @@ void AIEnt::update(double dt) {
 			break;
 	case 3: // Return
 		returnSpot = AIEnt::distanceToPatrol({ 0,0,0 }, { 10,0,0 });
-		orientation = Quaternion::lookAt(returnSpot, position);
-		Quaternion::buildFromAxisAngleD(rot180, { 0,1,0 }, 180);
-		orientation = Quaternion::mul(orientation, rot180);
+		orientation = Quaternion::lookAt(position, returnSpot);
 		velocity = Forward*speed;
 		if (distanceFromPlayer < 10) {
 			velocity = { 0, 0, speed*1.f };
