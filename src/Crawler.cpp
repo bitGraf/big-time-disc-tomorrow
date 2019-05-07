@@ -124,8 +124,8 @@ void CrawlerEnt::update(double dt) {
     bool onAPanel = false;
     for (int i = 0; i < numPanels; i++) {
         allPanels[i]->distanceToPoint(position);
-		int angleBetween = Vector::dot(Vector::normalized(velocity), Vector::normalized(allPanels[i]->Up));
-        if (allPanels[i]->inVolume) {
+		int angleBetween = acos(Vector::dot(Vector::normalized(velocity), Vector::normalized(allPanels[i]->Up)));
+        if (allPanels[i]->inVolume && angleBetween < 0.5) {
             onAPanel = true;
             allPanels[i]->Color = {1, 2.5, 1};
             if ((currentPanel == NULL) || (allPanels[i]->K2 < currentPanel->K2)) {

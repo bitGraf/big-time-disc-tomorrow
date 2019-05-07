@@ -20,6 +20,7 @@ struct AIEnt : EntityBase {
 
 	void onCreate() override;
 	void update(double dt) override;
+	void preRender();
 	vec3 distanceToPatrol(vec3, vec3);
 	quat lookTowards(vec3 target, bool away = FALSE);
 };

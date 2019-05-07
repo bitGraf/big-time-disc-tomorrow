@@ -5,11 +5,11 @@
 void AIEnt::onCreate() {
 	printf("Spawning AI...\n");
 	patrolPoints = Level::loadPathFile("../data/paths/guardpath.pth");
-	position = { 10, 0, 10 };
+	position = { 10, 0, 5 };
 }
 
 vec3 AIEnt::distanceToPatrol(vec3 a, vec3 b) {
-	const float totalLength = Vector::magnitude(a) - Vector::magnitude(b);
+	const float totalLength = abs(Vector::magnitude(a) - Vector::magnitude(b));
 	if (totalLength == 0.0) return a - position;
 	const float t = max(0, min(1, Vector::dot(b - position, a - position) / totalLength));
 	const vec3 projection = position + (b - a)*t;
@@ -21,7 +21,7 @@ quat AIEnt::lookTowards(vec3 target, bool away) {
 	quat lookAtTar = Quaternion::lookAt(position, target);
 	lookAtTar = { 0, lookAtTar.y, 0, lookAtTar.w };
 	Quaternion::normalize(lookAtTar);
-	if (away = TRUE) {
+	if (away == TRUE) {
 		Quaternion::buildFromAxisAngleD(rot180, { 0,1,0 }, 180);
 		lookAtTar = Quaternion::mul(lookAtTar, rot180);
 	}
@@ -34,43 +34,24 @@ void AIEnt::update(double dt) {
 	distanceFromPlayer = Vector::magnitude(Entity::manager.Player->position - position);
 
 	switch (state) {
-	/*case 0: // Patrol
-		// Thot Patrol Loop
-		if (position.x > 10) {
-			velocity.x = -speed;
-			orientation = { 0, -.7071f, 0, .7071f };
-		}
-		
-		if (position.x <= 0) {
-			velocity.x = speed;
-			orientation = { 0, .7071f, 0, .7071f };
-		}
-
-		// Player Distance Check
-			if (distanceFromPlayer <= 10) {
-				velocity = { 0, 0, 0 };
-				state = 2;
-				printf("Switching to state %d \n", state);
-		}
-		break;*/
 	case 0: // Patrol 2.0
 		orientation = AIEnt::lookTowards(patrolPoints[currentPatrolGoal]);
 		velocity = Forward*speed;
 		if (int(position.x - patrolPoints[currentPatrolGoal].x) == 0) {
+			velocity = { 0,0,0 };
 			currentPatrolGoal++;
+
 			printf("New Patrol Goal is: %i\n", currentPatrolGoal);
 		}
 
 		// Player Distance Check
 		if (distanceFromPlayer <= 10) {
-			velocity = { 0, 0, 0 };
 			state = 2;
 			printf("Switching to state %d \n", state);
 		}
 		break;
 	case 1: // Idle
 		if (distanceFromPlayer >= 10) {
-			velocity.x = speed*Forward.x;
 			state = 0;
 			printf("Switching to state %d \n", state);
 		}
@@ -79,18 +60,16 @@ void AIEnt::update(double dt) {
 		orientation = AIEnt::lookTowards(Entity::manager.Player->position, TRUE);
 		velocity = Forward*speed;
 		if (distanceFromPlayer >= 10) {
-			velocity = { 0, 0, 0 };
 			returnSpot = AIEnt::distanceToPatrol(patrolPoints[currentPatrolGoal], patrolPoints[currentPatrolGoal + 1]);
 			//printf("retX: %f, retY: %f, retZ: %f\n", returnSpot.x, returnSpot.y, returnSpot.z);
 			state = 3;
 			printf("Switching to state %d \n", state);
 		}
 			break;
-	case 3: // Return
+	case 3: // Return to given return spot
 		orientation = Quaternion::lookAt(position, returnSpot);
 		velocity = Forward*speed;
 		if (distanceFromPlayer < 10) {
-			velocity = { 0, 0, speed*1.f };
 			state = 2;
 			printf("Switching to state %d \n", state);
 		}
@@ -111,3 +90,12 @@ void AIEnt::update(double dt) {
 	EntityBase::update(dt);
 }
 
+void AIEnt::preRender() {
+	char text[64];
+	sprintf(text, "AI position:    [%5.2f %5.2f %5.2f]", position.x, position.y, position.z);
+	Font::drawText(Entity::manager.font, 0, 132, { 1, 1, 0, 1 }, text);
+	sprintf(text, "AI orientation: [%5.2f %5.2f %5.2f %5.2f]", orientation.x, orientation.y, orientation.z, orientation.w);
+	Font::drawText(Entity::manager.font, 0, 152, { 1, 1, 0, 1 }, text);
+	
+	EntityBase::preRender();
+}
