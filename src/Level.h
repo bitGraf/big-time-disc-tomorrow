@@ -25,4 +25,5 @@ namespace Level {
     LevelData *loadLevel(char* filename, char* filetype, char* texturename, char* texturetype);
     //PanelEnt** loadFromFile(char* filename, int* retNumPanels);
     void** loadFromFile(char* filename, int* retNumPanels);
+	vec3* loadPathFile(char* filename, int numNodes = NULL);
 }

@@ -178,3 +178,43 @@ LevelData* Level::loadLevel(char* filename, char* filetype, char* texturename, c
 
     return level;
 }
+
+vec3* Level::loadPathFile(char* filename, int numNodes) {
+	//Read whole file into array
+	FILE* modelFile = fopen(filename, "rb");
+	if (modelFile == NULL) {
+		printf("Failed to open path file [%s]\n", filename);
+		return NULL;
+	}
+	printf("Reading file: \"%s\"\n", filename);
+
+	fseek(modelFile, 0, SEEK_END);
+	long fileLength = ftell(modelFile);
+	fseek(modelFile, 0, SEEK_SET);
+
+	char *fileContents = (char *)malloc(fileLength + 1);
+	fread(fileContents, fileLength, 1, modelFile);
+	fclose(modelFile);
+	fileContents[fileLength] = 0;
+
+	//start parsing line by line
+	char* lineContents;
+	lineContents = strtok(fileContents, "\r\n");
+	int numCoords = strtod(lineContents + 1, NULL);
+	if (numNodes <= numCoords && numNodes != NULL) {
+		numCoords = numNodes;
+	}
+	vec3* coordList = (vec3*)malloc(numCoords * sizeof(vec3));
+	//PanelEnt** allPanels = (PanelEnt**)malloc(numPanels * sizeof(PanelEnt*));
+	for (int i = 0; i < numCoords; i++) {
+		lineContents = strtok(NULL, "\r\n");
+		if (lineContents[0] == 'P') {
+			char* pstr = lineContents + 1;
+			vec3 coords = { strtof(pstr, &pstr), strtof(pstr, &pstr), strtof(pstr, NULL) };
+			coordList[i] = coords;
+		}
+	}
+	free(fileContents);
+
+	return coordList;
+}

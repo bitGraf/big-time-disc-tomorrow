@@ -8,7 +8,6 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
     // Jump
     if (grounded && (key == GLFW_KEY_SPACE) && (action == GLFW_PRESS)) {
         printf("Jumping...\n");
-        
         if (!attached) {
             velocity.y += 10;
             grounded = false;
@@ -125,6 +124,7 @@ void CrawlerEnt::update(double dt) {
     bool onAPanel = false;
     for (int i = 0; i < numPanels; i++) {
         allPanels[i]->distanceToPoint(position);
+		int angleBetween = Vector::dot(Vector::normalized(velocity), Vector::normalized(allPanels[i]->Up));
         if (allPanels[i]->inVolume) {
             onAPanel = true;
             allPanels[i]->Color = {1, 2.5, 1};
