@@ -12,6 +12,7 @@ struct AIEnt : EntityBase {
 	vec3* patrolPoints;
 	quat rot180;
 	float distanceFromPlayer;
+	float timer = NULL;
 	int speed = 1;
 	// State
 	int state = 0;

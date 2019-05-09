@@ -213,6 +213,10 @@ vec3* Level::loadPathFile(char* filename, int numNodes) {
 			vec3 coords = { strtof(pstr, &pstr), strtof(pstr, &pstr), strtof(pstr, NULL) };
 			coordList[i] = coords;
 		}
+		if (lineContents[0] == 'R') {
+			vec3 coords =  {NULL};
+			coordList[i] = coords;
+		}
 	}
 	free(fileContents);
 

@@ -5,7 +5,6 @@
 void AIEnt::onCreate() {
 	printf("Spawning AI...\n");
 	patrolPoints = Level::loadPathFile("../data/paths/guardpath.pth");
-	position = { 10, 0, 5 };
 }
 
 vec3 AIEnt::distanceToPatrol(vec3 a, vec3 b) {
@@ -34,32 +33,48 @@ void AIEnt::update(double dt) {
 	distanceFromPlayer = Vector::magnitude(Entity::manager.Player->position - position);
 
 	switch (state) {
-	case 0: // Patrol 2.0
+	case 0: // Idle
+		if (distanceFromPlayer >= 10) {
+			state = 1;
+			printf("Switching to state %d \n", state);
+		}
+		break;
+	case 1: // Patrol 2.0
 		orientation = AIEnt::lookTowards(patrolPoints[currentPatrolGoal]);
 		velocity = Forward*speed;
 		if (int(position.x - patrolPoints[currentPatrolGoal].x) == 0) {
-			velocity = { 0,0,0 };
-			currentPatrolGoal++;
+			if (int(position.z - patrolPoints[currentPatrolGoal].z) == 0) {
 
-			printf("New Patrol Goal is: %i\n", currentPatrolGoal);
+				velocity = { 0,0,0 };
+				currentPatrolGoal++;
+				if (patrolPoints[currentPatrolGoal].x == NULL) {
+					currentPatrolGoal = 0;
+				}
+				printf("New Patrol Goal is: %i\n", currentPatrolGoal);
+				printf("X: %f, Y: %f, Z: %f\n", position.x, position.y, position.z);
+				
+			}
 		}
+		
 
 		// Player Distance Check
 		if (distanceFromPlayer <= 10) {
+			timer = 5;
 			state = 2;
 			printf("Switching to state %d \n", state);
 		}
 		break;
-	case 1: // Idle
-		if (distanceFromPlayer >= 10) {
-			state = 0;
-			printf("Switching to state %d \n", state);
-		}
-		break;
+
 	case 2: // Run away!
 		orientation = AIEnt::lookTowards(Entity::manager.Player->position, TRUE);
 		velocity = Forward*speed;
-		if (distanceFromPlayer >= 10) {
+		if (timer > 0) {
+			timer -= dt;
+		}
+		else {
+			timer = NULL;
+		}
+		if (distanceFromPlayer >= 10 && timer == NULL) {
 			returnSpot = AIEnt::distanceToPatrol(patrolPoints[currentPatrolGoal], patrolPoints[currentPatrolGoal + 1]);
 			//printf("retX: %f, retY: %f, retZ: %f\n", returnSpot.x, returnSpot.y, returnSpot.z);
 			state = 3;
@@ -70,6 +85,7 @@ void AIEnt::update(double dt) {
 		orientation = Quaternion::lookAt(position, returnSpot);
 		velocity = Forward*speed;
 		if (distanceFromPlayer < 10) {
+			timer = 5;
 			state = 2;
 			printf("Switching to state %d \n", state);
 		}
@@ -79,7 +95,7 @@ void AIEnt::update(double dt) {
 			if (int(position.z - returnSpot.z) == 0)
 			{
 				printf("Z complete\n");
-				state = 0;
+				state = 1;
 				printf("Switching to state %d \n", state);
 			}
 		}

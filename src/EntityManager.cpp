@@ -48,7 +48,22 @@ void Entity::init_entities(WindowInfo windowInfo) {
 	ent = Entity::createNewEntity(ENT_AI);
 	ent->mesh = Resources::manager.getTriMeshResource("bot2");
 	ent->baseColor = Resources::manager.getTextureResource("grid");
+	ent->position = { 15, 0, 15 };
 	
+	ent = Entity::createNewEntity(ENT_AI);
+	ent->mesh = Resources::manager.getTriMeshResource("bot2");
+	ent->baseColor = Resources::manager.getTextureResource("grid");
+	ent->position = { -15, 0, 15 };
+
+	ent = Entity::createNewEntity(ENT_AI);
+	ent->mesh = Resources::manager.getTriMeshResource("bot2");
+	ent->baseColor = Resources::manager.getTextureResource("grid");
+	ent->position = { 15, 0, -15 };
+	
+	ent = Entity::createNewEntity(ENT_AI);
+	ent->mesh = Resources::manager.getTriMeshResource("bot2");
+	ent->baseColor = Resources::manager.getTextureResource("grid");
+	ent->position = { -15, 0, -15 };
 
     manager.font = Font::newDynamicFont("../data/fonts/Consolas.ttf", 20);
 
