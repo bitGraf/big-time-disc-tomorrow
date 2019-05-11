@@ -26,7 +26,7 @@ void initialize_game(GLFWwindow* window) {
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	glfwSetKeyCallback(window, Entity::handleInputEvent);
+	glfwSetKeyCallback(window, handleInputEvent);
 
 	glEnable(GL_DEPTH_TEST);
 	//glEnable(GL_CULL_FACE);
@@ -37,6 +37,7 @@ void initialize_game(GLFWwindow* window) {
     //glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 	glClearColor(0.716f, 0.68f, 0.652f, 1.0f);
+	//glClearColor(255.0f/255.0f, 248.0f/255.0f, 231.0f/255.0f, 1.0f);//Cosmic Latte, too bright :(
 
     // Initialize Input state
     //Input::init();
@@ -192,22 +193,21 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 
 void ProcessInput(GLFWwindow *window) {	
     Input::update(window);
+}
 
-	bool hold = false;
+void handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	Entity::handleInputEvent(window, key, scancode, action, mods);
 
 	if (currentState == GameStates::Normal) {
-		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS && !hold) {
+		if ((key == GLFW_KEY_ESCAPE) && (action == GLFW_PRESS)) {
 			currentState = GameStates::Menu;
-			hold = true;
 		}
 	} else if (currentState == GameStates::Menu) {
-		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS && !hold) {
+		if ((key == GLFW_KEY_ESCAPE) && (action == GLFW_PRESS)) {
 			currentState = GameStates::Normal;
-			hold = true;
 		}
-		if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS && !hold) {
+		if ((key == GLFW_KEY_Q) && (action == GLFW_PRESS)) {
 			glfwSetWindowShouldClose(window, true);
-			hold = true;
 		}
 	}
 }

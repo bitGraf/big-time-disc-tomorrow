@@ -68,3 +68,4 @@ void cleanup();
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int mods);
