@@ -41,6 +41,17 @@ static const double RenderRate = 1 / 300.0;	//300 fps for rendering	-> max 5 fra
 static double fpsUpdateTime = 0;
 static double fpsUpdateRate = 0.5;
 
+enum GameStates {
+	Normal = 0,
+	Menu
+};
+
+// Game State Manager
+static GLuint currentState = 0;
+//void StateUpdate(double dt);
+//void StateProcessInput(GLFWwindow *window);
+//void StateRender();
+
 //External
 void initialize_game(GLFWwindow* window);
 void run_game_loop(GLFWwindow* window);

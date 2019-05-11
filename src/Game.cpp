@@ -103,9 +103,12 @@ void cleanup() {
 }
 
 void FrameUpdate (double dt) {
-    //Entity::manager.camera.updateViewMatrix();
-	Entity::manager.camera.update(dt);
-	Entity::fixedUpdateAllEntities(PhysicsRate);
+	if (currentState == GameStates::Normal) {
+		Entity::manager.camera.update(dt);
+		Entity::fixedUpdateAllEntities(PhysicsRate);
+	} else if (currentState == GameStates::Menu) {
+		// update menu
+	}
 
     //update fps string every fpsUpdateRate
     if (fpsUpdateTime > fpsUpdateRate) {
@@ -116,29 +119,39 @@ void FrameUpdate (double dt) {
 }
 
 void FixedUpdate(double dt) {
+	if (currentState == GameStates::Normal) {
+		// game update
+	} else if (currentState == GameStates::Menu) {
+		// menu update
+	}
 }
 
 void Render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	//Render normal entities
-	shader.use();
-	shader.setMat4("view", &Entity::manager.camera.viewMatrix);
-	shader.setvec3("camPos", &Entity::manager.camera.position);
-	Entity::renderAllEntities(&shader);
+	if (currentState == GameStates::Normal) {
+		//Render normal entities
+		shader.use();
+		shader.setMat4("view", &Entity::manager.camera.viewMatrix);
+		shader.setvec3("camPos", &Entity::manager.camera.position);
+		Entity::renderAllEntities(&shader);
 
-	mat4 m;
-	Matrix::identity(&m);
+		mat4 m;
+		Matrix::identity(&m);
 
-	//Render line entities
-	glDisable(GL_DEPTH_TEST);
-	lineShader.use();
-	lineShader.setMat4("view", &Entity::manager.camera.viewMatrix);
-	lineShader.setMat4("model", &m);
-	glBindVertexArray(axis.VAO);
-	glDrawElements(GL_LINES, axis.numFaces*2, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
-	glEnable(GL_DEPTH_TEST);
+		//Render line entities
+		glDisable(GL_DEPTH_TEST);
+		lineShader.use();
+		lineShader.setMat4("view", &Entity::manager.camera.viewMatrix);
+		lineShader.setMat4("model", &m);
+		glBindVertexArray(axis.VAO);
+		glDrawElements(GL_LINES, axis.numFaces*2, GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
+		glEnable(GL_DEPTH_TEST);
+	} else if (currentState == GameStates::Menu) {
+		// Render menu
+		Font::drawText(otherFont, windowInfo.width/2, windowInfo.height/2, {1,1,1,1}, "Menu", ALIGN_MID_MID);
+	}
 
 	//Render text
 	quat fpsColor = {1, 0, 0, 1};
@@ -180,8 +193,23 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 void ProcessInput(GLFWwindow *window) {	
     Input::update(window);
 
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
+	bool hold = false;
+
+	if (currentState == GameStates::Normal) {
+		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS && !hold) {
+			currentState = GameStates::Menu;
+			hold = true;
+		}
+	} else if (currentState == GameStates::Menu) {
+		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS && !hold) {
+			currentState = GameStates::Normal;
+			hold = true;
+		}
+		if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS && !hold) {
+			glfwSetWindowShouldClose(window, true);
+			hold = true;
+		}
+	}
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
