@@ -19,6 +19,7 @@ void initialize_game(GLFWwindow* window) {
 	Font::InitTextRendering(windowInfo);
 	fpsFont = Font::newDynamicFont("../data/fonts/Consolas.ttf", 20);
 	otherFont = Font::newDynamicFont("../data/fonts/Consolas.ttf", 32);
+	bigFont = Font::newDynamicFont("../data/fonts/Consolas.ttf", 50);
     sprintf(fpsText, "Fps: 0");
 
     // Set OpenGL State
@@ -151,7 +152,22 @@ void Render() {
 		glEnable(GL_DEPTH_TEST);
 	} else if (currentState == GameStates::Menu) {
 		// Render menu
-		Font::drawText(otherFont, windowInfo.width/2, windowInfo.height/2, {1,1,1,1}, "Menu", ALIGN_MID_MID);
+		int x = windowInfo.width/2;
+		int y = windowInfo.height * (1 - .85f);
+		quat menuColor = {1,1,1,1};
+		quat selectColor = {.5f, .8f, 1, 1};
+
+		// Menu
+		Font::drawText(bigFont, x, y, menuColor, "Menu", ALIGN_MID_MID);
+
+		y += 50;
+
+		// Levels
+		Font::drawText(otherFont, x, y+=35, currentMenuItem == 0 ? selectColor : menuColor, "Level 1", ALIGN_MID_MID);
+		Font::drawText(otherFont, x, y+=35, currentMenuItem == 1 ? selectColor : menuColor, "Level 2", ALIGN_MID_MID);
+		Font::drawText(otherFont, x, y+=35, currentMenuItem == 2 ? selectColor : menuColor, "Level 3", ALIGN_MID_MID);
+		Font::drawText(otherFont, x, y+=35, currentMenuItem == 3 ? selectColor : menuColor, "Level 4", ALIGN_MID_MID);
+		Font::drawText(otherFont, x, y+=35, currentMenuItem == 4 ? selectColor : menuColor, "Quit", ALIGN_MID_MID);
 	}
 
 	//Render text
@@ -201,6 +217,7 @@ void handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int
 	if (currentState == GameStates::Normal) {
 		if ((key == GLFW_KEY_ESCAPE) && (action == GLFW_PRESS)) {
 			currentState = GameStates::Menu;
+			currentMenuItem = 0;
 		}
 	} else if (currentState == GameStates::Menu) {
 		if ((key == GLFW_KEY_ESCAPE) && (action == GLFW_PRESS)) {
@@ -208,6 +225,30 @@ void handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int
 		}
 		if ((key == GLFW_KEY_Q) && (action == GLFW_PRESS)) {
 			glfwSetWindowShouldClose(window, true);
+		}
+
+		if ((key == GLFW_KEY_DOWN) && (action == GLFW_PRESS)) {
+			currentMenuItem++;
+			if (currentMenuItem == 5)
+				currentMenuItem = 0;
+			//printf("Current Menu Item: %d\n", currentMenuItem);
+		}
+		if ((key == GLFW_KEY_UP) && (action == GLFW_PRESS)) {
+			currentMenuItem--;
+			if (currentMenuItem == -1)
+				currentMenuItem = 4;
+			//printf("Current Menu Item: %d\n", currentMenuItem);
+		}
+
+		if ((key == GLFW_KEY_ENTER) && (action == GLFW_PRESS)) {
+			//Now check current menu state to see what action to do
+			switch (currentMenuItem) {
+				case 0: {printf("Load level 1\n");} break;
+				case 1: {printf("Load level 2\n");} break;
+				case 2: {printf("Load level 3\n");} break;
+				case 3: {printf("Load level 4\n");} break;
+				case 4: {glfwSetWindowShouldClose(window, true);} break;
+			}
 		}
 	}
 }

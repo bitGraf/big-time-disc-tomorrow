@@ -27,6 +27,7 @@ static TriangleMesh axis;
 
 static DynamicFont* fpsFont;
 static DynamicFont* otherFont;
+static DynamicFont* bigFont;
 static char fpsText[32];
 
 static int numRenders = 0;
@@ -48,9 +49,7 @@ enum GameStates {
 
 // Game State Manager
 static GLuint currentState = 0;
-//void StateUpdate(double dt);
-//void StateProcessInput(GLFWwindow *window);
-//void StateRender();
+static GLuint currentMenuItem = 0;
 
 //External
 void initialize_game(GLFWwindow* window);
