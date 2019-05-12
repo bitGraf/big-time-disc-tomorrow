@@ -4,9 +4,7 @@ Level LevelLoader::currentLevel;
 
 Level* LevelLoader::loadLevel(char* filename) {
     // Do not call more than once for now...
-    printf("uhh\n");
     if (Entity::manager.Player->currentLevel) {
-        printf("uhh2\n");
         //a level is already loaded
 
         //Remove current level.
@@ -17,21 +15,26 @@ Level* LevelLoader::loadLevel(char* filename) {
         Entity::manager.Player->currentLevel = NULL;
         free(currentLevel.panels);
     }
-    printf("loading\n");
 
-    int numPanelsLoaded = 0;
-    char* nameLoaded = NULL;
-    PanelEnt** loadedPanels = loadFromFile(filename, &numPanelsLoaded, nameLoaded);
+    if (filename) {
+        int numPanelsLoaded = 0;
+        char* nameLoaded = NULL;
+        PanelEnt** loadedPanels = loadFromFile(filename, &numPanelsLoaded, nameLoaded);
 
-    currentLevel.panels = loadedPanels;
-    currentLevel.numPanels = numPanelsLoaded;
-    currentLevel.name = std::string(nameLoaded);
+        currentLevel.panels = loadedPanels;
+        currentLevel.numPanels = numPanelsLoaded;
+        currentLevel.name = std::string(nameLoaded);
 
-    free(nameLoaded);
+        free(nameLoaded);
 
-    Entity::manager.Player->currentLevel = &currentLevel;
+        Entity::manager.Player->currentLevel = &currentLevel;
 
-    return &currentLevel;
+        return &currentLevel;
+    }
+
+    currentLevel.name = "No level loaded";
+
+    return NULL;
 }
 
 PanelEnt** LevelLoader::loadFromFile(char* filename, int* retNumPanels, char*& target) {

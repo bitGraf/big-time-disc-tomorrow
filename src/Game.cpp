@@ -166,7 +166,7 @@ void Render() {
 		Font::drawText(otherFont, x, y+=35, currentMenuItem == 0 ? selectColor : menuColor, "Level 1", ALIGN_MID_MID);
 		Font::drawText(otherFont, x, y+=35, currentMenuItem == 1 ? selectColor : menuColor, "Level 2", ALIGN_MID_MID);
 		Font::drawText(otherFont, x, y+=35, currentMenuItem == 2 ? selectColor : menuColor, "Level 3", ALIGN_MID_MID);
-		Font::drawText(otherFont, x, y+=35, currentMenuItem == 3 ? selectColor : menuColor, "Level 4", ALIGN_MID_MID);
+		Font::drawText(otherFont, x, y+=35, currentMenuItem == 3 ? selectColor : menuColor, "Unload level", ALIGN_MID_MID);
 		Font::drawText(otherFont, x, y+=35, currentMenuItem == 4 ? selectColor : menuColor, "Quit", ALIGN_MID_MID);
 	}
 
@@ -249,7 +249,7 @@ void handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int
 				case 0: {printf("Load level 1\n");LevelLoader::loadLevel("../data/levels/level.lvl");currentState = GameStates::Normal;} break;
 				case 1: {printf("Load level 2\n");LevelLoader::loadLevel("../data/levels/level2.lvl");currentState = GameStates::Normal;} break;
 				case 2: {printf("Load level 3\n");LevelLoader::loadLevel("../data/levels/panelTest.lvl");currentState = GameStates::Normal;} break;
-				case 3: {printf("Load level 4\n");} break;
+				case 3: {printf("Unload level\n");LevelLoader::loadLevel(NULL);currentState = GameStates::Normal;} break;
 				case 4: {glfwSetWindowShouldClose(window, true);} break;
 			}
 		}

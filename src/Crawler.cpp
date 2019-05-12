@@ -55,10 +55,12 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
     }
 
     if ((key == GLFW_KEY_L) && (action == GLFW_PRESS)) {
-        for (int i = 0; i < currentLevel->numPanels; i++) {
-            currentLevel->panels[i]->Remove = true;
+        if (currentLevel) {
+            for (int i = 0; i < currentLevel->numPanels; i++) {
+                currentLevel->panels[i]->Remove = true;
+            }
+            currentLevel = NULL;
         }
-        currentLevel = NULL;
     }
 }
 
