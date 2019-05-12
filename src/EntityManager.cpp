@@ -17,6 +17,7 @@ void Entity::init_entities(WindowInfo windowInfo) {
     //Resources::manager.loadTriMeshResource("cube", ".modl");
     Resources::manager.loadTriMeshResource("bigBot", ".ply");   //very large file lmao
     Resources::manager.loadTriMeshResource("bot2", ".ply", true);
+    Resources::manager.loadTriMeshResource("bot3", ".ply", true);
 
     Resources::manager.loadTextureResource("wall", ".jpg");
     Resources::manager.loadTextureResource("sample", ".jpg");
@@ -30,7 +31,7 @@ void Entity::init_entities(WindowInfo windowInfo) {
 
 
     manager.Player = (CrawlerEnt*)Entity::createNewEntity(ENT_Crawler);
-    manager.Player->mesh = Resources::manager.getTriMeshResource("bigBot");
+    manager.Player->mesh = Resources::manager.getTriMeshResource("bot3");
     manager.Player->baseColor = Resources::manager.getTextureResource("rustediron2_basecolor");
     manager.Player->normalMap = Resources::manager.getTextureResource("rustediron2_normal");
     manager.Player->amrMap = Resources::manager.getTextureResource("rustediron2_amr");
