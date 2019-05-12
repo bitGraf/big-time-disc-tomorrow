@@ -37,8 +37,6 @@ struct CrawlerEnt : EntityBase {
 
     // These shouldn't be stored in this class
     Level* currentLevel = NULL;
-    //PanelEnt** allPanels = NULL;
-    //int numPanels = 0;
 
 
     void update(double dt) override;

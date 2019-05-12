@@ -34,6 +34,10 @@ void Entity::init_entities(WindowInfo windowInfo) {
     manager.Player->baseColor = Resources::manager.getTextureResource("rustediron2_basecolor");
     manager.Player->normalMap = Resources::manager.getTextureResource("rustediron2_normal");
     manager.Player->amrMap = Resources::manager.getTextureResource("rustediron2_amr");
+
+    printf("Crawler::Before load\n");
+    //manager.Player->currentLevel = LevelLoader::loadLevel("../data/levels/level2.lvl");
+    printf("Crawler::After load\n");
     //ent->Color = {5, 5, 7};
 
     //Level::loadLevel("mountains512", ".png", "mColor", ".png");
@@ -97,6 +101,12 @@ void Entity::handleInputEvent(GLFWwindow* window, int key, int scancode, int act
 
         Entity::printAllEntities();
 	}
+
+    if ((key == GLFW_KEY_P) && (action == GLFW_PRESS)) {
+        printf("Listing all entities...\n");
+
+        Entity::pruneEntities();
+	}    
 
     for (int i = 0; i < manager.numEntries; i++) {
         EntityBase* ent = (manager.pointerList[i]);
@@ -288,4 +298,35 @@ EntityBase* Entity::lookup_entity_by_id(int ID) {
     }
 
     return manager.pointerList[ID];
+}
+
+void Entity::pruneEntities() {
+    printf("Pruning entities. There are currently %d entitiesin the list,\n", manager.numEntries);
+    int num2remove = 0;
+    for (int i = 0; i < manager.numEntries; i++) {
+        if (manager.pointerList[i]->Remove)
+            num2remove++;
+    }
+    printf(" %d need to be removed.\n", num2remove);
+
+    if (num2remove > 0) {
+        int newNumEntries = manager.numEntries - num2remove;
+        EntityBase** newList = (EntityBase**)malloc(newNumEntries * sizeof(EntityBase*));
+        int curr = 0;
+        for (int i = 0; i < manager.numEntries; i++) {
+            if (!manager.pointerList[i]->Remove) {
+                newList[curr] = manager.pointerList[i];
+                curr++;
+            } else {
+                free(manager.pointerList[i]);
+                manager.pointerList[i] = NULL;
+            }
+        }
+        free(manager.pointerList);
+        manager.pointerList = newList;
+        manager.numEntries = newNumEntries;
+        manager.maxSize = manager.numEntries;
+    }
+
+    Entity::printAllEntities();
 }

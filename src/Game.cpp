@@ -246,9 +246,9 @@ void handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int
 		if ((key == GLFW_KEY_ENTER) && (action == GLFW_PRESS)) {
 			//Now check current menu state to see what action to do
 			switch (currentMenuItem) {
-				case 0: {printf("Load level 1\n");} break;
-				case 1: {printf("Load level 2\n");} break;
-				case 2: {printf("Load level 3\n");} break;
+				case 0: {printf("Load level 1\n");LevelLoader::loadLevel("../data/levels/level.lvl");currentState = GameStates::Normal;} break;
+				case 1: {printf("Load level 2\n");LevelLoader::loadLevel("../data/levels/level2.lvl");currentState = GameStates::Normal;} break;
+				case 2: {printf("Load level 3\n");LevelLoader::loadLevel("../data/levels/panelTest.lvl");currentState = GameStates::Normal;} break;
 				case 3: {printf("Load level 4\n");} break;
 				case 4: {glfwSetWindowShouldClose(window, true);} break;
 			}

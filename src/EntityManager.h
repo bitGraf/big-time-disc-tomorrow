@@ -105,6 +105,9 @@ namespace Entity {
     // Adding entities to the manager
     int registerEntity(EntityTypes type = ENT_Base);
     void printAllEntities();
+
+    // Remove entities from list
+    void pruneEntities();
     
     // Operating on current entities
     void renderAllEntities(ShaderProgram* shader);

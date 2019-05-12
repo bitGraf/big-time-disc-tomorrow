@@ -53,6 +53,13 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
     if ((key == GLFW_KEY_C) && (action == GLFW_PRESS)) {
         cameraFollow = !cameraFollow;
     }
+
+    if ((key == GLFW_KEY_L) && (action == GLFW_PRESS)) {
+        for (int i = 0; i < currentLevel->numPanels; i++) {
+            currentLevel->panels[i]->Remove = true;
+        }
+        currentLevel = NULL;
+    }
 }
 
 void CrawlerEnt::update(double dt) {
@@ -187,12 +194,10 @@ void CrawlerEnt::postRender() {
 
 void CrawlerEnt::onCreate() {
     printf("loading panels...\n");
+    currentLevel = NULL;
 
     //Load level from file
     //allPanels = (PanelEnt**)LevelLoader::loadFromFile("../data/levels/level2.lvl", &numPanels);
-    printf("Crawler::Before load\n");
-    currentLevel = LevelLoader::loadLevel("../data/levels/level2.lvl");
-    printf("Crawler::After load\n");
 
     F = move_acc * mass;
     K = F / max_speed;
