@@ -92,6 +92,12 @@ void Entity::handleInputEvent(GLFWwindow* window, int key, int scancode, int act
         Entity::manager.showFrames = !Entity::manager.showFrames;
 	}
 
+    if ((key == GLFW_KEY_I) && (action == GLFW_PRESS)) {
+        printf("Listing all entities...\n");
+
+        Entity::printAllEntities();
+	}
+
     for (int i = 0; i < manager.numEntries; i++) {
         EntityBase* ent = (manager.pointerList[i]);
 

@@ -121,22 +121,24 @@ void CrawlerEnt::update(double dt) {
         grounded = true;
     }
 
-    bool onAPanel = false;
-    for (int i = 0; i < numPanels; i++) {
-        allPanels[i]->distanceToPoint(position);
-        if (allPanels[i]->inVolume) {
-            onAPanel = true;
-            allPanels[i]->Color = {1, 2.5, 1};
-            if ((currentPanel == NULL) || (allPanels[i]->K2 < currentPanel->K2)) {
-                if (attachCoolDown < 0.001f)
-                    transitionToPanel(allPanels[i]);
+    if (currentLevel != NULL) {
+        bool onAPanel = false;
+        for (int i = 0; i < currentLevel->numPanels; i++) {
+            currentLevel->panels[i]->distanceToPoint(position);
+            if (currentLevel->panels[i]->inVolume) {
+                onAPanel = true;
+                currentLevel->panels[i]->Color = {1, 2.5, 1};
+                if ((currentPanel == NULL) || (currentLevel->panels[i]->K2 < currentPanel->K2)) {
+                    if (attachCoolDown < 0.001f)
+                        transitionToPanel(currentLevel->panels[i]);
+                }
+            } else {
+                currentLevel->panels[i]->Color = {2.5, 1, 1};
             }
-        } else {
-            allPanels[i]->Color = {2.5, 1, 1};
         }
-    }
-    if (currentPanel != NULL && !onAPanel) {
-        transitionToPanel(NULL);
+        if (currentPanel != NULL && !onAPanel) {
+            transitionToPanel(NULL);
+        }
     }
 
     if (cameraFollow) {
@@ -184,10 +186,13 @@ void CrawlerEnt::postRender() {
 }
 
 void CrawlerEnt::onCreate() {
-    printf("loading panel...\n");
+    printf("loading panels...\n");
 
     //Load level from file
-    allPanels = (PanelEnt**)Level::loadFromFile("../data/levels/level2.lvl", &numPanels);
+    //allPanels = (PanelEnt**)LevelLoader::loadFromFile("../data/levels/level2.lvl", &numPanels);
+    printf("Crawler::Before load\n");
+    currentLevel = LevelLoader::loadLevel("../data/levels/level2.lvl");
+    printf("Crawler::After load\n");
 
     F = move_acc * mass;
     K = F / max_speed;

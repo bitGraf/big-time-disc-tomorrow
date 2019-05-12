@@ -7,23 +7,21 @@
 #include "Utils.h"
 #include "EntityManager.h"
 
-struct Building {
-    vec3 position;
-    quat orientation;
-    vec3 scale = {1, 1, 1};
+#include <string>
+
+struct PanelEnt;
+
+struct Level {
+    std::string name = "NO LEVEL LOADED";
+
+    PanelEnt** panels = NULL;
+    int numPanels = 0;
 };
 
-struct LevelData {
-    char* name = NULL;
+namespace LevelLoader {
+    extern Level currentLevel;
 
-    //Buildings
-    int numBuildings;
-    Building* buildings = NULL;
-};
-
-namespace Level {
-    LevelData *loadLevel(char* filename, char* filetype, char* texturename, char* texturetype);
-    //PanelEnt** loadFromFile(char* filename, int* retNumPanels);
-    void** loadFromFile(char* filename, int* retNumPanels);
+    Level* loadLevel(char* filename);
+    PanelEnt** loadFromFile(char* filename, int* retNumPanels, char*& target);
 	vec3* loadPathFile(char* filename, int numNodes = NULL);
 }

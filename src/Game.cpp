@@ -179,8 +179,8 @@ void Render() {
 
 	quat fg_color = {1, 1, 1, 1};
 	quat bg_color = {0, 0, 0, .5f};
-	Font::drawText(otherFont, windowInfo.width/2 - b, -b, bg_color, "Running...", ALIGN_TOP_MID);
-	Font::drawText(otherFont, windowInfo.width/2, 0, fg_color, "Running...", ALIGN_TOP_MID);
+	Font::drawText(otherFont, windowInfo.width/2 - b, -b, bg_color, (char*)LevelLoader::currentLevel.name.c_str(), ALIGN_TOP_MID);
+	Font::drawText(otherFont, windowInfo.width/2, 0, fg_color, (char*)LevelLoader::currentLevel.name.c_str(), ALIGN_TOP_MID);
 
 
 	// Render keyboard input
@@ -215,6 +215,9 @@ void handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int
 	Entity::handleInputEvent(window, key, scancode, action, mods);
 
 	if (currentState == GameStates::Normal) {
+		if ((key == GLFW_KEY_Q) && (action == GLFW_PRESS)) {
+			glfwSetWindowShouldClose(window, true);
+		}
 		if ((key == GLFW_KEY_ESCAPE) && (action == GLFW_PRESS)) {
 			currentState = GameStates::Menu;
 			currentMenuItem = 0;

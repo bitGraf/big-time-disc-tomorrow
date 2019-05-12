@@ -4,7 +4,7 @@
 
 void AIEnt::onCreate() {
 	printf("Spawning AI...\n");
-	patrolPoints = Level::loadPathFile("../data/paths/guardpath.pth");
+	patrolPoints = LevelLoader::loadPathFile("../data/paths/guardpath.pth");
 }
 
 vec3 AIEnt::distanceToPatrol(vec3 a, vec3 b) {

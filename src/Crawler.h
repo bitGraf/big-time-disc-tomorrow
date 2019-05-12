@@ -7,6 +7,8 @@
 
 #include "Panel.h"
 
+struct Level;
+
 struct CrawlerEnt : EntityBase {
     float max_speed = 5.0f;
     float move_acc  = 9.81f;//1 G
@@ -34,8 +36,9 @@ struct CrawlerEnt : EntityBase {
     vec3 acceleration;
 
     // These shouldn't be stored in this class
-    PanelEnt** allPanels = NULL;
-    int numPanels = 0;
+    Level* currentLevel = NULL;
+    //PanelEnt** allPanels = NULL;
+    //int numPanels = 0;
 
 
     void update(double dt) override;
