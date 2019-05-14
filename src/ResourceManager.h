@@ -28,6 +28,23 @@ struct TerrainData {
     unsigned char* data;
 };
 
+struct ResourceFile {
+    FILE* fp = NULL;
+    unsigned int numLines = 0;
+    unsigned long fileLength = 0;
+    bool loaded = false;
+    char* fileContents = NULL;
+    char* currentLine = NULL;
+
+    bool load(char* filename);
+    char* getNextLine();
+
+    char* tokenSplit(char* delim);
+
+    void close();
+    ~ResourceFile();
+};
+
 struct ResourceManager {
     std::unordered_map<std::string, TriMeshResource*> TriMeshResources;
     std::unordered_map<std::string, TextureResource*> TextureResources;

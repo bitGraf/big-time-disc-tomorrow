@@ -303,3 +303,99 @@ void ResourceManager::printAllResources() {
             mesh.second->data.VAO);
     }
 }
+
+
+
+bool ResourceFile::load(char* filename) {
+    close();
+
+    //Read whole file into array
+    fp = fopen(filename, "rb");
+    if (fp == NULL) {
+        printf("Failed to open file [%s]\n", filename);
+        return false;
+    }
+    printf("Reading file: \"%s\"\n", filename);
+    
+    fseek(fp, 0, SEEK_END);
+	fileLength = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+
+	fileContents = (char *)malloc(fileLength + 1);
+	fread(fileContents, fileLength, 1, fp);
+	fclose(fp);
+	fileContents[fileLength] = 0;
+
+    // fill the filecontents with zeros
+    numLines = 1;
+    for (int i = 0; i < fileLength; i++) {
+        char c = fileContents[i];
+        if (c == '\r') {
+            fileContents[i] = '\0';
+        } else if (c == '\n') {
+            fileContents[i] = '\0';
+            numLines++;
+        }
+    }
+
+    currentLine = NULL;
+
+    // temp
+    printf("File loaded. %d lines, %d characters\n", numLines, (int)fileLength);
+
+    loaded = true;
+    return true;
+}
+char* ResourceFile::getNextLine() {
+    if (currentLine == NULL) {
+        currentLine = fileContents;
+        return currentLine;
+    }
+
+    int offset = 0;
+
+    while (*(currentLine + offset) != '\0') {
+        offset++;
+    }
+    if (*(currentLine + offset + 1) == '\0')
+        offset+=2;
+    //while (*(currentLine + offset) == '\0') {
+    //    offset++;}
+    
+    currentLine = currentLine + offset;
+
+    if (currentLine > fileContents+fileLength)
+        return NULL;
+
+    /*char c = currentLine[0];
+    int i = 1;
+    do {
+        printf("|%c|", c);
+        c = currentLine[i];
+        i++;
+    } while (c != 0);*/
+
+    return currentLine;
+}
+
+char* ResourceFile::tokenSplit(char* delim) {
+    return NULL;
+}
+
+void ResourceFile::close() {
+    if (fp) {
+        fclose(fp);
+        fp = NULL;
+    }
+
+    if (fileContents) {
+        free(fileContents);
+        fileContents = NULL;
+    }
+
+    loaded = false;
+}
+
+ResourceFile::~ResourceFile() {
+    close();
+}
