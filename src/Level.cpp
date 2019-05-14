@@ -41,116 +41,77 @@ PanelEnt** LevelLoader::loadFromFile(char* filename, int* retNumPanels, char*& t
     //Panel resources
     Resources::manager.loadTriMeshResource("plane", ".modl");
     Resources::manager.loadTextureResource("wall", ".jpg");
+	
+	// Load File
+	ResourceFile modelFile;
+	modelFile.load(filename);
 
-    //Read whole file into array
-    FILE* modelFile = fopen(filename, "rb");
-    if (modelFile == NULL) {
-        printf("Failed to open file [%s]\n", filename);
-        return NULL;
-    }
-    printf("Reading file: \"%s\"\n", filename);
-    
-    fseek(modelFile, 0, SEEK_END);
-	long fileLength = ftell(modelFile);
-	fseek(modelFile, 0, SEEK_SET);
+	// Set target to the level name
+	char* lineContents = modelFile.getNextLine();
+	target = (char*)malloc(strlen(lineContents) + 1);
 
-	char *fileContents = (char *)malloc(fileLength + 1);
-	fread(fileContents, fileLength, 1, modelFile);
-	fclose(modelFile);
-	fileContents[fileLength] = 0;
+	strcpy(target, lineContents);
 
-    //start parsing line by line
-    char* lineContents;
-    lineContents = strtok(fileContents, "\r\n");
+	lineContents = modelFile.getNextLine();
+	lineContents = modelFile.getNextLine();
 
-    // Set target to the level name
-    target = (char*)malloc(strlen(lineContents)+1);
-    strcpy(target, lineContents);
+	int numPanels = strtod(lineContents + 10, NULL);
+	printf("NumPanels = %d\n", numPanels);
 
-    lineContents = strtok(NULL, "\r\n");
-    lineContents = strtok(NULL, "\r\n");
+	if (retNumPanels != NULL)
+		*retNumPanels = numPanels;
+	PanelEnt** allPanels = (PanelEnt**)malloc(numPanels * sizeof(PanelEnt*));
+	for (int i = 0; i < numPanels; i++) {
+		allPanels[i] = (PanelEnt*)Entity::createNewEntity(ENT_Panel);
+		allPanels[i]->mesh = Resources::manager.getTriMeshResource("plane");
+		allPanels[i]->baseColor = Resources::manager.getTextureResource("wall");
 
-    int numPanels = strtod(lineContents + 10, NULL);
-    printf("NumPanels = %d\n", numPanels);
+		lineContents = modelFile.getNextLine();
+		char* pstr = lineContents;
+		vec3 v1 = { strtof(pstr, &pstr), strtof(pstr, &pstr), strtof(pstr, &pstr) };
+		vec3 v2 = { strtof(pstr, &pstr), strtof(pstr, &pstr), strtof(pstr, &pstr) };
+		vec3 v3 = { strtof(pstr, &pstr), strtof(pstr, &pstr), strtof(pstr, &pstr) };
+		vec3 v4 = { strtof(pstr, &pstr), strtof(pstr, &pstr), strtof(pstr, NULL) };
 
-    if (retNumPanels != NULL)
-        *retNumPanels = numPanels;
-    PanelEnt** allPanels = (PanelEnt**)malloc(numPanels * sizeof(PanelEnt*));
+		vec3 panelPos = (v1 + v2 + v3 + v4) * 0.25f;
+		float xScale = Vector::magnitude(v3 - v2);
+		float zScale = Vector::magnitude(v2 - v1);
+		vec3 T = Vector::normalized(v3 - v2);
+		vec3 B = Vector::normalized(v2 - v1);
+		vec3 N = Vector::cross(B, T);
+		quat panelRotation = Quaternion::fromDCM(T, N, B);
 
-    for (int i = 0; i < numPanels; i ++) {
-        allPanels[i] = (PanelEnt*)Entity::createNewEntity(ENT_Panel);
-        allPanels[i]->mesh = Resources::manager.getTriMeshResource("plane");
-        allPanels[i]->baseColor = Resources::manager.getTextureResource("wall");
+		allPanels[i]->orientation = panelRotation;
+		allPanels[i]->position = panelPos;
+		allPanels[i]->length = xScale;
+		allPanels[i]->width = zScale;
+		allPanels[i]->scale = { allPanels[i]->length, 1, allPanels[i]->width };
 
-        lineContents = strtok(NULL, "\r\n");
-        char* pstr = lineContents;
-        vec3 v1 = {strtof(pstr, &pstr), strtof(pstr, &pstr), strtof(pstr, &pstr)};
-        vec3 v2 = {strtof(pstr, &pstr), strtof(pstr, &pstr), strtof(pstr, &pstr)};
-        vec3 v3 = {strtof(pstr, &pstr), strtof(pstr, &pstr), strtof(pstr, &pstr)};
-        vec3 v4 = {strtof(pstr, &pstr), strtof(pstr, &pstr), strtof(pstr, NULL)};
+		allPanels[i]->update(0);
+	}
+	modelFile.close();
 
-        vec3 panelPos = (v1 + v2 + v3 + v4) * 0.25f;
-        float xScale = Vector::magnitude(v3-v2);
-        float zScale = Vector::magnitude(v2-v1);
-        vec3 T = Vector::normalized(v3 - v2);
-        vec3 B = Vector::normalized(v2 - v1);
-        vec3 N = Vector::cross(B, T);
-        quat panelRotation = Quaternion::fromDCM(T, N, B);
-
-        allPanels[i]->orientation = panelRotation;
-        allPanels[i]->position = panelPos;
-        allPanels[i]->length = xScale;
-        allPanels[i]->width = zScale;
-        allPanels[i]->scale = {allPanels[i]->length, 1, allPanels[i]->width};
-
-        allPanels[i]->update(0);
-    }
-
-    free(fileContents);
-
-    return allPanels;
+	return allPanels;
 }
 
+
 vec3* LevelLoader::loadPathFile(char* filename, int numNodes) {
-	//Read whole file into array
-	FILE* modelFile = fopen(filename, "rb");
-	if (modelFile == NULL) {
-		printf("Failed to open path file [%s]\n", filename);
-		return NULL;
-	}
-	printf("Reading file: \"%s\"\n", filename);
-
-	fseek(modelFile, 0, SEEK_END);
-	long fileLength = ftell(modelFile);
-	fseek(modelFile, 0, SEEK_SET);
-
-	char *fileContents = (char *)malloc(fileLength + 1);
-	fread(fileContents, fileLength, 1, modelFile);
-	fclose(modelFile);
-	fileContents[fileLength] = 0;
-
-	//start parsing line by line
-	char* lineContents;
-	lineContents = strtok(fileContents, "\r\n");
-	int numCoords = strtod(lineContents + 1, NULL);
-	if (numNodes <= numCoords && numNodes != NULL) {
-		numCoords = numNodes;
-	}
-	vec3* coordList = (vec3*)malloc(numCoords * sizeof(vec3));
-	//PanelEnt** allPanels = (PanelEnt**)malloc(numPanels * sizeof(PanelEnt*));
-	for (int i = 0; i < numCoords; i++) {
-		lineContents = strtok(NULL, "\r\n");
+	ResourceFile pathFile;
+	pathFile.load(filename);
+	vec3* coordList = (vec3*)malloc(pathFile.numLines * sizeof(vec3));
+	for (int i = 0; i < pathFile.numLines; i++) {
+		char* lineContents = pathFile.getNextLine();
 		if (lineContents[0] == 'P') {
 			char* pstr = lineContents + 1;
 			vec3 coords = { strtof(pstr, &pstr), strtof(pstr, &pstr), strtof(pstr, NULL) };
 			coordList[i] = coords;
 		}
 		if (lineContents[0] == 'R') {
-			vec3 coords =  {NULL};
+			vec3 coords = { NULL };
 			coordList[i] = coords;
 		}
 	}
-	free(fileContents);
-
+	pathFile.close();
 	return coordList;
 }
+

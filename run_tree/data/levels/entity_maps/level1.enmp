@@ -1,0 +1,5 @@
+E 4
+ENT_AI bot2 grid guardpath.pth 0 0 -15;
+ENT_AI bot2 grid guardpath.pth 1 0 -15;
+ENT_AI bot2 grid guardpath.pth 2 0 -15;
+ENT_AI bot2 grid guardpath.pth 3 0 -15;
