@@ -23,5 +23,5 @@ struct AIEnt : EntityBase {
 	void update(double dt) override;
 	void preRender();
 	vec3 distanceToPatrol(vec3, vec3);
-	quat lookTowards(vec3 target, bool away = FALSE);
+	quat lookTowards(vec3 target, bool away = false);
 };

@@ -1,5 +1,4 @@
-E 4
-ENT_AI bot2 grid guardpath.pth 0 0 -15;
-ENT_AI bot2 grid guardpath.pth 1 0 -15;
-ENT_AI bot2 grid guardpath.pth 2 0 -15;
-ENT_AI bot2 grid guardpath.pth 3 0 -15;
+bot2 rustediron2_basecolor guardpath.pth 0 0 -15
+bot3 rustediron2_basecolor guardpath.pth 1 0 -15
+bot4 rustediron2_basecolor guardpath.pth 2 0 -15
+bot5 rustediron2_basecolor guardpath.pth 3 0 -15

@@ -23,5 +23,6 @@ namespace LevelLoader {
 
     Level* loadLevel(char* filename);
     PanelEnt** loadFromFile(char* filename, int* retNumPanels, char*& target);
-	vec3* loadPathFile(char* filename, int numNodes = NULL);
+	vec3* loadPathFile(char* filename);
+	void* loadLevelAI(char* filename);
 }

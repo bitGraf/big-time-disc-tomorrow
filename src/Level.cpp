@@ -95,7 +95,7 @@ PanelEnt** LevelLoader::loadFromFile(char* filename, int* retNumPanels, char*& t
 }
 
 
-vec3* LevelLoader::loadPathFile(char* filename, int numNodes) {
+vec3* LevelLoader::loadPathFile(char* filename) {
 	ResourceFile pathFile;
 	pathFile.load(filename);
 	vec3* coordList = (vec3*)malloc(pathFile.numLines * sizeof(vec3));
@@ -115,3 +115,22 @@ vec3* LevelLoader::loadPathFile(char* filename, int numNodes) {
 	return coordList;
 }
 
+void* LevelLoader::loadLevelAI(char* filename) {
+	ResourceFile aiFile;
+	aiFile.load(filename);
+	for (int i = 0; i < 1; i++) {
+		char* lineContents = aiFile.getNextLine();
+		printf("%s\n", lineContents);
+		char* pstr = lineContents;
+		EntityBase* ent = Entity::createNewEntity(ENT_AI);
+		char* mesh = strtok(pstr, " ");
+		//printf("%s\n", mesh);
+		//char* baseColor = strtok(NULL, " ");
+		//char* path = strtok(NULL, " ");
+		//vec3 position = { strtof(pstr, &pstr), strtof(pstr, &pstr), strtof(pstr, NULL) };
+		//ent->mesh = Resources::manager.getTriMeshResource(mesh);
+		//ent->baseColor = Resources::manager.getTextureResource(baseColor);
+		//ent->position = position;
+	}
+	return NULL;
+}
