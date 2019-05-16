@@ -36,7 +36,7 @@ void AIEnt::update(double dt) {
 	case 0: // Idle
 		if (distanceFromPlayer >= 10) {
 			state = 1;
-			printf("Switching to state %d \n", state);
+			//printf("Switching to state %d \n", state);
 		}
 		break;
 	case 1: // Patrol 2.0
@@ -50,8 +50,6 @@ void AIEnt::update(double dt) {
 				if (patrolPoints[currentPatrolGoal].x == NULL) {
 					currentPatrolGoal = 0;
 				}
-				printf("New Patrol Goal is: %i\n", currentPatrolGoal);
-				printf("X: %f, Y: %f, Z: %f\n", position.x, position.y, position.z);
 			}
 		}
 		
@@ -60,7 +58,7 @@ void AIEnt::update(double dt) {
 		if (distanceFromPlayer <= 10) {
 			timer = 5;
 			state = 2;
-			printf("Switching to state %d \n", state);
+			//printf("Switching to state %d \n", state);
 		}
 		break;
 
@@ -77,7 +75,7 @@ void AIEnt::update(double dt) {
 			returnSpot = AIEnt::distanceToPatrol(patrolPoints[currentPatrolGoal], patrolPoints[currentPatrolGoal + 1]);
 			//printf("retX: %f, retY: %f, retZ: %f\n", returnSpot.x, returnSpot.y, returnSpot.z);
 			state = 3;
-			printf("Switching to state %d \n", state);
+			//printf("Switching to state %d \n", state);
 		}
 			break;
 	case 3: // Return to given return spot
@@ -86,16 +84,14 @@ void AIEnt::update(double dt) {
 		if (distanceFromPlayer < 10) {
 			timer = 5;
 			state = 2;
-			printf("Switching to state %d \n", state);
+			//printf("Switching to state %d \n", state);
 		}
 		else if (int(position.x - returnSpot.x) == 0)
 		{
-			printf("X complete\n");
 			if (int(position.z - returnSpot.z) == 0)
 			{
-				printf("Z complete\n");
 				state = 1;
-				printf("Switching to state %d \n", state);
+				//printf("Switching to state %d \n", state);
 			}
 		}
 		break;
@@ -106,11 +102,11 @@ void AIEnt::update(double dt) {
 }
 
 void AIEnt::preRender() {
-	char text[64];
-	sprintf(text, "AI position:    [%5.2f %5.2f %5.2f]", position.x, position.y, position.z);
-	Font::drawText(Entity::manager.font, 0, 132, { 1, 1, 0, 1 }, text);
-	sprintf(text, "AI orientation: [%5.2f %5.2f %5.2f %5.2f]", orientation.x, orientation.y, orientation.z, orientation.w);
-	Font::drawText(Entity::manager.font, 0, 152, { 1, 1, 0, 1 }, text);
+	//char text[64];
+	//sprintf(text, "AI position:    [%5.2f %5.2f %5.2f]", position.x, position.y, position.z);
+	//Font::drawText(Entity::manager.font, 0, 132, { 1, 1, 0, 1 }, text);
+	//sprintf(text, "AI orientation: [%5.2f %5.2f %5.2f %5.2f]", orientation.x, orientation.y, orientation.z, orientation.w);
+	//Font::drawText(Entity::manager.font, 0, 152, { 1, 1, 0, 1 }, text);
 	
 	EntityBase::preRender();
 }

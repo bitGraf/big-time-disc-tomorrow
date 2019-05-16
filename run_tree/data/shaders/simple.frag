@@ -16,7 +16,7 @@ void main() {
     lights[0].position = vec3(0, 3, -3);
     lights[0].color = vec3(1, .3, .1);
     lights[0].strength = 50;
-    lights[1].position = vec3(5, 5, 2);
+	lights[1].position = vec3(5, 5, 2);
     lights[1].color = vec3(1, 1, 1);
     lights[1].strength = 20;
 

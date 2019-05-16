@@ -153,5 +153,6 @@ AIEnt** LevelLoader::loadLevelAI(char* filename, int* retNumAI) {
 		allAI[i]->baseColor = Resources::manager.getTextureResource(baseColor);
 		allAI[i]->position = position;
 	}
+	aiFile.close();
 	return allAI;
 }
