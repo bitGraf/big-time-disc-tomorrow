@@ -1,8 +1,8 @@
 bot2 rustediron2_basecolor guardpath.pth 
-0 0 5
+10 0 10
 bot2 rustediron2_basecolor guardpath.pth 
-0 0 -5
+10 0 -10
 bot2 rustediron2_basecolor guardpath.pth 
-5 0 0
+-10 0 10
 bot2 rustediron2_basecolor guardpath.pth 
-0 0 -5
+-10 0 -10

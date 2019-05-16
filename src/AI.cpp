@@ -20,7 +20,7 @@ quat AIEnt::lookTowards(vec3 target, bool away) {
 	quat lookAtTar = Quaternion::lookAt(position, target);
 	lookAtTar = { 0, lookAtTar.y, 0, lookAtTar.w };
 	Quaternion::normalize(lookAtTar);
-	if (away == TRUE) {
+	if (away == true) {
 		Quaternion::buildFromAxisAngleD(rot180, { 0,1,0 }, 180);
 		lookAtTar = Quaternion::mul(lookAtTar, rot180);
 	}
@@ -52,7 +52,6 @@ void AIEnt::update(double dt) {
 				}
 				printf("New Patrol Goal is: %i\n", currentPatrolGoal);
 				printf("X: %f, Y: %f, Z: %f\n", position.x, position.y, position.z);
-				
 			}
 		}
 		

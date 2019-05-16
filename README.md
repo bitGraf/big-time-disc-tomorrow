@@ -3,7 +3,7 @@ TODO:
 
 AI:
 - Fix math for distanceToPatrol
-- Add per-entity loading of AI info
+- Add Ai-specific path loading
 
 Geometry:
 - Fix panel transition math

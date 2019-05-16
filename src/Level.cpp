@@ -2,7 +2,7 @@
 
 Level LevelLoader::currentLevel;
 
-Level* LevelLoader::loadLevel(char* filename) {
+Level* LevelLoader::loadLevel(char* filename, char*AIfilename) {
     // Do not call more than once for now...
     if (Entity::manager.Player->currentLevel) {
         //a level is already loaded
@@ -11,18 +11,25 @@ Level* LevelLoader::loadLevel(char* filename) {
         for (int i = 0; i < Entity::manager.Player->currentLevel->numPanels; i++) {
             Entity::manager.Player->currentLevel->panels[i]->Remove = true;
         }
+		for (int i = 0; i < Entity::manager.Player->currentLevel->numAI; i++) {
+			Entity::manager.Player->currentLevel->AIs[i]->Remove = true;
+		}
         Entity::pruneEntities();
         Entity::manager.Player->currentLevel = NULL;
         free(currentLevel.panels);
+		free(currentLevel.AIs);
     }
 
     if (filename) {
         int numPanelsLoaded = 0;
+		int numAILoaded = 0;
         char* nameLoaded = NULL;
         PanelEnt** loadedPanels = loadFromFile(filename, &numPanelsLoaded, nameLoaded);
-
+		AIEnt** loadedAI = loadLevelAI(AIfilename, &numAILoaded);
         currentLevel.panels = loadedPanels;
         currentLevel.numPanels = numPanelsLoaded;
+		currentLevel.AIs = loadedAI;
+		currentLevel.numAI = numAILoaded;
         currentLevel.name = std::string(nameLoaded);
 
         free(nameLoaded);
@@ -115,22 +122,36 @@ vec3* LevelLoader::loadPathFile(char* filename) {
 	return coordList;
 }
 
-void* LevelLoader::loadLevelAI(char* filename) {
+AIEnt** LevelLoader::loadLevelAI(char* filename, int* retNumAI) {
 	ResourceFile aiFile;
 	aiFile.load(filename);
-	for (int i = 0; i < 1; i++) {
+	if (retNumAI != NULL) {
+		*retNumAI = aiFile.numLines / 2;
+	}
+	AIEnt** allAI = (AIEnt**)malloc(aiFile.numLines/2 * sizeof(AIEnt*));
+	for (int i = 0; i < aiFile.numLines/2; i++) {
 		char* lineContents = aiFile.getNextLine();
 		printf("%s\n", lineContents);
-		char* pstr = lineContents;
-		EntityBase* ent = Entity::createNewEntity(ENT_AI);
+		char* pstr;
+		pstr = (char*)malloc(strlen(lineContents));
+		strcpy(pstr, lineContents);
+		printf("%s\n", pstr);
+		allAI[i] = (AIEnt*)Entity::createNewEntity(ENT_AI);
 		char* mesh = strtok(pstr, " ");
-		//printf("%s\n", mesh);
-		//char* baseColor = strtok(NULL, " ");
-		//char* path = strtok(NULL, " ");
-		//vec3 position = { strtof(pstr, &pstr), strtof(pstr, &pstr), strtof(pstr, NULL) };
-		//ent->mesh = Resources::manager.getTriMeshResource(mesh);
-		//ent->baseColor = Resources::manager.getTextureResource(baseColor);
-		//ent->position = position;
+		printf("%s\n", mesh);
+		char* baseColor = strtok(NULL, " ");
+		printf("%s\n", baseColor);
+		char* path = strtok(NULL, " ");
+		printf("%s\n", pstr);
+		lineContents = aiFile.getNextLine();
+		char* pstr_c;
+		pstr_c = (char*)malloc(strlen(lineContents));
+		strcpy(pstr_c, lineContents);
+		vec3 position = { strtof(pstr_c, &pstr_c), strtof(pstr_c, &pstr_c), strtof(pstr_c, NULL) };
+		printf("X: %f, Y: %f, Z: %f", position.x, position.y, position.z);
+		allAI[i]->mesh = Resources::manager.getTriMeshResource(mesh);
+		allAI[i]->baseColor = Resources::manager.getTextureResource(baseColor);
+		allAI[i]->position = position;
 	}
-	return NULL;
+	return allAI;
 }
