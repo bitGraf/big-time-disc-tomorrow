@@ -182,6 +182,8 @@
     <None Include="run_tree\data\shaders\pbr.frag" />
     <None Include="run_tree\data\shaders\simple.frag" />
     <None Include="run_tree\data\shaders\simple.vert" />
+    <None Include="run_tree\data\shaders\skybox.frag" />
+    <None Include="run_tree\data\shaders\skybox.vert" />
     <None Include="run_tree\data\shaders\text.frag" />
     <None Include="run_tree\data\shaders\text.vert" />
   </ItemGroup>

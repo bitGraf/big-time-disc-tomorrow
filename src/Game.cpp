@@ -14,6 +14,11 @@ void initialize_game(GLFWwindow* window) {
 	lineShader.use();
 	lineShader.setMat4("projection", &Entity::manager.camera.projectionMatrix);
 	Entity::manager.lineShader = &lineShader;
+	skyShader.smartLoad("skybox.vert", "skybox.frag", "skyShader");
+	skyShader.use();
+	//skyShader.setMat4("projection", &Entity::manager.camera.projectionMatrix);
+	//skybox.loadCubeMap("skybox");
+
 
 	//Fonts
 	Font::InitTextRendering(windowInfo);
@@ -150,6 +155,19 @@ void Render() {
 		glDrawElements(GL_LINES, axis.numFaces*2, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 		glEnable(GL_DEPTH_TEST);
+
+		//Render skybox
+		/*
+		glDepthMask(GL_FALSE);
+		skyShader.use();
+		//view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
+		skyShader.setMat4("view", &Entity::manager.camera.viewMatrix);
+		glBindVertexArray(skyboxVAO);
+		skybox.bindCube(GL_TEXTURE0);
+		//Texture::bindCube();
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDepthMask(GL_TRUE);*/
+
 	} else if (currentState == GameStates::Menu) {
 		// Render menu
 		int x = windowInfo.width/2;

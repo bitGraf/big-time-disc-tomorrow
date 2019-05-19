@@ -34,12 +34,45 @@ void Texture::loadImage(std::string filename) {
 	}
 
 	printf("Loaded texture: [%dx%d], %d channels\n", width, height, nrChannels);
-
 	stbi_image_free(data);
 }
 
-void Texture::loadImage2(std::string filename) {
-	loadImage(filename);
+void Texture::loadCubeMap(std::string filename) {
+	//Load each filename
+	std::string faces[6] =
+	{
+		(filename + "_right.jpg").c_str(),
+		(filename + "_left.jpg").c_str(),
+		(filename + "_top.jpg").c_str(),
+		(filename + "_bottom.jpg").c_str(),
+		(filename + "_front.jpg").c_str(),
+		(filename + "_back.jpg").c_str()
+	};
+
+	//Generate OpenGL Texture
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	for (GLuint i = 0; i < 5; i++)
+	{
+		unsigned char* data = stbi_load((TextureResourcePath + faces[i]).c_str(), &width, &height, &nrChannels, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+			printf("Loaded texture: [%dx%d], %d channels\n", width, height, nrChannels);
+			stbi_image_free(data);
+		}
+		else
+		{
+			std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+			stbi_image_free(data);
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 }
 
 void Texture::bind(GLuint offset) {

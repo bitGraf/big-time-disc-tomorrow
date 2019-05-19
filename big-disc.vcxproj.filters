@@ -172,5 +172,11 @@
     <None Include="run_tree\data\shaders\text.vert">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="run_tree\data\shaders\skybox.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="run_tree\data\shaders\skybox.vert">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
