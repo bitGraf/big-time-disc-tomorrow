@@ -9,5 +9,5 @@ out vec3 pass_vertPos;
 
 void main() {
 	pass_vertPos = vertPos;
-	gl_Position = projection * view * vec4(vertPos, 1.0);
+	gl_Position = projection * mat4(mat3(view)) * vec4(vertPos, 1.0);
 }

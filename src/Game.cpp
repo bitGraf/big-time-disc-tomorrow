@@ -194,6 +194,17 @@ void Render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	if (currentState == GameStates::Normal) {
+		//Render skybox
+		glDepthMask(GL_FALSE);
+		glDepthFunc(GL_LEQUAL);
+		skyShader.use();
+		skyShader.setMat4("view", &Entity::manager.camera.viewMatrix);
+		glBindVertexArray(skyboxVAO);
+		skybox.bindCube(GL_TEXTURE0);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDepthMask(GL_TRUE);
+		glDepthFunc(GL_LESS);
+		
 		//Render normal entities
 		shader.use();
 		shader.setMat4("view", &Entity::manager.camera.viewMatrix);
@@ -212,16 +223,6 @@ void Render() {
 		glDrawElements(GL_LINES, axis.numFaces*2, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 		glEnable(GL_DEPTH_TEST);
-
-		//Render skybox
-		
-		glDepthMask(GL_FALSE);
-		skyShader.use();
-		skyShader.setMat4("view", &Entity::manager.camera.viewMatrix);
-		glBindVertexArray(skyboxVAO);
-		skybox.bindCube(GL_TEXTURE0);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		glDepthMask(GL_TRUE);
 
 	} else if (currentState == GameStates::Menu) {
 		// Render menu

@@ -38,6 +38,8 @@ void Texture::loadImage(std::string filename) {
 }
 
 void Texture::loadCubeMap(std::string filename) {
+	stbi_set_flip_vertically_on_load(false);
+	
 	//Load each filename
 	std::string faces[6] =
 	{
@@ -53,7 +55,7 @@ void Texture::loadCubeMap(std::string filename) {
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 
-	for (GLuint i = 0; i < 5; i++)
+	for (GLuint i = 0; i < 6; i++)
 	{
 		unsigned char* data = stbi_load((TextureResourcePath + faces[i]).c_str(), &width, &height, &nrChannels, 0);
 		if (data)
@@ -73,6 +75,7 @@ void Texture::loadCubeMap(std::string filename) {
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	stbi_set_flip_vertically_on_load(true);
 }
 
 void Texture::bind(GLuint offset) {
