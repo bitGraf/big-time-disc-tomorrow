@@ -51,17 +51,17 @@ void initialize_game(GLFWwindow* window) {
 		-1.0f, -1.0f,  1.0f,
 		1.0f, -1.0f,  1.0f
 	};
-	GLuint skyboxVAO;
 
 	glGenVertexArrays(1, &skyboxVAO);
 	glBindVertexArray(skyboxVAO);
+	printf("SkyboxVAO: %d\n", (int)skyboxVAO);
 
 	GLuint skyboxVBO;
 	glGenBuffers(1, &skyboxVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
 	glBufferData(GL_ARRAY_BUFFER, 108 * sizeof(float), skyboxVerts, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
 
     //Shaders
 	shader.smartLoad("simple.vert", "pbr.frag", "entityShader");
