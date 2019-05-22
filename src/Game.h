@@ -43,8 +43,8 @@ static const double RenderRate = 1 / 300.0;	//300 fps for rendering	-> max 5 fra
 static double fpsUpdateTime = 0;
 static double fpsUpdateRate = 0.5;
 
-//static Texture skybox;
-//int skyboxVAO;
+static Texture skybox;
+static int skyboxVAO;
 
 enum GameStates {
 	Normal = 0,

@@ -3,15 +3,6 @@
 EntityManager Entity::manager;
 
 void Entity::init_entities(WindowInfo windowInfo) {
-    // Test
-    ResourceFile file;
-    file.load("../data/models/axis.modl");
-    for (int i = 0; i < file.numLines; i++) {
-        char* line = file.getNextLine();
-        printf("Line %d [%s]\n", i+1, line);
-    }
-    file.close();
-
     //
 	// Load assets from file
 	//
