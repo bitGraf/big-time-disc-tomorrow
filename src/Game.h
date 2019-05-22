@@ -45,6 +45,7 @@ static double fpsUpdateRate = 0.5;
 
 static Texture skybox;
 static int skyboxVAO;
+static int skyboxVBO;
 
 enum GameStates {
 	Normal = 0,
