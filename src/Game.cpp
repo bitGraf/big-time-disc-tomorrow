@@ -289,7 +289,7 @@ void handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int
 	Entity::handleInputEvent(window, key, scancode, action, mods);
 
 	if (currentState == GameStates::Normal) {
-		if ((key == GLFW_KEY_Q) && (action == GLFW_PRESS)) {
+		if ((key == GLFW_KEY_X) && (action == GLFW_PRESS)) {
 			glfwSetWindowShouldClose(window, true);
 		}
 		if ((key == GLFW_KEY_ESCAPE) && (action == GLFW_PRESS)) {
@@ -300,13 +300,13 @@ void handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int
 		if ((key == GLFW_KEY_ESCAPE) && (action == GLFW_PRESS)) {
 			currentState = GameStates::Normal;
 		}
-		if ((key == GLFW_KEY_Q) && (action == GLFW_PRESS)) {
+		if ((key == GLFW_KEY_X) && (action == GLFW_PRESS)) {
 			glfwSetWindowShouldClose(window, true);
 		}
 
 		if ((key == GLFW_KEY_DOWN) && (action == GLFW_PRESS)) {
 			currentMenuItem++;
-			if (currentMenuItem == 5)
+			if (currentMenuItem == 5) // Set to a "menuMax" variable?
 				currentMenuItem = 0;
 			//printf("Current Menu Item: %d\n", currentMenuItem);
 		}

@@ -39,17 +39,6 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
         Entity::manager.camera.update(0);
     }
 
-    if ((key == GLFW_KEY_E) && (action == GLFW_PRESS)) {
-        MissileEnt* ent = (MissileEnt*)Entity::createNewEntity(ENT_Missile);
-        Resources::manager.loadTextureResource("missile_baseColor", ".png");
-        Resources::manager.loadTriMeshResource("missile", ".ply");
-        ent->baseColor = Resources::manager.getTextureResource("missile_baseColor");
-        ent->mesh = Resources::manager.getTriMeshResource("missile");
-        ent->position = position;
-        ent->orientation = {-.7071f, 0, 0, .7071f};
-        ent->update(0);
-    }
-
     if ((key == GLFW_KEY_C) && (action == GLFW_PRESS)) {
         cameraFollow = !cameraFollow;
     }
@@ -74,9 +63,12 @@ void CrawlerEnt::update(double dt) {
     float vb = Input::manager.move_backward.value;
     float vl = Input::manager.move_left.value;
     float vr = Input::manager.move_right.value;
+	float vsl = Input::manager.move_strafe_left.value;
+	float vsr = Input::manager.move_strafe_right.value;
 
     float forwardBackward = vf - vb;
     float rightLeft = vr - vl;
+	float strafeRightLeft = vsl - vsr;
 
     float delAngle = -50*dt*rightLeft;
     quat transQ;
@@ -108,6 +100,12 @@ void CrawlerEnt::update(double dt) {
         if (Input::manager.move_strafe.value > 0.5f) {
             propulsion = propulsion + localLeft*rightLeft*F*1.5f;
         }
+		if (Input::manager.move_strafe_left.value || Input::manager.move_strafe_right.value > 0.5f) {
+			propulsion = localLeft*strafeRightLeft*F*1.2f;
+			if (Input::manager.move_strafe.value > 0.5f) {
+				propulsion = propulsion * .5;
+			}
+		}
     }
     vec3 gravity = { 0, !grounded ? -9.81f : 0, 0 };
 	acceleration = gravity + (propulsion + friction) * (1/mass);

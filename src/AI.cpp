@@ -99,11 +99,25 @@ void AIEnt::update(double dt) {
 	case 4: // Attack!
 		targetOrientation = AIEnt::lookTowards(Entity::manager.Player->position);
 		velocity = { 0, 0, 0 };
-		if (distanceFromPlayer <= 5) {
-			velocity = velocity*-1;
-			Entity::manager.Player->health -= .1;
+		if (timer >= 4) {
+			MissileEnt* ent = (MissileEnt*)Entity::createNewEntity(ENT_Missile);
+			Resources::manager.loadTextureResource("wood", ".jpg");
+			Resources::manager.loadTriMeshResource("sphere", ".modl");
+			ent->baseColor = Resources::manager.getTextureResource("wood");
+			ent->mesh = Resources::manager.getTriMeshResource("sphere");
+			ent->scale = scale*.15;
+			ent->thrust = 450;
+			ent->separationTime = 10.f;
+			ent->position = position;
+			ent->target = Entity::manager.Player->position;
+			ent->velocity = Vector::normalized(ent->target - ent->position)*6;
+			ent->orientation = orientation;
+			ent->update(0);
+			timer = 0;
 		}
-		if (distanceFromPlayer >= 15) {
+		timer += dt;
+		
+		if (distanceFromPlayer >= 30) {
 			state = 1;
 		}
 		break;

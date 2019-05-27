@@ -14,3 +14,7 @@ Geometry:
 Gamestate:
 - Add inventory/player-stattracker
 - Add loading/saving
+
+Gameplay:
+- Potentially remove 'thrust' dynamic from Ent_Missile
+- Basic effects? (ie "Call EffectManager to display text/effect at given loc, for given time, etc)

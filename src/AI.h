@@ -14,7 +14,7 @@ struct AIEnt : EntityBase {
 	quat rot180;
 	quat targetOrientation;
 	float distanceFromPlayer;
-	float rate = 1.75;
+	float rate = 1.25;
 	float timer = NULL;
 	float speed = 42.5;
 	float patrolTolerance = 2;

@@ -1,5 +1,6 @@
 #pragma once
 #include "Physics.h"
+#include "EntityManager.h"
 
 struct MissileEnt : public PhysicsEnt {
     float thrust = 2200;
