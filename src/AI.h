@@ -8,12 +8,16 @@
 struct AIEnt : EntityBase {
 	// Init Vals
 	vec3 velocity = { 0, 0, 0 };
+	vec3 targetPosition;
 	vec3 returnSpot;
 	vec3* patrolPoints;
 	quat rot180;
+	quat targetOrientation;
 	float distanceFromPlayer;
+	float rate = 1.75;
 	float timer = NULL;
-	int speed = 1;
+	float speed = 42.5;
+	float patrolTolerance = 2;
 	// State
 	int state = 0;
 	int currentPatrolGoal = 0;
@@ -22,6 +26,6 @@ struct AIEnt : EntityBase {
 	void onCreate() override;
 	void update(double dt) override;
 	void preRender();
-	vec3 distanceToPatrol(vec3, vec3);
+	vec3 returnPoint(vec3, vec3);
 	quat lookTowards(vec3 target, bool away = false);
 };

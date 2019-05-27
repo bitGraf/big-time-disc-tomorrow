@@ -15,7 +15,7 @@ public:
 	Texture();
 
 	void loadImage(std::string filename);
-	void loadCubeMap(std::string filename);
+	void loadCubeMap(std::string filename, std::string filetype);
 	void loadImage2(std::string filename);
 	void bind(GLuint offset);
 	void bindCube(GLuint offset);

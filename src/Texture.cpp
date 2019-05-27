@@ -37,18 +37,18 @@ void Texture::loadImage(std::string filename) {
 	stbi_image_free(data);
 }
 
-void Texture::loadCubeMap(std::string filename) {
+void Texture::loadCubeMap(std::string filename, std::string filetype) {
 	stbi_set_flip_vertically_on_load(false);
 	
 	//Load each filename
 	std::string faces[6] =
 	{
-		(filename + "_right.jpg").c_str(),
-		(filename + "_left.jpg").c_str(),
-		(filename + "_top.jpg").c_str(),
-		(filename + "_bottom.jpg").c_str(),
-		(filename + "_front.jpg").c_str(),
-		(filename + "_back.jpg").c_str()
+		(filename + "_right" + filetype).c_str(),
+		(filename + "_left" + filetype).c_str(),
+		(filename + "_top" + filetype).c_str(),
+		(filename + "_bottom" + filetype).c_str(),
+		(filename + "_front" + filetype).c_str(),
+		(filename + "_back" + filetype).c_str()
 	};
 
 	//Generate OpenGL Texture

@@ -7,7 +7,7 @@ void AIEnt::onCreate() {
 	patrolPoints = LevelLoader::loadPathFile("../data/paths/guardpath.pth");
 }
 
-vec3 AIEnt::distanceToPatrol(vec3 a, vec3 b) {
+vec3 AIEnt::returnPoint(vec3 a, vec3 b) {
 	const float totalLength = abs(Vector::magnitude(a) - Vector::magnitude(b));
 	if (totalLength == 0.0) return a - position;
 	const float t = max(0, min(1, Vector::dot(b - position, a - position) / totalLength));
@@ -29,7 +29,9 @@ quat AIEnt::lookTowards(vec3 target, bool away) {
 
 void AIEnt::update(double dt) {
 
-	position = position + (velocity * dt);
+	targetPosition = position + (velocity * dt);
+	!isnan(targetPosition.x) ? position = Vector::lerp(position, targetPosition, rate * dt) : position = position;
+	!isnan(targetOrientation.y) ? orientation = Quaternion::lerp(orientation, targetOrientation, rate * dt) : orientation = orientation;
 	distanceFromPlayer = Vector::magnitude(Entity::manager.Player->position - position);
 
 	switch (state) {
@@ -40,22 +42,21 @@ void AIEnt::update(double dt) {
 		}
 		break;
 	case 1: // Patrol 2.0
-		orientation = AIEnt::lookTowards(patrolPoints[currentPatrolGoal]);
+		targetOrientation = AIEnt::lookTowards(patrolPoints[currentPatrolGoal]);
 		velocity = Forward*speed;
-		if (int(position.x - patrolPoints[currentPatrolGoal].x) == 0) {
-			if (int(position.z - patrolPoints[currentPatrolGoal].z) == 0) {
-
-				velocity = { 0,0,0 };
-				currentPatrolGoal++;
-				if (patrolPoints[currentPatrolGoal].x == NULL) {
-					currentPatrolGoal = 0;
-				}
+		if (Vector::magnitude(position - patrolPoints[currentPatrolGoal]) <= patrolTolerance) {
+			currentPatrolGoal++;
+			if (patrolPoints[currentPatrolGoal].x == NULL) {
+				currentPatrolGoal = 0;
 			}
 		}
 		
 
 		// Player Distance Check
 		if (distanceFromPlayer <= 10) {
+			state = 4;
+		}
+		else if (distanceFromPlayer <= 3) {
 			timer = 5;
 			state = 2;
 			//printf("Switching to state %d \n", state);
@@ -63,7 +64,7 @@ void AIEnt::update(double dt) {
 		break;
 
 	case 2: // Run away!
-		orientation = AIEnt::lookTowards(Entity::manager.Player->position, TRUE);
+		targetOrientation = AIEnt::lookTowards(Entity::manager.Player->position, TRUE);
 		velocity = Forward*speed;
 		if (timer > 0) {
 			timer -= dt;
@@ -72,14 +73,14 @@ void AIEnt::update(double dt) {
 			timer = NULL;
 		}
 		if (distanceFromPlayer >= 10 && timer == NULL) {
-			returnSpot = AIEnt::distanceToPatrol(patrolPoints[currentPatrolGoal], patrolPoints[currentPatrolGoal + 1]);
+			returnSpot = AIEnt::returnPoint(patrolPoints[currentPatrolGoal], patrolPoints[currentPatrolGoal + 1]);
 			//printf("retX: %f, retY: %f, retZ: %f\n", returnSpot.x, returnSpot.y, returnSpot.z);
 			state = 3;
 			//printf("Switching to state %d \n", state);
 		}
 			break;
 	case 3: // Return to given return spot
-		orientation = Quaternion::lookAt(position, returnSpot);
+		targetOrientation = Quaternion::lookAt(position, returnSpot);
 		velocity = Forward*speed;
 		if (distanceFromPlayer < 10) {
 			timer = 5;
@@ -95,6 +96,17 @@ void AIEnt::update(double dt) {
 			}
 		}
 		break;
+	case 4: // Attack!
+		targetOrientation = AIEnt::lookTowards(Entity::manager.Player->position);
+		velocity = { 0, 0, 0 };
+		if (distanceFromPlayer <= 5) {
+			velocity = velocity*-1;
+			Entity::manager.Player->health -= .1;
+		}
+		if (distanceFromPlayer >= 15) {
+			state = 1;
+		}
+		break;
 	default:
 		state = 0;
 	}
@@ -102,11 +114,11 @@ void AIEnt::update(double dt) {
 }
 
 void AIEnt::preRender() {
-	//char text[64];
-	//sprintf(text, "AI position:    [%5.2f %5.2f %5.2f]", position.x, position.y, position.z);
-	//Font::drawText(Entity::manager.font, 0, 132, { 1, 1, 0, 1 }, text);
-	//sprintf(text, "AI orientation: [%5.2f %5.2f %5.2f %5.2f]", orientation.x, orientation.y, orientation.z, orientation.w);
-	//Font::drawText(Entity::manager.font, 0, 152, { 1, 1, 0, 1 }, text);
+	char text[64];
+	sprintf(text, "AI position:    [%5.2f %5.2f %5.2f]", position.x, position.y, position.z);
+	Font::drawText(Entity::manager.font, 0, 132, { 1, 1, 0, 1 }, text);
+	sprintf(text, "AI orientation: [%5.2f %5.2f %5.2f %5.2f]", orientation.x, orientation.y, orientation.z, orientation.w);
+	Font::drawText(Entity::manager.font, 0, 152, { 1, 1, 0, 1 }, text);
 	
 	EntityBase::preRender();
 }

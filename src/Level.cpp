@@ -131,24 +131,19 @@ AIEnt** LevelLoader::loadLevelAI(char* filename, int* retNumAI) {
 	AIEnt** allAI = (AIEnt**)malloc(aiFile.numLines/2 * sizeof(AIEnt*));
 	for (int i = 0; i < aiFile.numLines/2; i++) {
 		char* lineContents = aiFile.getNextLine();
-		printf("%s\n", lineContents);
 		char* pstr;
 		pstr = (char*)malloc(strlen(lineContents));
 		strcpy(pstr, lineContents);
-		printf("%s\n", pstr);
 		allAI[i] = (AIEnt*)Entity::createNewEntity(ENT_AI);
 		char* mesh = strtok(pstr, " ");
-		printf("%s\n", mesh);
 		char* baseColor = strtok(NULL, " ");
-		printf("%s\n", baseColor);
 		char* path = strtok(NULL, " ");
-		printf("%s\n", pstr);
 		lineContents = aiFile.getNextLine();
 		char* pstr_c;
 		pstr_c = (char*)malloc(strlen(lineContents));
 		strcpy(pstr_c, lineContents);
 		vec3 position = { strtof(pstr_c, &pstr_c), strtof(pstr_c, &pstr_c), strtof(pstr_c, NULL) };
-		printf("X: %f, Y: %f, Z: %f", position.x, position.y, position.z);
+		printf("X: %f, Y: %f, Z: %f\n", position.x, position.y, position.z);
 		allAI[i]->mesh = Resources::manager.getTriMeshResource(mesh);
 		allAI[i]->baseColor = Resources::manager.getTextureResource(baseColor);
 		allAI[i]->position = position;

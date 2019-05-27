@@ -34,6 +34,7 @@ struct EntityBase {
 
     //Other information
     vec3 Color = {1, 1, 1};
+	float health = 100;
 
     //Common function prototypes
     virtual void update(double dt) {

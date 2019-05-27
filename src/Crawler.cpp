@@ -179,7 +179,8 @@ void CrawlerEnt::postRender() {
     Font::drawText(Entity::manager.font, 0, 72, {1, 1, 0, 1}, text);
     sprintf(text, "Cooldown: %6.4f", attachCoolDown);
     Font::drawText(Entity::manager.font, 0, 92, {1, 1, 0, 1}, text);
-
+	sprintf(text, "Health: %5.2f,", health);
+	Font::drawText(Entity::manager.font, 0, 112, { 1, 1, 0, 1 }, text);
 /*
     for (int i = 0; i < numPanels; i++) {
         sprintf(text, "Panel %d: [K = %5.2f, In Volume: %s]%s (%5.2f, %5.2f)", 
