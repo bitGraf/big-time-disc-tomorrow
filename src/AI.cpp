@@ -64,7 +64,7 @@ void AIEnt::update(double dt) {
 		break;
 
 	case 2: // Run away!
-		targetOrientation = AIEnt::lookTowards(Entity::manager.Player->position, TRUE);
+		targetOrientation = AIEnt::lookTowards(Entity::manager.Player->position, true);
 		velocity = Forward*speed;
 		if (timer > 0) {
 			timer -= dt;
