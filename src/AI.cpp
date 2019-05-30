@@ -56,11 +56,6 @@ void AIEnt::update(double dt) {
 		if (distanceFromPlayer <= 10) {
 			state = 4;
 		}
-		else if (distanceFromPlayer <= 3) {
-			timer = 5;
-			state = 2;
-			//printf("Switching to state %d \n", state);
-		}
 		break;
 
 	case 2: // Run away!
@@ -83,9 +78,7 @@ void AIEnt::update(double dt) {
 		targetOrientation = Quaternion::lookAt(position, returnSpot);
 		velocity = Forward*speed;
 		if (distanceFromPlayer < 10) {
-			timer = 5;
-			state = 2;
-			//printf("Switching to state %d \n", state);
+			state = 4;
 		}
 		else if (int(position.x - returnSpot.x) == 0)
 		{
@@ -119,6 +112,10 @@ void AIEnt::update(double dt) {
 		
 		if (distanceFromPlayer >= 30) {
 			state = 1;
+		}
+		if (distanceFromPlayer <= 4.5) {
+			timer = 3;
+			state = 2;
 		}
 		break;
 	default:

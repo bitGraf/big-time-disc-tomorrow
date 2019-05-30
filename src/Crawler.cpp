@@ -12,10 +12,12 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
             velocity.y += 10;
             grounded = false;
         } else {
-            grounded = false;
+			quat newOrientation = { orientation.x, 0.f, orientation.z, orientation.w };
+			grounded = false;
             velocity = velocity + currentPanel->Up * 10.0f;
             attachCoolDown = 0.5f;
             transitionToPanel(NULL);
+			orientation = Quaternion::normalized(newOrientation);
         }
     }
 
