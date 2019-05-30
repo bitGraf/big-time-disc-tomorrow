@@ -129,24 +129,31 @@ AIEnt** LevelLoader::loadLevelAI(char* filename, int* retNumAI) {
 		*retNumAI = aiFile.numLines / 2;
 	}
 	AIEnt** allAI = (AIEnt**)malloc(aiFile.numLines/2 * sizeof(AIEnt*));
-	for (int i = 0; i < aiFile.numLines/2; i++) {
+	for (int i = 0; i < aiFile.numLines / 2; i++) {
 		char* lineContents = aiFile.getNextLine();
-		char* pstr;
-		pstr = (char*)malloc(strlen(lineContents));
-		strcpy(pstr, lineContents);
+		char* lineCopy = (char*)malloc(1 + strlen(lineContents));
+		strcpy(lineCopy, lineContents);
+		char* pstr = lineCopy;
+
 		allAI[i] = (AIEnt*)Entity::createNewEntity(ENT_AI);
 		char* mesh = strtok(pstr, " ");
 		char* baseColor = strtok(NULL, " ");
 		char* path = strtok(NULL, " ");
+		free(lineCopy);
+
 		lineContents = aiFile.getNextLine();
-		char* pstr_c;
-		pstr_c = (char*)malloc(strlen(lineContents));
-		strcpy(pstr_c, lineContents);
-		vec3 position = { strtof(pstr_c, &pstr_c), strtof(pstr_c, &pstr_c), strtof(pstr_c, NULL) };
-		printf("X: %f, Y: %f, Z: %f\n", position.x, position.y, position.z);
+		lineCopy = (char*)malloc(1 + strlen(lineContents));
+		strcpy(lineCopy, lineContents);
+		pstr = lineCopy;
+
+		vec3 position = { strtof(pstr, &pstr), strtof(pstr, &pstr), strtof(pstr, NULL) };
 		allAI[i]->mesh = Resources::manager.getTriMeshResource(mesh);
 		allAI[i]->baseColor = Resources::manager.getTextureResource(baseColor);
 		allAI[i]->position = position;
+
+		free(lineCopy);
+		lineCopy = NULL;
+		pstr = NULL;
 	}
 	aiFile.close();
 	return allAI;

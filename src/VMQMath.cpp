@@ -15,8 +15,11 @@ vec3 Vector::cross(const vec3& a, const vec3& b) {
 }
 
 vec3 Vector::normalized(const vec3& v) {
-    float m = 1/sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
-    return {v.x*m, v.y*m, v.z*m};
+    float m = sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+	if (fabs(m) < 0.001f) {
+		return { 0, 0, 0 };
+	}
+    return {v.x/m, v.y/m, v.z/m};
 }
 
 void Vector::normalize(vec3& v) {
