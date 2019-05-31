@@ -87,3 +87,9 @@ void Texture::bindCube(GLuint offset) {
 	glActiveTexture(offset);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 }
+
+void Texture::cleanup() {
+	glDeleteTextures(1, &textureID);
+	textureID = 0;
+	width = height = nrChannels = 0;
+}

@@ -304,6 +304,19 @@ void ResourceManager::printAllResources() {
     }
 }
 
+void ResourceManager::cleanup() {
+	// delete all textures
+	for (auto tex : TextureResources) {
+		tex.second->data.cleanup();
+		delete tex.second;
+	}
+
+	// delete all meshes
+	for (auto mesh : TriMeshResources) {
+		mesh.second->data.~TriangleMesh();
+		delete mesh.second;
+	}
+}
 
 
 bool ResourceFile::load(char* filename) {

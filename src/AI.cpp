@@ -133,3 +133,8 @@ void AIEnt::preRender() {
 	
 	EntityBase::preRender();
 }
+
+void AIEnt::onDestroy() {
+	free(patrolPoints);
+	patrolPoints = NULL;
+}

@@ -19,6 +19,7 @@ public:
 	void loadImage2(std::string filename);
 	void bind(GLuint offset);
 	void bindCube(GLuint offset);
+	void cleanup();
 
 	GLuint textureID;
 	int width, height, nrChannels;

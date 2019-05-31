@@ -48,7 +48,8 @@ static GLuint skyboxVAO;
 
 enum GameStates {
 	Normal = 0,
-	Menu
+	Menu,
+	Inventory
 };
 
 // Game State Manager

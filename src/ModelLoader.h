@@ -41,10 +41,10 @@ struct TriangleMesh {
     ~TriangleMesh() {
         //is TriMesh ever loses scope, free memory
         printf("\t\tFreeing Triangle mesh data [VAO %d]\n", VAO);
-        free(vertices);
-        free(indices);
-        free(normals);
-		free(texcoords);
+		if (vertices)  free(vertices);  vertices  = NULL;
+		if (indices)   free(indices);   indices   = NULL;
+		if (normals)   free(normals);   normals   = NULL;
+		if (texcoords) free(texcoords); texcoords = NULL;
     }
 };
 

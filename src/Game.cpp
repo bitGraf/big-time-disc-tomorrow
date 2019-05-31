@@ -160,10 +160,12 @@ void run_game_loop(GLFWwindow* window) {
 }
 
 void cleanup() {
-    free(fpsFont);
-	free(otherFont);
+	free(fpsFont);		fpsFont	  = NULL;
+	free(otherFont);	otherFont = NULL;
+	free(bigFont);		bigFont   = NULL;
 
     Entity::manager.freeAll();
+	Resources::manager.cleanup();
 }
 
 void FrameUpdate (double dt) {

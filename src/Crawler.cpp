@@ -15,7 +15,7 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
 			quat newOrientation;// = { orientation.x, 0.f, orientation.z, orientation.w };
 			grounded = false;
             velocity = velocity + currentPanel->Up * 10.0f;
-            attachCoolDown = 0.5f;
+            attachCoolDown = 0.25f;
             transitionToPanel(NULL);
 			localOrientation = Quaternion::normalized(newOrientation);
         }
@@ -144,6 +144,8 @@ void CrawlerEnt::update(double dt) {
                 if ((currentPanel == NULL) || (currentLevel->panels[i]->K2 < currentPanel->K2)) {
                     if (attachCoolDown < 0.001f)
                         transitionToPanel(currentLevel->panels[i]);
+					attachCoolDown = .25f;
+					break;
                 }
             } else {
                 currentLevel->panels[i]->Color = {2.5, 1, 1};

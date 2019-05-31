@@ -59,6 +59,7 @@ struct EntityBase {
     virtual void postRender() {}
     virtual void handleInput(int key, int scancode, int action, int mods) {}
     virtual void onCreate() {}
+	virtual void onDestroy() {}
 
     virtual ~EntityBase() {
         printf("\tFreeing Entity [%2d]...\n", ID);

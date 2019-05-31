@@ -10,7 +10,7 @@ struct AIEnt : EntityBase {
 	vec3 velocity = { 0, 0, 0 };
 	vec3 targetPosition;
 	vec3 returnSpot;
-	vec3* patrolPoints;
+	vec3* patrolPoints; //NULL terminated?
 	quat rot180;
 	quat targetOrientation;
 	float distanceFromPlayer;
@@ -25,6 +25,8 @@ struct AIEnt : EntityBase {
 
 	void onCreate() override;
 	void update(double dt) override;
+	void onDestroy() override;
+
 	void preRender();
 	vec3 returnPoint(vec3, vec3);
 	quat lookTowards(vec3 target, bool away = false);

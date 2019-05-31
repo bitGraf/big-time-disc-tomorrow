@@ -4,7 +4,6 @@
 GLFWwindow* createWindow();
 
 char exe_location[MAX_PATH];
-//char* working_directory = NULL;
 
 int main(int argc, char** argv) {
 	printf("\n-------------------------------------------\n\n");

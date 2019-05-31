@@ -299,6 +299,7 @@ void Entity::pruneEntities() {
                 newList[curr] = manager.pointerList[i];
                 curr++;
             } else {
+				manager.pointerList[i]->onDestroy(); // Call the entity specific cleanup function
                 free(manager.pointerList[i]);
                 manager.pointerList[i] = NULL;
             }
