@@ -4,8 +4,8 @@ EntityManager Entity::manager;
 
 void Entity::init_entities(WindowInfo windowInfo) {
     //
-	// Load assets from file
-	//
+    // Load assets from file
+    //
 
     ModelLoader::loadFile(&manager.axis, "../data/models/axis.modl");
     ModelLoader::loadFileStanford(&manager.questionMark, "../data/models/unknownModel.ply");
@@ -55,7 +55,7 @@ void Entity::init_entities(WindowInfo windowInfo) {
     Entity::printAllEntities();
 
     //Camera
-	manager.camera.updateProjectionMatrix(windowInfo);
+    manager.camera.updateProjectionMatrix(windowInfo);
 }
 
 EntityBase* Entity::createNewEntity(EntityTypes type, int* id) {
@@ -75,19 +75,19 @@ void Entity::handleInputEvent(GLFWwindow* window, int key, int scancode, int act
         printf("toggle frame rendering...\n");
 
         Entity::manager.showFrames = !Entity::manager.showFrames;
-	}
+    }
 
     if ((key == GLFW_KEY_I) && (action == GLFW_PRESS)) {
         printf("Listing all entities...\n");
 
         Entity::printAllEntities();
-	}
+    }
 
     if ((key == GLFW_KEY_P) && (action == GLFW_PRESS)) {
         printf("Listing all entities...\n");
 
         Entity::pruneEntities();
-	}    
+    }    
 
     for (int i = 0; i < manager.numEntries; i++) {
         EntityBase* ent = (manager.pointerList[i]);
@@ -187,7 +187,7 @@ void Entity::printAllEntities() {
                 ent->subType==ENT_Base ? " " : (
                 ent->subType==ENT_Player ? "Player" : (
                 ent->subType==ENT_Crawler ? "Crawler" : (
-				ent->subType==ENT_AI ? "AI" : (
+                ent->subType==ENT_AI ? "AI" : (
                 ent->subType==ENT_Panel ? "Panel" : (
                 ent->subType==ENT_Static ? "Static" : (
                 ent->subType==ENT_Temporary ? "Temporary" : (
@@ -251,10 +251,10 @@ int Entity::registerEntity(EntityTypes type) {
             manager.pointerList[manager.numEntries] = new PhysicsEnt;
             //printf("Adding new EntityStatic\n");
         } break;
-		case ENT_AI: {
-			manager.pointerList[manager.numEntries] = new AIEnt;
-			//printf("Adding new EntityAI\n");
-		} break;
+        case ENT_AI: {
+            manager.pointerList[manager.numEntries] = new AIEnt;
+            //printf("Adding new EntityAI\n");
+        } break;
         default: {
             manager.pointerList[manager.numEntries] = new EntityBase;
             //printf("Adding new EntityBase\n");
@@ -299,7 +299,7 @@ void Entity::pruneEntities() {
                 newList[curr] = manager.pointerList[i];
                 curr++;
             } else {
-				manager.pointerList[i]->onDestroy(); // Call the entity specific cleanup function
+                manager.pointerList[i]->onDestroy(); // Call the entity specific cleanup function
                 free(manager.pointerList[i]);
                 manager.pointerList[i] = NULL;
             }

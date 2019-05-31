@@ -16,9 +16,9 @@ vec3 Vector::cross(const vec3& a, const vec3& b) {
 
 vec3 Vector::normalized(const vec3& v) {
     float m = sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
-	if (fabs(m) < 0.001f) {
-		return { 0, 0, 0 };
-	}
+    if (fabs(m) < 0.001f) {
+        return { 0, 0, 0 };
+    }
     return {v.x/m, v.y/m, v.z/m};
 }
 
@@ -326,7 +326,7 @@ float Vector::magnitude(vec3 v) {
 }
 
 float Vector::magnitude(vec2 v) {
-	return sqrt(v.x*v.x + v.y*v.y);
+    return sqrt(v.x*v.x + v.y*v.y);
 }
 
 quat Quaternion::fromDCM(vec3 x, vec3 y, vec3 z) {

@@ -21,26 +21,26 @@ void ModelLoader::bufferModel(TriangleMesh* mesh, bool lineRender) {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
     glEnableVertexAttribArray(1);
 
-	//buffer Vertex texture data
-	glGenBuffers(1, &VBOtex);
-	glBindBuffer(GL_ARRAY_BUFFER, VBOtex);
-	glBufferData(GL_ARRAY_BUFFER, mesh->numVerts * sizeof(vec2), mesh->texcoords, GL_STATIC_DRAW);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(vec2), (void*)0);
-	glEnableVertexAttribArray(2);
+    //buffer Vertex texture data
+    glGenBuffers(1, &VBOtex);
+    glBindBuffer(GL_ARRAY_BUFFER, VBOtex);
+    glBufferData(GL_ARRAY_BUFFER, mesh->numVerts * sizeof(vec2), mesh->texcoords, GL_STATIC_DRAW);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(vec2), (void*)0);
+    glEnableVertexAttribArray(2);
 
     //buffer Vertex tangent data
-	glGenBuffers(1, &VBOtan);
-	glBindBuffer(GL_ARRAY_BUFFER, VBOtan);
-	glBufferData(GL_ARRAY_BUFFER, mesh->numVerts * sizeof(vec3), mesh->tangents, GL_STATIC_DRAW);
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
-	glEnableVertexAttribArray(3);
+    glGenBuffers(1, &VBOtan);
+    glBindBuffer(GL_ARRAY_BUFFER, VBOtan);
+    glBufferData(GL_ARRAY_BUFFER, mesh->numVerts * sizeof(vec3), mesh->tangents, GL_STATIC_DRAW);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
+    glEnableVertexAttribArray(3);
 
     //buffer Vertex bitangent data
-	glGenBuffers(1, &VBObtan);
-	glBindBuffer(GL_ARRAY_BUFFER, VBObtan);
-	glBufferData(GL_ARRAY_BUFFER, mesh->numVerts * sizeof(vec3), mesh->bitangents, GL_STATIC_DRAW);
-	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
-	glEnableVertexAttribArray(4);
+    glGenBuffers(1, &VBObtan);
+    glBindBuffer(GL_ARRAY_BUFFER, VBObtan);
+    glBufferData(GL_ARRAY_BUFFER, mesh->numVerts * sizeof(vec3), mesh->bitangents, GL_STATIC_DRAW);
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
+    glEnableVertexAttribArray(4);
 
     //buffer indexing
     glGenBuffers(1, &EBO);
@@ -61,7 +61,7 @@ void ModelLoader::bufferModel(TriangleMesh* mesh, bool lineRender) {
     mesh->VAO = VAO;
     mesh->VBOpos = VBOpos;
     mesh->VBOnorm = VBOnorm;
-	mesh->VBOtex = VBOtex;
+    mesh->VBOtex = VBOtex;
     mesh->EBO = EBO;
 
     /*for (int i = 0; i < mesh->numVerts*3; i++) {
@@ -83,13 +83,13 @@ void ModelLoader::loadFileStanford(TriangleMesh* triMesh, char* filename, bool h
     printf("Reading file: \"%s\"\n", filename);
     
     fseek(modelFile, 0, SEEK_END);
-	long fileLength = ftell(modelFile);
-	fseek(modelFile, 0, SEEK_SET);
+    long fileLength = ftell(modelFile);
+    fseek(modelFile, 0, SEEK_SET);
 
-	char *fileContents = (char *)malloc(fileLength + 1);
-	fread(fileContents, fileLength, 1, modelFile);
-	fclose(modelFile);
-	fileContents[fileLength] = 0;
+    char *fileContents = (char *)malloc(fileLength + 1);
+    fread(fileContents, fileLength, 1, modelFile);
+    fclose(modelFile);
+    fileContents[fileLength] = 0;
 
     char* lineContents;
     bool header = true;
@@ -221,13 +221,13 @@ void ModelLoader::loadFile(TriangleMesh* triMesh, char* filename) {
     printf("Reading file: \"%s\"\n", filename);
     
     fseek(modelFile, 0, SEEK_END);
-	long fileLength = ftell(modelFile);
-	fseek(modelFile, 0, SEEK_SET);
+    long fileLength = ftell(modelFile);
+    fseek(modelFile, 0, SEEK_SET);
 
-	char *fileContents = (char *)malloc(fileLength + 1);
-	fread(fileContents, fileLength, 1, modelFile);
-	fclose(modelFile);
-	fileContents[fileLength] = 0;
+    char *fileContents = (char *)malloc(fileLength + 1);
+    fread(fileContents, fileLength, 1, modelFile);
+    fclose(modelFile);
+    fileContents[fileLength] = 0;
 
     //printf("File contents: \n%s\n\n", fileContents);
 
@@ -239,7 +239,7 @@ void ModelLoader::loadFile(TriangleMesh* triMesh, char* filename) {
     int currentVertex = 0;
     int currentNormal = 0;
     int currentIndex = 0;
-	int currentTexture = 0;
+    int currentTexture = 0;
 
     char* lineContents;
     int i = 0;
@@ -296,13 +296,13 @@ void ModelLoader::loadFile(TriangleMesh* triMesh, char* filename) {
                         //currentIndex+=3;
                     }
                 } break;
-				case 'u': {
-					vec2 result = parseVec2(lineContents);
-					assert(triMesh->texcoords != NULL);
-					assert(currentTexture < triMesh->numVerts);
-					triMesh->texcoords[currentTexture] = result;
-					currentTexture++;
-				} break;
+                case 'u': {
+                    vec2 result = parseVec2(lineContents);
+                    assert(triMesh->texcoords != NULL);
+                    assert(currentTexture < triMesh->numVerts);
+                    triMesh->texcoords[currentTexture] = result;
+                    currentTexture++;
+                } break;
                 default: {
                 }break;
             }
@@ -318,7 +318,7 @@ void ModelLoader::loadFile(TriangleMesh* triMesh, char* filename) {
     if (
         (currentVertex != triMesh->numVerts) ||
         (currentNormal != triMesh->numVerts) ||
-		(currentTexture != triMesh->numVerts)||
+        (currentTexture != triMesh->numVerts)||
         (currentIndex  != triMesh->numFaces*indPerPrim)
 
     ) {
@@ -326,7 +326,7 @@ void ModelLoader::loadFile(TriangleMesh* triMesh, char* filename) {
         printf("Type     Found     Expected\n");
         printf("Vertices %d        %d\n", currentVertex, triMesh->numVerts);
         printf("Normals  %d        %d\n", currentNormal, triMesh->numVerts);
-		printf("Textures %d        %d\n", currentTexture, triMesh->numVerts);
+        printf("Textures %d        %d\n", currentTexture, triMesh->numVerts);
         printf("Indices  %d        %d\n\n", currentIndex,  triMesh->numFaces*indPerPrim);
     }
 
@@ -384,21 +384,21 @@ vec3 ModelLoader::parseVec3(char* line, bool normalise) {
 }
 
 vec2 ModelLoader::parseVec2(char* line, bool normalise) {
-	int start = 0;
-	while (line[start] != ' ') {
-		start++;
-	}
-	while (line[start] == ' ') {
-		start++;
-	}
-	char* pstr = line + start;
-	float x = strtof(pstr, &pstr);  //split the string into two floats
-	float y = strtof(pstr, NULL);
+    int start = 0;
+    while (line[start] != ' ') {
+        start++;
+    }
+    while (line[start] == ' ') {
+        start++;
+    }
+    char* pstr = line + start;
+    float x = strtof(pstr, &pstr);  //split the string into two floats
+    float y = strtof(pstr, NULL);
 
 
-	vec2 ret = { x, y };
-	//ret.print("\tVector2: ");
-	return ret;
+    vec2 ret = { x, y };
+    //ret.print("\tVector2: ");
+    return ret;
 }
 
 void ModelLoader::parseCommand(char* line, TriangleMesh* mesh) {
@@ -423,7 +423,7 @@ void ModelLoader::parseCommand(char* line, TriangleMesh* mesh) {
         //allocate memory for vertices
         mesh->vertices  = (vec3*)malloc(mesh->numVerts * sizeof(vec3));
         mesh->normals   = (vec3*)malloc(mesh->numVerts * sizeof(vec3));
-		mesh->texcoords = (vec2*)malloc(mesh->numVerts * sizeof(vec2));
+        mesh->texcoords = (vec2*)malloc(mesh->numVerts * sizeof(vec2));
 
     } else if (!strcmp(varName, "numFaces")) {
         int value = (int)strtol(pstr+2, NULL, 10);

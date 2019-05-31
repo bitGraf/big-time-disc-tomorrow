@@ -22,7 +22,7 @@ enum EntityTypes {
     ENT_Panel,
     ENT_Physics,
     ENT_Missile,
-	ENT_AI
+    ENT_AI
 };
 
 /*struct LoadOptions {

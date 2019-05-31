@@ -16,9 +16,9 @@ struct Level {
     std::string name = "NO LEVEL LOADED";
 
     PanelEnt** panels = NULL;
-	AIEnt** AIs = NULL;
+    AIEnt** AIs = NULL;
     int numPanels = 0;
-	int numAI = 0;
+    int numAI = 0;
 };
 
 namespace LevelLoader {
@@ -26,6 +26,6 @@ namespace LevelLoader {
 
     Level* loadLevel(char* filename, char* AIfilename = NULL);
     PanelEnt** loadFromFile(char* filename, int* retNumPanels, char*& target);
-	AIEnt** loadLevelAI(char* filename, int* retNumAI);
-	vec3* loadPathFile(char* filename);
+    AIEnt** loadLevelAI(char* filename, int* retNumAI);
+    vec3* loadPathFile(char* filename);
 }

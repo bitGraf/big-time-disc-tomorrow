@@ -57,7 +57,7 @@ TriMeshResource* ResourceManager::loadTriMeshResource(std::string filename, int 
         //allocate memory for vertices
         mesh->vertices = (vec3*)malloc(mesh->numVerts * sizeof(vec3));
         mesh->normals  = (vec3*)malloc(mesh->numVerts * sizeof(vec3));
-		mesh->texcoords = (vec2*)malloc(mesh->numVerts * sizeof(vec2));
+        mesh->texcoords = (vec2*)malloc(mesh->numVerts * sizeof(vec2));
 
         mesh->numFaces = numFaces;
         //allocate memory for indices
@@ -106,7 +106,7 @@ TerrainData ResourceManager::loadTerrainResource(std::string filename, std::stri
         //load image, parse data, and create terrain from heightmap.
         int imgWidth, imgHeight, imgComps;
         unsigned char *data = stbi_load(fullPath.c_str(), 
-		    &imgWidth, &imgHeight, &imgComps, 0);
+            &imgWidth, &imgHeight, &imgComps, 0);
 
         float delx = length / (M-1);
         float delz = width / (N-1);
@@ -305,17 +305,17 @@ void ResourceManager::printAllResources() {
 }
 
 void ResourceManager::cleanup() {
-	// delete all textures
-	for (auto tex : TextureResources) {
-		tex.second->data.cleanup();
-		delete tex.second;
-	}
+    // delete all textures
+    for (auto tex : TextureResources) {
+        tex.second->data.cleanup();
+        delete tex.second;
+    }
 
-	// delete all meshes
-	for (auto mesh : TriMeshResources) {
-		mesh.second->data.~TriangleMesh();
-		delete mesh.second;
-	}
+    // delete all meshes
+    for (auto mesh : TriMeshResources) {
+        mesh.second->data.~TriangleMesh();
+        delete mesh.second;
+    }
 }
 
 
@@ -331,13 +331,13 @@ bool ResourceFile::load(char* filename) {
     printf("Reading file: \"%s\"\n", filename);
     
     fseek(fp, 0, SEEK_END);
-	fileLength = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
+    fileLength = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
 
-	fileContents = (char *)malloc(fileLength + 1);
-	fread(fileContents, fileLength, 1, fp);
-	fclose(fp);
-	fileContents[fileLength] = 0;
+    fileContents = (char *)malloc(fileLength + 1);
+    fread(fileContents, fileLength, 1, fp);
+    fclose(fp);
+    fileContents[fileLength] = 0;
 
     // fill the filecontents with zeros
     numLines = 1;

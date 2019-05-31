@@ -18,7 +18,7 @@ struct TriangleMesh {
     //Vertex data
     vec3* vertices = NULL;
     vec3* normals = NULL;
-	vec2* texcoords = NULL;
+    vec2* texcoords = NULL;
     vec3* tangents = NULL;
     vec3* bitangents = NULL;
 
@@ -35,16 +35,16 @@ struct TriangleMesh {
     GLuint VAO = 0;
     GLuint VBOpos = 0;
     GLuint VBOnorm = 0;
-	GLuint VBOtex = 0;
+    GLuint VBOtex = 0;
     GLuint EBO = 0;
 
     ~TriangleMesh() {
         //is TriMesh ever loses scope, free memory
         printf("\t\tFreeing Triangle mesh data [VAO %d]\n", VAO);
-		if (vertices)  free(vertices);  vertices  = NULL;
-		if (indices)   free(indices);   indices   = NULL;
-		if (normals)   free(normals);   normals   = NULL;
-		if (texcoords) free(texcoords); texcoords = NULL;
+        if (vertices)  free(vertices);  vertices  = NULL;
+        if (indices)   free(indices);   indices   = NULL;
+        if (normals)   free(normals);   normals   = NULL;
+        if (texcoords) free(texcoords); texcoords = NULL;
     }
 };
 
@@ -54,7 +54,7 @@ namespace ModelLoader {
     void bufferModel(TriangleMesh* mesh, bool lineRender = false);
     
     vec3 parseVec3(char* line, bool normalise = false);
-	vec2 parseVec2(char* line, bool normalise = false);
+    vec2 parseVec2(char* line, bool normalise = false);
     Triangle parseFace(char* line, bool index1 = false);
     void parseCommand(char* line, TriangleMesh* mesh);
 }
