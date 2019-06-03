@@ -76,7 +76,7 @@ void CrawlerEnt::update(double dt) {
     float rightLeft = vr - vl;
     float strafeRightLeft = vsl - vsr;
 
-    float delAngle = -50*dt*rightLeft;
+    float delAngle = -150*dt*rightLeft;
     quat transQ;
 
     Quaternion::buildFromAxisAngleD(transQ, {0, 1, 0}, delAngle);

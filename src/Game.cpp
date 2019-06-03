@@ -171,7 +171,7 @@ void cleanup() {
 void FrameUpdate (double dt) {
     if (currentState == GameStates::Normal) {
         Entity::manager.camera.update(dt);
-        Entity::fixedUpdateAllEntities(PhysicsRate);
+        Entity::fixedUpdateAllEntities(dt);
     } else if (currentState == GameStates::Menu) {
         // update menu
     }

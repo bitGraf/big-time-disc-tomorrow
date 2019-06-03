@@ -10,8 +10,8 @@
 struct Level;
 
 struct CrawlerEnt : EntityBase {
-    float max_speed = 5.0f;
-    float move_acc  = 9.81f;//1 G
+    float max_speed = 25.0f;
+    float move_acc  = 5*9.81f;//1 G
     float mass = 10;
     float F, K;
 
