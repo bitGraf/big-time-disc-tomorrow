@@ -34,7 +34,7 @@ struct EntityBase {
 
     //Other information
     vec3 Color = {1, 1, 1};
-	float health = 100;
+    float health = 100;
 
     //Common function prototypes
     virtual void update(double dt) {
@@ -59,6 +59,7 @@ struct EntityBase {
     virtual void postRender() {}
     virtual void handleInput(int key, int scancode, int action, int mods) {}
     virtual void onCreate() {}
+    virtual void onDestroy() {}
 
     virtual ~EntityBase() {
         printf("\tFreeing Entity [%2d]...\n", ID);

@@ -4,14 +4,14 @@ void MissileEnt::update(double dt) {
     timeOfFlight += dt;
 
     if (timeOfFlight < separationTime) {
-		vec3 toTarg = Vector::normalized(target - position);
-		appliedForce = toTarg*thrust;
-		if (Vector::magnitude(Entity::manager.Player->position - position) < 3.f) {
-			Remove = true;
-			Entity::manager.Player->health -= 5;
-		}
+        vec3 toTarg = Vector::normalized(target - position);
+        appliedForce = toTarg*thrust;
+        if (Vector::magnitude(Entity::manager.Player->position - position) < 3.f) {
+            Remove = true;
+            Entity::manager.Player->health -= 5;
+        }
     } else {
-		Remove = true;
+        Remove = true;
     }
 
     PhysicsEnt::update(dt);

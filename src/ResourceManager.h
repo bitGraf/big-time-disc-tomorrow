@@ -60,6 +60,7 @@ struct ResourceManager {
     //TriMeshResource* getTerrainResource(std::string lookup);
 
     void printAllResources();
+    void cleanup();
 
     float getHeight(TerrainData, float x, float y);
 

@@ -10,28 +10,28 @@ void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
         grounded = false;
     }
 
-	if (grounded && (key == GLFW_KEY_P) && (action == GLFW_PRESS)) {
-		printf("Laying an egg... Yoshey..\n");
+    if (grounded && (key == GLFW_KEY_P) && (action == GLFW_PRESS)) {
+        printf("Laying an egg... Yoshey..\n");
         EntityBase* ent = Entity::createNewEntity(ENT_Static);
         ent->position = this->position;
         ent->mesh = Resources::manager.getTriMeshResource("sphere");
         ent->baseColor = Resources::manager.getTextureResource("sample");
         ent->Color = {1, 5, 5};
         ent->scale = {.1f, .3f, .1f};
-	}
+    }
 
     if (grounded && (key == GLFW_KEY_E) && (action == GLFW_PRESS)) {
-		printf("Acquire Fentanyl I must...\n");
+        printf("Acquire Fentanyl I must...\n");
         EntityBase* ent = Entity::createNewEntity(ENT_Static);
         ent->mesh = Resources::manager.getTriMeshResource("cube");
         ent->baseColor = Resources::manager.getTextureResource("sample");
         ent->Color = {.2f, 3, 10};
         ent->scale = {.6f, .6f, .6f};
         ent->position = this->position;
-	}
+    }
 
     if (grounded && (key == GLFW_KEY_O) && (action == GLFW_PRESS)) {
-		printf("Toggle wireframe...\n");
+        printf("Toggle wireframe...\n");
         Entity::manager.pointRender = !Entity::manager.pointRender;
 
         if (Entity::manager.pointRender) {
@@ -41,12 +41,12 @@ void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
             glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
             glEnable(GL_CULL_FACE);
         }
-	}
+    }
 
     if (grounded && (key == GLFW_KEY_I) && (action == GLFW_PRESS)) {
         Resources::manager.printAllResources();
         Entity::printAllEntities();
-	}
+    }
 
     if (grounded && (key == GLFW_KEY_U) && (action == GLFW_PRESS)) {
         printf("nut...\n");
@@ -56,7 +56,7 @@ void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
         ent->baseColor = Resources::manager.getTextureResource("sample");
         ent->Color = {1, 5, 5};
         ent->scale = {.1f, .3f, .1f};
-	}
+    }
 
     if (!levelLoaded && (key == GLFW_KEY_M) && (action == GLFW_PRESS)) {
         printf("load level...\n");
@@ -67,24 +67,24 @@ void PlayerEnt::handleInput(int key, int scancode, int action, int mods) {
         terr->mesh = Resources::manager.getTriMeshResource("mountains512");
         terr->baseColor = Resources::manager.getTextureResource("wall");
         levelLoaded = true;
-	}
+    }
 
     if (grounded && (key == GLFW_KEY_F) && (action == GLFW_PRESS)) {
         printf("toggle frame rendering...\n");
 
         Entity::manager.showFrames = !Entity::manager.showFrames;
-	}
+    }
 
     if (grounded && (key == GLFW_KEY_R) && (action == GLFW_PRESS)) {
         printf("toggle rotation...\n");
 
         rotate = !rotate;
-	}
+    }
 }
 
 void PlayerEnt::update(double dt) {
     //if (rotate)
-	//    angle += 9 * dt;
+    //    angle += 9 * dt;
     
     float vf = Input::manager.move_forward.value;
     float vb = Input::manager.move_backward.value;
@@ -101,17 +101,17 @@ void PlayerEnt::update(double dt) {
 
     Quaternion::buildFromAxisAngleD(orientation, {0, 1, 0}, angle);
 
-	acc = { 0, !grounded ? -9.81f : 0, 0 };
+    acc = { 0, !grounded ? -9.81f : 0, 0 };
 
     vel = {0, (vel.y + acc.y * float(dt)), 0};
     vel = vel + Forward * forwardBackward;
     //vel = vel + Left    * -rightLeft;
-	//vel = { rightLeft, (vel.y + acc.y * float(dt)), -forwardBackward };
+    //vel = { rightLeft, (vel.y + acc.y * float(dt)), -forwardBackward };
     position = position + vel * dt;
     if (position.y < 0) {
         position.y = 0;
-		vel.y = 0;
-		acc.y = 0;
+        vel.y = 0;
+        acc.y = 0;
         grounded = true;
     }
 

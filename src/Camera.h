@@ -77,14 +77,14 @@ struct Camera {
     }
 
     void handleInput(int key, int scancode, int action, int mods) {
-        	if (key == GLFW_KEY_F && action == GLFW_PRESS) {
+            if (key == GLFW_KEY_F && action == GLFW_PRESS) {
                 Forward.print("Forward: ");
             }
             if (key == GLFW_KEY_U && action == GLFW_PRESS) {
-                Up.print	 ("Up:      ");
+                Up.print     ("Up:      ");
             }
             if (key == GLFW_KEY_R && action == GLFW_PRESS) {
-                Left.print	 ("Left:   ");
+                Left.print     ("Left:   ");
             }
     }
 };

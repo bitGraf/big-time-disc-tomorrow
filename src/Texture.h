@@ -12,16 +12,17 @@ const std::string TextureResourcePath = "../data/textures/";
 
 class Texture {
 public:
-	Texture();
+    Texture();
 
-	void loadImage(std::string filename);
-	void loadCubeMap(std::string filename, std::string filetype);
-	void loadImage2(std::string filename);
-	void bind(GLuint offset);
-	void bindCube(GLuint offset);
+    void loadImage(std::string filename);
+    void loadCubeMap(std::string filename, std::string filetype);
+    void loadImage2(std::string filename);
+    void bind(GLuint offset);
+    void bindCube(GLuint offset);
+    void cleanup();
 
-	GLuint textureID;
-	int width, height, nrChannels;
+    GLuint textureID;
+    int width, height, nrChannels;
 };
 
 #endif

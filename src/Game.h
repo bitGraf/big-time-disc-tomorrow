@@ -2,7 +2,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <stdio.h> 	
+#include <stdio.h>     
 
 #include "ShaderProgram.h"
 #include "Utils.h"
@@ -34,11 +34,11 @@ static char fpsText[32];
 static int numRenders = 0;
 static int numUpdates = 0;
 
-static const double PhysicsRate = 1 / 60.0;	//60 ups for physics
-static const double RenderRate = 1 / 300.0;	//300 fps for rendering	-> max 5 frames per physics update?
-										//every loop: render, and calculate the time left, 
-										//subtract that from a running counter. When counter is less
-										//than zero, run physics update and set counter back to max.
+static const double PhysicsRate = 1 / 60.0;    //60 ups for physics
+static const double RenderRate = 1 / 300.0;    //300 fps for rendering    -> max 5 frames per physics update?
+                                        //every loop: render, and calculate the time left, 
+                                        //subtract that from a running counter. When counter is less
+                                        //than zero, run physics update and set counter back to max.
 
 static double fpsUpdateTime = 0;
 static double fpsUpdateRate = 0.5;
@@ -47,8 +47,9 @@ static Texture skybox;
 static GLuint skyboxVAO;
 
 enum GameStates {
-	Normal = 0,
-	Menu
+    Normal = 0,
+    Menu,
+    Inventory
 };
 
 // Game State Manager

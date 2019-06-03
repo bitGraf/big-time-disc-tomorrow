@@ -12,10 +12,12 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
             velocity.y += 10;
             grounded = false;
         } else {
+            quat newOrientation;// = { orientation.x, 0.f, orientation.z, orientation.w };
             grounded = false;
             velocity = velocity + currentPanel->Up * 10.0f;
-            attachCoolDown = 0.5f;
+            attachCoolDown = 0.25f;
             transitionToPanel(NULL);
+            localOrientation = Quaternion::normalized(newOrientation);
         }
     }
 
@@ -51,6 +53,10 @@ void CrawlerEnt::handleInput(int key, int scancode, int action, int mods) {
             currentLevel = NULL;
         }
     }
+
+    if ((key == GLFW_KEY_Y) && (action == GLFW_PRESS)) {
+        printf("BREAK\n");
+    }
 }
 
 void CrawlerEnt::update(double dt) {
@@ -63,12 +69,12 @@ void CrawlerEnt::update(double dt) {
     float vb = Input::manager.move_backward.value;
     float vl = Input::manager.move_left.value;
     float vr = Input::manager.move_right.value;
-	float vsl = Input::manager.move_strafe_left.value;
-	float vsr = Input::manager.move_strafe_right.value;
+    float vsl = Input::manager.move_strafe_left.value;
+    float vsr = Input::manager.move_strafe_right.value;
 
     float forwardBackward = vf - vb;
     float rightLeft = vr - vl;
-	float strafeRightLeft = vsl - vsr;
+    float strafeRightLeft = vsl - vsr;
 
     float delAngle = -50*dt*rightLeft;
     quat transQ;
@@ -100,15 +106,15 @@ void CrawlerEnt::update(double dt) {
         if (Input::manager.move_strafe.value > 0.5f) {
             propulsion = propulsion + localLeft*rightLeft*F*1.5f;
         }
-		if (Input::manager.move_strafe_left.value || Input::manager.move_strafe_right.value > 0.5f) {
-			propulsion = localLeft*strafeRightLeft*F*1.2f;
-			if (Input::manager.move_strafe.value > 0.5f) {
-				propulsion = propulsion * .5;
-			}
-		}
+        if (Input::manager.move_strafe_left.value || Input::manager.move_strafe_right.value > 0.5f) {
+            propulsion = localLeft*strafeRightLeft*F*1.2f;
+            if (Input::manager.move_strafe.value > 0.5f) {
+                propulsion = propulsion * .5;
+            }
+        }
     }
     vec3 gravity = { 0, !grounded ? -9.81f : 0, 0 };
-	acceleration = gravity + (propulsion + friction) * (1/mass);
+    acceleration = gravity + (propulsion + friction) * (1/mass);
 
     velocity = velocity + acceleration*dt;
     localPos = localPos + velocity*dt;
@@ -123,8 +129,8 @@ void CrawlerEnt::update(double dt) {
 
     if (!attached && position.y < 1 && velocity.y < 0) {
         position.y = 1;
-		velocity.y = 0;
-		acceleration.y = 0;
+        velocity.y = 0;
+        acceleration.y = 0;
         grounded = true;
     }
 
@@ -138,6 +144,8 @@ void CrawlerEnt::update(double dt) {
                 if ((currentPanel == NULL) || (currentLevel->panels[i]->K2 < currentPanel->K2)) {
                     if (attachCoolDown < 0.001f)
                         transitionToPanel(currentLevel->panels[i]);
+                    attachCoolDown = .25f;
+                    break;
                 }
             } else {
                 currentLevel->panels[i]->Color = {2.5, 1, 1};
@@ -177,8 +185,8 @@ void CrawlerEnt::postRender() {
     Font::drawText(Entity::manager.font, 0, 72, {1, 1, 0, 1}, text);
     sprintf(text, "Cooldown: %6.4f", attachCoolDown);
     Font::drawText(Entity::manager.font, 0, 92, {1, 1, 0, 1}, text);
-	sprintf(text, "Health: %5.2f,", health);
-	Font::drawText(Entity::manager.font, 0, 112, { 1, 1, 0, 1 }, text);
+    sprintf(text, "Health: %5.2f,", health);
+    Font::drawText(Entity::manager.font, 0, 112, { 1, 1, 0, 1 }, text);
 /*
     for (int i = 0; i < numPanels; i++) {
         sprintf(text, "Panel %d: [K = %5.2f, In Volume: %s]%s (%5.2f, %5.2f)", 
