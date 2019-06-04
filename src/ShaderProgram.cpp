@@ -232,3 +232,11 @@ void ShaderProgram::setDirectionalLight(const std::string& name, DirectionalLigh
     glUniform4fv(getLoc(name + ".color"), 1, &(light.color.x));
     glUniform1fv(getLoc(name + ".strength"), 1, &(light.strength));
 }
+
+void ShaderProgram::setSpotLight(const std::string& name, SpotLight light) const {
+    glUniform3fv(getLoc(name + ".position"), 1, &(light.position.x));
+    glUniform3fv(getLoc(name + ".direction"), 1, &(light.direction.x));
+    glUniform4fv(getLoc(name + ".color"), 1, &(light.color.x));
+    glUniform1fv(getLoc(name + ".strength"), 1, &(light.strength));
+    glUniform1fv(getLoc(name + ".cutoff"), 1, &(light.cutoff));
+}

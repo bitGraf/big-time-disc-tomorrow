@@ -18,9 +18,18 @@ struct DirectionalLight {
 	float strength;
 };
 
+struct SpotLight {
+	vec3 position;
+	vec3 direction;
+	vec4 color;
+	float strength;
+	float cutoff;
+};
+
 const int NUMPOINTLIGHTS = 4;
 uniform PointLight pointLights[NUMPOINTLIGHTS];
 uniform DirectionalLight sun;
+uniform SpotLight spotLight;
 
 //uniform PBRMaterial material;
 uniform vec3 camPos;
@@ -35,6 +44,7 @@ uniform sampler2D amrMap;
 //uniform sampler2D   brdfLUT;
 
 const float PI = 3.14159265359;
+const float outerCutoff = cos(40*PI/180);
 
 float DistributionGGX(vec3 N, vec3 H, float roughness);
 float GeometrySchlickGGX(float NdotV, float roughness);
@@ -51,12 +61,15 @@ vec3 addPointLight(PointLight light, vec3 normal, vec3 fragPos,
 vec3 addDirLight(DirectionalLight light, vec3 normal, vec3 fragPos, 
 				   vec3 viewDir, vec3 F0, float roughness, 
 				   float metallic, vec3 albedo);
+vec3 addSpotLight(SpotLight light, vec3 normal, vec3 fragPos, 
+				   vec3 viewDir, vec3 F0, float roughness, 
+				   float metallic, vec3 albedo);
 
 void main()
 {
     //Read all texture information
     vec3 albedo = color * vec3(texture(baseColor, pass_tex));
-    vec3 normal = pass_normal;
+    vec3 normal = normalize(pass_normal);
     vec3 amr = vec3(texture(amrMap, pass_tex));
     
     float ao = amr.x;
@@ -79,6 +92,7 @@ void main()
     
     FragColor = vec4(color, 1.0);
 	//FragColor = vec4(1,0,0,1);
+	//FragColor = vec4(N, 1);
 }
 
 vec3 fresnelSchlick(float cosTheta, vec3 F0, float roughness) {
@@ -130,6 +144,33 @@ vec3 calcTotalLightContribution(PointLight pointLights[NUMPOINTLIGHTS], Directio
     }
 
 	//Spot lights
+	Lo += addSpotLight(spotLight, normal, fragPos, viewDir, F0, roughness, metallic, albedo);
+
+	return Lo;
+}
+
+vec3 addDirLight(DirectionalLight light, vec3 normal, vec3 fragPos, 
+				   vec3 viewDir, vec3 F0, float roughness, 
+				   float metallic, vec3 albedo) {
+	vec3 L = normalize(-light.direction);
+    vec3 H = normalize(viewDir + L);
+        
+    vec3 radiance = light.color.xyz * light.strength;
+        
+    float NDF = DistributionGGX(normal, H, roughness);
+    float G = GeometrySmith(normal, viewDir, L, roughness);
+    vec3 F = fresnelSchlick(clamp(dot(H, viewDir), 0.0, 1.0), F0, roughness);
+        
+    vec3 numerator = NDF * G * F;
+    float denominator = 4.0 * max(dot(normal, viewDir), 0) * max(dot(normal, L), 0);
+    vec3 specular = numerator / max(denominator, 0.001);
+        
+    vec3 kS = F;
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;
+        
+    float NdotL = max(dot(normal, L), 0);
+    vec3 Lo = (kD*albedo / PI + specular) * radiance * NdotL;
 
 	return Lo;
 }
@@ -162,13 +203,19 @@ vec3 addPointLight(PointLight light, vec3 normal, vec3 fragPos,
 	return Lo;
 }
 
-vec3 addDirLight(DirectionalLight light, vec3 normal, vec3 fragPos, 
+vec3 addSpotLight(SpotLight light, vec3 normal, vec3 fragPos, 
 				   vec3 viewDir, vec3 F0, float roughness, 
 				   float metallic, vec3 albedo) {
-	vec3 L = normalize(-light.direction);
+	vec3 L = normalize(light.position - fragPos);
     vec3 H = normalize(viewDir + L);
+
+	float theta = dot(L, normalize(-light.direction));
+	float epsilon = light.cutoff - outerCutoff;
+	float intensity = clamp((theta -  outerCutoff) / epsilon, 0.0, 1.0);
         
-    vec3 radiance = light.color.xyz * light.strength;
+    float distance = length(light.position - pass_fragPos);
+    float attenuation = 1 / (distance * distance);
+    vec3 radiance = light.color.xyz * attenuation * light.strength * intensity;
         
     float NDF = DistributionGGX(normal, H, roughness);
     float G = GeometrySmith(normal, viewDir, L, roughness);

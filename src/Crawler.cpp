@@ -172,6 +172,8 @@ void CrawlerEnt::update(double dt) {
     }
 
     EntityBase::update(dt);
+    Entity::manager.spotlight.direction = Vector::normalized(position - 
+            Entity::manager.spotlight.position);
 }
 
 void CrawlerEnt::postRender() {

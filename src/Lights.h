@@ -4,26 +4,37 @@
 #include "Vector.h"
 #include "Quaternion.h"
 
-typedef quat Color;
+typedef quat vec4;
 
 struct PointLight {
     vec3 position;
-    Color color;
+    vec4 color;
     float strength;
 
     PointLight();
-    PointLight(vec3, Color, double);
+    PointLight(vec3, vec4, float);
     PointLight(vec3);
 };
 
 struct DirectionalLight {
     vec3 direction;
-    Color color;
+    vec4 color;
     float strength;
 
     DirectionalLight();
-    DirectionalLight(vec3, Color, double);
+    DirectionalLight(vec3, vec4, float);
     DirectionalLight(vec3);
+};
+
+struct SpotLight {
+    vec3 position;
+    vec3 direction;
+    vec4 color;
+    float strength;
+    float cutoff;
+
+    SpotLight();
+    SpotLight(vec3, vec3, vec4, float, float);
 };
 
 #endif

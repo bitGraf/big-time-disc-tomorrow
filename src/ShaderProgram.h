@@ -32,6 +32,7 @@ struct ShaderProgram {
 
     void setPointLight(const std::string &name, PointLight light) const;
     void setDirectionalLight(const std::string &name, DirectionalLight light) const;
+    void setSpotLight(const std::string &name, SpotLight light) const;
 
 private:
     void registerUniform(const std::string &name);

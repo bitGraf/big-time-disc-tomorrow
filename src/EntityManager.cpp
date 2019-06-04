@@ -57,7 +57,7 @@ void Entity::init_entities(WindowInfo windowInfo) {
     //Camera
     manager.camera.updateProjectionMatrix(windowInfo);
 
-    float lightStrength = 50;
+    float lightStrength = 5;
     manager.lights[0].position = { 10, 3, 10};
     manager.lights[0].color = { 1, 0, 0 };
     manager.lights[0].strength = lightStrength;
@@ -73,7 +73,13 @@ void Entity::init_entities(WindowInfo windowInfo) {
 
     manager.sun.direction = -Vector::normalized({100,200,0});
     manager.sun.color = { 1,1,1 };
-    manager.sun.strength = 1;
+    manager.sun.strength = 0;
+
+    manager.spotlight.position = { 0, 10, 0 };
+    manager.spotlight.direction = { 0,-1,0 };
+    manager.spotlight.color = { 1,0,1 };
+    manager.spotlight.strength = 50;
+    manager.spotlight.cutoff = cos(deg2Rad(35));
 }
 
 EntityBase* Entity::createNewEntity(EntityTypes type, int* id) {
@@ -129,6 +135,9 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
         EntityBase* ent = (manager.pointerList[i]);
 
         if (!ent->Remove) {
+            if (ent->scale.x > 63) {
+                printf("Floor\n");
+            }
             ent->preRender();
             
             shader->use();
@@ -144,6 +153,7 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
                 shader->setPointLight(uName + std::to_string(i) + "]", manager.lights[i]);
             }
             shader->setDirectionalLight("sun", manager.sun);
+            shader->setSpotLight("spotLight", manager.spotlight);
 
             int verts2render = 0;
             if (ent->mesh == NULL) {
@@ -160,10 +170,13 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
             else 
                 ent->baseColor->data.bind(GL_TEXTURE0);
 
-            if (ent->normalMap == NULL)
+            if (ent->normalMap == NULL) {
                 manager.default_normalMap.bind(GL_TEXTURE1);
-            else 
+                printf("lolo\n");
+            }
+            else {
                 ent->normalMap->data.bind(GL_TEXTURE1);
+            }
 
             if (ent->amrMap == NULL)
                 manager.default_amrMap.bind(GL_TEXTURE2);

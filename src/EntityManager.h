@@ -62,6 +62,7 @@ struct EntityManager {
     // Lights
     PointLight lights[4];
     DirectionalLight sun;
+    SpotLight spotlight;
 
     //Important entities
     CrawlerEnt* Player;
