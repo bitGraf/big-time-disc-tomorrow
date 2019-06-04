@@ -9,6 +9,7 @@
 #include "Physics.h"
 #include "Missile.h"
 #include "AI.h"
+#include "Lights.h"
 
 #include <string>
 
@@ -57,6 +58,10 @@ struct EntityManager {
     ShaderProgram* lineShader;
 
     DynamicFont* font;
+
+    // Lights
+    PointLight lights[4];
+    DirectionalLight sun;
 
     //Important entities
     CrawlerEnt* Player;

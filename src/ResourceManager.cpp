@@ -272,7 +272,7 @@ TextureResource* ResourceManager::getTextureResource(std::string lookup) {
 TriMeshResource* ResourceManager::getTriMeshResource(std::string lookup) {
     if (TriMeshResources.find(lookup) == TriMeshResources.end()) {
         printf("Model resource [%s] not loaded yet, loading it now...\n", lookup.c_str());
-        loadTriMeshResource(lookup, ".modl");
+        loadTriMeshResource(lookup, ".ply");
         return TriMeshResources.at(lookup);
     } else {
         //printf("Model resource [%s] succesfully accessed.\n", lookup.c_str());

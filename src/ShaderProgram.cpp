@@ -165,7 +165,7 @@ void ShaderProgram::smartLoad(std::string vShaderPath,
     glDeleteShader(vShader);
     glDeleteShader(fShader);
 
-    if (success) {
+    if (success && useUniformMap) {
         registerAllUniforms(vShaderCode, vSize);
         registerAllUniforms(fShaderCode, fSize);
     }
@@ -175,38 +175,60 @@ void ShaderProgram::use() {
     glUseProgram(shaderID);
 }
 
+GLuint ShaderProgram::getLoc(const std::string &name, bool useMap) const {
+    if (useUniformMap && useMap) {
+        // lookup uniform location in map
+        return uniformMap.at(name);
+    } else {
+        // just query the gpu for the location
+        return glGetUniformLocation(shaderID, name.c_str());
+    }
+}
+
 void ShaderProgram::setBool(const std::string &name, bool value) const {
     //glUniform1i(glGetUniformLocation(shaderID, name.c_str()), (int)value);
-    int loc = uniformMap.at(name);
+    GLuint loc = getLoc(name);
     glUniform1i(loc, (int)value);
 }
 
 void ShaderProgram::setInt(const std::string & name, int value) const {
     //glUniform1i(glGetUniformLocation(shaderID, name.c_str()), value);
-    int loc = uniformMap.at(name);
+    int loc = getLoc(name);
     glUniform1i(loc, value);
 }
 
 void ShaderProgram::setFloat(const std::string & name, float value) const {
     //glUniform1f(glGetUniformLocation(shaderID, name.c_str()), value);
-    int loc = uniformMap.at(name);
+    int loc = getLoc(name);
     glUniform1f(loc, value);
 }
 
 void ShaderProgram::setMat4(const std::string & name, mat4* value) const {
     //glUniformMatrix4fv(glGetUniformLocation(shaderID, name.c_str()), 1, GL_FALSE, &(value->a11));
-    int loc = uniformMap.at(name);
+    int loc = getLoc(name);
     glUniformMatrix4fv(loc, 1, GL_FALSE, &(value->a11));
 }
 
 void ShaderProgram::setvec3(const std::string & name, vec3* value) const {
     //glUniform3fv(glGetUniformLocation(shaderID, (name).c_str()), 1, &(value->x));
-    int loc = uniformMap.at(name);
+    int loc = getLoc(name);
     glUniform3fv(loc, 1, &(value->x));
 }
 
 void ShaderProgram::setVec4(const std::string & name, float a, float b, float c, float d) const {
     //glUniform3fv(glGetUniformLocation(shaderID, (name).c_str()), 1, &(value->x));
-    int loc = uniformMap.at(name);
+    int loc = getLoc(name);
     glUniform4f(loc, a, b, c, d);
+}
+
+void ShaderProgram::setPointLight(const std::string& name, PointLight light) const {
+    glUniform3fv(getLoc(name + ".position"), 1, &(light.position.x));
+    glUniform4fv(getLoc(name + ".color"), 1, &(light.color.x));
+    glUniform1fv(getLoc(name + ".strength"), 1, &(light.strength));
+}
+
+void ShaderProgram::setDirectionalLight(const std::string& name, DirectionalLight light) const {
+    glUniform3fv(getLoc(name + ".direction"), 1, &(light.direction.x));
+    glUniform4fv(getLoc(name + ".color"), 1, &(light.color.x));
+    glUniform1fv(getLoc(name + ".strength"), 1, &(light.strength));
 }

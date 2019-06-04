@@ -45,8 +45,8 @@ void Entity::init_entities(WindowInfo windowInfo) {
     EntityBase* ent = Entity::createNewEntity(ENT_Static);
     ent->mesh = Resources::manager.getTriMeshResource("plane");
     ent->baseColor = Resources::manager.getTextureResource("grid");
-    ent->scale = {64, 64, 64};//one block  = 2 units
-    ent->Color = {4, 4, 4};
+    ent->scale = { 64, 64, 64 };//one block  = 2 units
+    ent->Color = { 4, 4, 4 };
     StaticEnt* se = (StaticEnt*)ent;
     se->Rainbow = false;
 
@@ -56,6 +56,24 @@ void Entity::init_entities(WindowInfo windowInfo) {
 
     //Camera
     manager.camera.updateProjectionMatrix(windowInfo);
+
+    float lightStrength = 50;
+    manager.lights[0].position = { 10, 3, 10};
+    manager.lights[0].color = { 1, 0, 0 };
+    manager.lights[0].strength = lightStrength;
+    manager.lights[1].position = {-10, 3, 10};
+    manager.lights[1].color = { 0, 1, 0 };
+    manager.lights[1].strength = lightStrength;
+    manager.lights[2].position = {-10, 3,-10};
+    manager.lights[2].color = { 0, 0, 1 };
+    manager.lights[2].strength = lightStrength;
+    manager.lights[3].position = { 10, 3,-10};
+    manager.lights[3].color = { 0, 1, 1 };
+    manager.lights[3].strength = lightStrength;
+
+    manager.sun.direction = -Vector::normalized({100,200,0});
+    manager.sun.color = { 1,1,1 };
+    manager.sun.strength = 1;
 }
 
 EntityBase* Entity::createNewEntity(EntityTypes type, int* id) {
@@ -120,6 +138,13 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
             shader->setInt("baseColor", 0);
             shader->setInt("normalMap", 1);
             shader->setInt("amrMap", 2);
+
+            std::string uName = "pointLights[";
+            for (int i = 0; i < 4; i++) {
+                shader->setPointLight(uName + std::to_string(i) + "]", manager.lights[i]);
+            }
+            shader->setDirectionalLight("sun", manager.sun);
+
             int verts2render = 0;
             if (ent->mesh == NULL) {
                 glBindVertexArray(manager.questionMark.VAO);

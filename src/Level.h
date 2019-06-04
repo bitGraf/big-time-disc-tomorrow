@@ -6,6 +6,7 @@
 
 #include "Utils.h"
 #include "EntityManager.h"
+#include "Lights.h"
 
 #include <string>
 
