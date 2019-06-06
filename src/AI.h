@@ -16,7 +16,7 @@ struct AIEnt : EntityBase {
     float distanceFromPlayer;
     float rate = 1.25;
     float timer = NULL;
-    float speed = 42.5;
+    float speed = 212.5;
     float patrolTolerance = 2;
     // State
     int state = 0;

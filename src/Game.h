@@ -55,6 +55,10 @@ enum GameStates {
 // Game State Manager
 static GLuint currentState = 0;
 static GLuint currentMenuItem = 0;
+static GLuint currentInventoryItemX = 0;
+static GLuint currentInventoryItemY = 0;
+static GLuint currentInventoryXMax = 4;
+static GLuint currentInventoryYMax = 7;
 
 //External
 void initialize_game(GLFWwindow* window);

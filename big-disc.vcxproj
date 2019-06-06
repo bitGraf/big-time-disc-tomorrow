@@ -137,6 +137,7 @@
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\Level.cpp" />
+    <ClCompile Include="src\Lights.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Missile.cpp" />
     <ClCompile Include="src\ModelLoader.cpp" />
@@ -160,6 +161,7 @@
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\InputBindings.h" />
     <ClInclude Include="src\Level.h" />
+    <ClInclude Include="src\Lights.h" />
     <ClInclude Include="src\Matrix.h" />
     <ClInclude Include="src\Missile.h" />
     <ClInclude Include="src\ModelLoader.h" />

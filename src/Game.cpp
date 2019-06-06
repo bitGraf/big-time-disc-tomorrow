@@ -54,7 +54,7 @@ void initialize_game(GLFWwindow* window) {
 
     glGenVertexArrays(1, &skyboxVAO);
     glBindVertexArray(skyboxVAO);
-    printf("SkyboxVAO: %d\n", (int)skyboxVAO);
+    //printf("SkyboxVAO: %d\n", (int)skyboxVAO);
 
     GLuint skyboxVBO;
     glGenBuffers(1, &skyboxVBO);
@@ -244,7 +244,12 @@ void Render() {
         Font::drawText(otherFont, x, y+=35, currentMenuItem == 2 ? selectColor : menuColor, "Level 3", ALIGN_MID_MID);
         Font::drawText(otherFont, x, y+=35, currentMenuItem == 3 ? selectColor : menuColor, "Unload level", ALIGN_MID_MID);
         Font::drawText(otherFont, x, y+=35, currentMenuItem == 4 ? selectColor : menuColor, "Quit", ALIGN_MID_MID);
-    }
+	} else if (currentState == GameStates::Inventory) {
+		int x = windowInfo.width / 2;
+		int y = windowInfo.height * (1 - .85f);
+		quat invColor = { 1,1,1,1 };
+		Font::drawText(bigFont, x, y, invColor, "Inventory", ALIGN_MID_MID);
+	}
 
     //Render text
     quat fpsColor = {1, 0, 0, 1};
@@ -298,6 +303,9 @@ void handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int
             currentState = GameStates::Menu;
             currentMenuItem = 0;
         }
+		if ((key == GLFW_KEY_I) && (action == GLFW_PRESS)) {
+			currentState = GameStates::Inventory;
+		}
     } else if (currentState == GameStates::Menu) {
         if ((key == GLFW_KEY_ESCAPE) && (action == GLFW_PRESS)) {
             currentState = GameStates::Normal;
@@ -329,7 +337,34 @@ void handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int
                 case 4: {glfwSetWindowShouldClose(window, true);} break;
             }
         }
-    }
+	}
+	else if (currentState == GameStates::Inventory) {
+		if ((key == GLFW_KEY_ESCAPE) && (action == GLFW_PRESS)) {
+			currentState = GameStates::Normal;
+			currentInventoryItemX = 0;
+			currentInventoryItemY = 0;
+		}
+		if ((key == GLFW_KEY_DOWN) && (action == GLFW_PRESS)) {
+			currentInventoryItemX--;
+			if (currentInventoryItemX < 0) // Set to a "menuMax" variable?
+				currentInventoryItemX = 0;
+		}
+		if ((key == GLFW_KEY_UP) && (action == GLFW_PRESS)) {
+			currentInventoryItemX++;
+			if (currentInventoryItemX > currentInventoryXMax)
+				currentInventoryItemX = currentInventoryXMax;
+		}
+		if ((key == GLFW_KEY_LEFT) && (action == GLFW_PRESS)) {
+			currentInventoryItemY--;
+			if (currentInventoryItemY < 0) // Set to a "menuMax" variable?
+				currentInventoryItemY = 0;
+		}
+		if ((key == GLFW_KEY_RIGHT) && (action == GLFW_PRESS)) {
+			currentInventoryItemY++;
+			if (currentInventoryItemY > currentInventoryYMax)
+				currentInventoryItemY = currentInventoryYMax;
+		}
+	}
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {

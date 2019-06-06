@@ -101,7 +101,7 @@ void Entity::handleInputEvent(GLFWwindow* window, int key, int scancode, int act
         Entity::manager.showFrames = !Entity::manager.showFrames;
     }
 
-    if ((key == GLFW_KEY_I) && (action == GLFW_PRESS)) {
+    if ((key == GLFW_KEY_O) && (action == GLFW_PRESS)) {
         printf("Listing all entities...\n");
 
         Entity::printAllEntities();
@@ -135,9 +135,6 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
         EntityBase* ent = (manager.pointerList[i]);
 
         if (!ent->Remove) {
-            if (ent->scale.x > 63) {
-                printf("Floor\n");
-            }
             ent->preRender();
             
             shader->use();
@@ -172,7 +169,6 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
 
             if (ent->normalMap == NULL) {
                 manager.default_normalMap.bind(GL_TEXTURE1);
-                printf("lolo\n");
             }
             else {
                 ent->normalMap->data.bind(GL_TEXTURE1);
@@ -229,8 +225,9 @@ void Entity::printAllEntities() {
                 ent->subType==ENT_Panel ? "Panel" : (
                 ent->subType==ENT_Static ? "Static" : (
                 ent->subType==ENT_Temporary ? "Temporary" : (
-                ent->subType==ENT_Terrain ? "Terrain" : 
-                    "Unknown type"))))))));
+                ent->subType==ENT_Terrain ? "Terrain" : (
+				ent->subType==ENT_Missile ? "Missile" :
+                    "Unknown type")))))))));
         } else {
             printf("%p\t%d\t%d\n", manager.pointerList[i],
             0, 0);
