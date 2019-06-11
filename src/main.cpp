@@ -1,11 +1,136 @@
 #include "Game.h"
 #include "Platform.h"
 
+#include "CollisionDetection.h"
+
 GLFWwindow* createWindow();
 
 char exe_location[MAX_PATH];
 
+int
+line_support(vec3 *support, const vec3 d,
+    const vec3 a, const vec3 b)
+{
+    int i = 0;
+    if (Vector::dot(a, d) < Vector::dot(b, d)) {
+        *support = b; i = 1;
+    } else *support = a;
+    return i;
+}
+int
+polyhedron_support(vec3 *support, const vec3 d,
+    const vec3 *verts, int cnt)
+{
+    int imax = 0;
+    float dmax = Vector::dot(verts[0], d);
+    for (int i = 1; i < cnt; ++i) {
+        /* find vertex with max dot product in direction d */
+        float dot = Vector::dot(verts[i], d);
+        if (dot < dmax) continue;
+        imax = i, dmax = dot;
+    } *support = verts[imax];
+    return imax;
+}
+gjk_result
+polyhedron_intersect_capsule(const vec3 *verts, int cnt,
+    const vec3 ca, const vec3 cb, float cr)
+{
+    /* initial guess */
+    vec3 d;
+    gjk_support s = {0};
+    s.a = verts[0];
+    s.b = ca;
+    d = s.b - s.a;
+    int numIts = 0;
+
+    /* run gjk algorithm */
+    gjk_simplex gsx = {0};
+    while (gjk(&gsx, &s, &d)) {
+        vec3 n = -d;
+        s.aid = polyhedron_support(&s.a, n, verts, cnt);
+        s.bid = line_support(&s.b, d, ca, cb);
+        s.a.print(" a = ");
+        s.b.print(" b = ");
+        d = s.b - s.a;
+        numIts++;
+    }
+    /* check distance between closest points */
+    gjk_result res;
+    gjk_analyze(&res, &gsx);
+    gjk_quad(&res, 1, cr);
+    printf("%d iteration\n", numIts);
+    return res;
+}
+
 int main(int argc, char** argv) {
+    CollisionEntity capsule;
+    capsule.collisionHull = new CapsuleHull;
+    CapsuleHull* caps = (CapsuleHull*)capsule.collisionHull;
+    caps->a = {0,0,0};
+    caps->b = {0,5,0};
+
+    CollisionEntity polyhedron;
+    polyhedron.collisionHull = new PolyHull;
+    PolyHull* poly = (PolyHull*)polyhedron.collisionHull;
+    const int numVerts = 6;
+    vec3 verts[numVerts];
+    verts[0] = {-2,  0,  0};
+    verts[1] = { 2,  0,  0};
+    verts[2] = { 0, -2,  0};
+    verts[3] = { 0,  2,  0};
+    verts[4] = { 0,  0, -2};
+    verts[5] = { 0,  0,  2};
+    poly->numVerts = numVerts;
+    poly->vertices = (vec3*)verts;
+
+    CollisionEvent e = Collision::collisionTest(&capsule, &polyhedron);
+
+    if (e.intersect) {
+        printf("intersecting %f deep\n", (e.distance));
+    } else {
+        printf("%f units away\n", (e.distance));
+    }
+    e.response1.print("p0: ");
+    e.response2.print("p1: ");
+    printf("%f actual distance.\n", Vector::magnitude(e.response1-e.response2));
+
+    delete capsule.collisionHull;
+    delete polyhedron.collisionHull;
+
+    /********************
+    **Collision Testing**
+    ********************/
+    /*const int numVerts = 6;
+    vec3 verts[numVerts];
+    verts[0] = {-2,  0,  0};
+    verts[1] = { 2,  0,  0};
+    verts[2] = { 0, -2,  0};
+    verts[3] = { 0,  2,  0};
+    verts[4] = { 0,  0, -2};
+    verts[5] = { 0,  0,  2};
+
+    vec3 pos = {5, 3, 0};
+    for(int i =0; i < numVerts; i++) {
+        verts[i] = verts[i] + pos;
+    }
+
+    vec3 ca = {0,0,0};
+    vec3 cb = {0,5,0};
+
+    gjk_result res = polyhedron_intersect_capsule((vec3*)verts, numVerts, ca, cb, 2);
+    
+    if (res.hit) {
+        printf("intersecting %f deep\n", sqrt(res.distance_squared));
+    } else {
+        printf("%f units away\n", sqrt(res.distance_squared));
+    }
+    res.p0.print("p0: ");
+    res.p1.print("p1: ");
+    printf("%f actual distance.\n", Vector::magnitude(res.p0-res.p1));*/
+    
+
+    return 0;
+
     printf("\n-------------------------------------------\n\n");
     get_run_location(exe_location);
     change_working_directory(exe_location);

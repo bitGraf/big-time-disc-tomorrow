@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "CollisionDetection.h"
 
 void initialize_game(GLFWwindow* window) {
     // Load entities

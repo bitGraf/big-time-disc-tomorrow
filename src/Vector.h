@@ -74,5 +74,9 @@ namespace Vector {
     float magnitude(vec3 v);
     float magnitude(vec2 v);
 
+    vec3 inverse(vec3& v);
+
+    bool isZero(vec3& v, float tol = .001f);
+
     vec3 lerp(vec3 start, vec3 end, float progression);
 }

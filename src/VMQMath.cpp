@@ -22,9 +22,17 @@ vec3 Vector::normalized(const vec3& v) {
     return {v.x/m, v.y/m, v.z/m};
 }
 
+bool Vector::isZero(vec3& v, float tol) {
+    return (magnitude(v) < tol);
+}
+
 void Vector::normalize(vec3& v) {
     float m = 1/sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
     v = (v * m);
+}
+
+vec3 Vector::inverse(vec3& v) {
+    return {-v.x, -v.y, -v.z};
 }
 
 void Matrix::zero(mat4* m) {
