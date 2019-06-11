@@ -26,10 +26,10 @@ vec3 PolyHull::supportPoint(vec3 d, int* id) {
 
 vec3 CapsuleHull::supportPoint(vec3 d, int* id) {
     if (Vector::dot(a, d) < Vector::dot(b, d)) {
-        *id = 1;
+        if (id) *id = 1;
         return b;
     } else  {
-        *id = 0;
+        if (id) *id = 0;
         return a;
     }
 }

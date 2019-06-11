@@ -64,12 +64,15 @@ polyhedron_intersect_capsule(const vec3 *verts, int cnt,
 
 int main(int argc, char** argv) {
     CollisionEntity capsule;
+    capsule.position = { 0,0,0 };
     capsule.collisionHull = new CapsuleHull;
     CapsuleHull* caps = (CapsuleHull*)capsule.collisionHull;
     caps->a = {0,0,0};
     caps->b = {0,5,0};
+    caps->radius = 2;
 
     CollisionEntity polyhedron;
+    polyhedron.position = {5, 3, 0};
     polyhedron.collisionHull = new PolyHull;
     PolyHull* poly = (PolyHull*)polyhedron.collisionHull;
     const int numVerts = 6;
@@ -82,6 +85,7 @@ int main(int argc, char** argv) {
     verts[5] = { 0,  0,  2};
     poly->numVerts = numVerts;
     poly->vertices = (vec3*)verts;
+    poly->radius = 0;
 
     CollisionEvent e = Collision::collisionTest(&capsule, &polyhedron);
 
@@ -96,40 +100,6 @@ int main(int argc, char** argv) {
 
     delete capsule.collisionHull;
     delete polyhedron.collisionHull;
-
-    /********************
-    **Collision Testing**
-    ********************/
-    /*const int numVerts = 6;
-    vec3 verts[numVerts];
-    verts[0] = {-2,  0,  0};
-    verts[1] = { 2,  0,  0};
-    verts[2] = { 0, -2,  0};
-    verts[3] = { 0,  2,  0};
-    verts[4] = { 0,  0, -2};
-    verts[5] = { 0,  0,  2};
-
-    vec3 pos = {5, 3, 0};
-    for(int i =0; i < numVerts; i++) {
-        verts[i] = verts[i] + pos;
-    }
-
-    vec3 ca = {0,0,0};
-    vec3 cb = {0,5,0};
-
-    gjk_result res = polyhedron_intersect_capsule((vec3*)verts, numVerts, ca, cb, 2);
-    
-    if (res.hit) {
-        printf("intersecting %f deep\n", sqrt(res.distance_squared));
-    } else {
-        printf("%f units away\n", sqrt(res.distance_squared));
-    }
-    res.p0.print("p0: ");
-    res.p1.print("p1: ");
-    printf("%f actual distance.\n", Vector::magnitude(res.p0-res.p1));*/
-    
-
-    return 0;
 
     printf("\n-------------------------------------------\n\n");
     get_run_location(exe_location);
