@@ -130,12 +130,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\AI.cpp" />
+    <ClCompile Include="src\CollisionDetection.cpp" />
     <ClCompile Include="src\Crawler.cpp" />
     <ClCompile Include="src\DynamicFont.cpp" />
     <ClCompile Include="src\EntityManager.cpp" />
     <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\GJK.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\Input.cpp" />
+    <ClCompile Include="src\InventoryManager.cpp" />
     <ClCompile Include="src\Level.cpp" />
     <ClCompile Include="src\Lights.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -146,6 +149,7 @@
     <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />
+    <ClCompile Include="src\SpriteManager.cpp" />
     <ClCompile Include="src\stb_implementation.c" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\VMQMath.cpp" />
@@ -153,13 +157,16 @@
   <ItemGroup>
     <ClInclude Include="src\AI.h" />
     <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\CollisionDetection.h" />
     <ClInclude Include="src\Crawler.h" />
     <ClInclude Include="src\DynamicFont.h" />
     <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\EntityManager.h" />
     <ClInclude Include="src\Game.h" />
+    <ClInclude Include="src\GJK.h" />
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\InputBindings.h" />
+    <ClInclude Include="src\InventoryManager.h" />
     <ClInclude Include="src\Level.h" />
     <ClInclude Include="src\Lights.h" />
     <ClInclude Include="src\Matrix.h" />
@@ -172,6 +179,7 @@
     <ClInclude Include="src\Quaternion.h" />
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\ShaderProgram.h" />
+    <ClInclude Include="src\SpriteManager.h" />
     <ClInclude Include="src\stb_image.h" />
     <ClInclude Include="src\stb_truetype.h" />
     <ClInclude Include="src\Texture.h" />
@@ -186,6 +194,8 @@
     <None Include="run_tree\data\shaders\simple.vert" />
     <None Include="run_tree\data\shaders\skybox.frag" />
     <None Include="run_tree\data\shaders\skybox.vert" />
+    <None Include="run_tree\data\shaders\sprite.frag" />
+    <None Include="run_tree\data\shaders\sprite.vert" />
     <None Include="run_tree\data\shaders\text.frag" />
     <None Include="run_tree\data\shaders\text.vert" />
   </ItemGroup>

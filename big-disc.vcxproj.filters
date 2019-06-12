@@ -75,6 +75,18 @@
     <ClCompile Include="src\Lights.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\InventoryManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpriteManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CollisionDetection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GJK.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.h">
@@ -155,6 +167,18 @@
     <ClInclude Include="src\Lights.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\InventoryManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SpriteManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CollisionDetection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GJK.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="run_tree\data\shaders\axisSymbol.frag">
@@ -182,6 +206,12 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="run_tree\data\shaders\skybox.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="run_tree\data\shaders\sprite.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="run_tree\data\shaders\sprite.vert">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
