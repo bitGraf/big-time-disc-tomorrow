@@ -2,7 +2,6 @@
 #define _COLLISION_DETECTION_H_
 
 #include "Entity.h"
-#include "GJK.h"
 
 struct ConvexHull {
     float radius = 0;
