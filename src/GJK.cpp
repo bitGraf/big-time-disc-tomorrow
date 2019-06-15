@@ -4,19 +4,52 @@
 #define GJK_FLT_MAX 3.40282347E+28F
 #define GJK_EPSILON 1.19209290E-07F
 
+int gjk_iteration(GJK_Result* res, GJK_SupportPoint p, vec3* search_dir) {
+    res->Rp = res->R;
+    res->R = p.P;
 
+    float differ = Vector::magnitude(res->Rp - res->R);
+    if (differ < 0.15f) {
+        //converged
+        res->hit = false;
+        res->distance = Vector::magnitude(res->R);
+        return 0;
+    }
 
-void gjk(GJK_Result* s) {
-    vec3 origin1 = { 0,3,0 };
-    origin1 = origin1;
-    vec3 origin2 = { 3,5,0 };
+    if (containsOrigin(res->simplex[0].P, res->simplex[1].P, res->simplex[2].P, p.P)) {
+        res->hit = true;
+        res->distance = 0;
+        res->simplex[3] = p;
+        return 0;
+    }
 
-    vec3 search_dir = { 1, 2, 3 };
-    vec3 b = support(search_dir, origin1, origin2);
-    vec3 a = support(-search_dir, origin1, origin2);
+    int ret = collapseSimplex(res->simplex[0].P, res->simplex[1].P, res->simplex[2].P, p.P, 
+            &res->simplex[0].P, &res->simplex[1].P, &res->simplex[2].P);
+    if (ret == 0) {
+        res->numNoConverge++;
+        if (res->numNoConverge >= 10) {
+            printf("Not converging\n");
+            res->hit = false;
+            res->distance =0;
+            return 0;
+        }
+    }
+
+    *search_dir = planeNormal(res->simplex[0].P, res->simplex[1].P, res->simplex[2].P);
+
+    res->iterations++;
+    return 1;
+}
+
+void gjk(GJK_Result* s, vec3 initial_guess) {
+    vec3 search_dir = initial_guess;//{ 1, 2, 3 };
+    vec3 f1 = {0,3,0};
+    vec3 f2 = {3,5,0};
+    vec3 b = gjk_support(search_dir, f1, f2);
+    vec3 a = gjk_support(-search_dir, f1, f2);
 
     search_dir = Vector::cross(a, b - a);
-    vec3 c = support(search_dir, origin1, origin2);
+    vec3 c = gjk_support(search_dir, f1, f2);
 
     int iteration = 0, maxIterations = 30;
     int numNoConverge = 0, maxNoConverge = 5;
@@ -28,7 +61,7 @@ void gjk(GJK_Result* s) {
     while (iteration < maxIterations) {
         search_dir = planeNormal(a, b, c);
 
-        d = support(search_dir, origin1, origin2);
+        d = gjk_support(search_dir, f1, f2);
         Rprev = R;
         R = d;
 
@@ -54,13 +87,20 @@ void gjk(GJK_Result* s) {
         iteration++;
     }
 
-    s->simplex[0] = a;
-    s->simplex[1] = b;
-    s->simplex[2] = c;
-    s->simplex[3] = d;
+    s->simplex[0].P = a;
+    s->simplex[1].P = b;
+    s->simplex[2].P = c;
+    s->simplex[3].P = d;
     s->simplexSize = 4;
     s->iterations = iteration;
     s->distance = s->hit ? 0 : Vector::magnitude(R);
+}
+
+vec3 gjk_support(vec3 d, vec3 f1, vec3 f2) {
+    vec3 v1 = Vector::normalized( d)*4 + f1;
+    vec3 v2 = Vector::normalized(-d)*2 + f2;
+
+    return v1 - v2;
 }
 
 int collapseSimplex(const vec3 a, const vec3 b, const vec3 c, const vec3 d,
@@ -98,17 +138,6 @@ int collapseSimplex(const vec3 a, const vec3 b, const vec3 c, const vec3 d,
     } break;
     }
     return 0;
-}
-
-vec3 sphereSupport(vec3 d, vec3 origin, float radius) {
-    return Vector::normalized(d)*radius + origin;
-}
-
-vec3 support(vec3 d, vec3 origin1, vec3 origin2) {
-    vec3 v1 = sphereSupport(d, origin1, 4);
-    vec3 v2 = sphereSupport(-d, origin2, 2);
-
-    return v1 - v2;
 }
 
 vec3 planeNormal(vec3 a, vec3 b, vec3 c) {

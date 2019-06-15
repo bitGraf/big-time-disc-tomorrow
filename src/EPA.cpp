@@ -3,9 +3,8 @@
 
 vec3 EPA(GJK_Result* gjk_result) {
     // temp placeholders
-    vec3 origin1 = { 0,3,0 }; //r=4
-    origin1 = origin1;
-    vec3 origin2 = { 3,5,0 }; //r=2
+    vec3 f1 = { 0,3,0 }; //r=4
+    vec3 f2 = { 3,5,0 }; //r=2
 
     if (!gjk_result->hit) {
         printf("Cannot perform EPA algorithm on a non-intersecting simplex.\n");
@@ -14,13 +13,13 @@ vec3 EPA(GJK_Result* gjk_result) {
 
     EPA_Simplex simplex = { 0 };
     createFaceFromVerts(&simplex.faces[0], //ABC
-        gjk_result->simplex[0], gjk_result->simplex[1], gjk_result->simplex[2]);
+        gjk_result->simplex[0].P, gjk_result->simplex[1].P, gjk_result->simplex[2].P);
     createFaceFromVerts(&simplex.faces[1], //ABD
-        gjk_result->simplex[0], gjk_result->simplex[1], gjk_result->simplex[3]);
+        gjk_result->simplex[0].P, gjk_result->simplex[1].P, gjk_result->simplex[3].P);
     createFaceFromVerts(&simplex.faces[2], //BCD
-        gjk_result->simplex[1], gjk_result->simplex[2], gjk_result->simplex[3]);
+        gjk_result->simplex[1].P, gjk_result->simplex[2].P, gjk_result->simplex[3].P);
     createFaceFromVerts(&simplex.faces[3], //CAD
-        gjk_result->simplex[2], gjk_result->simplex[0], gjk_result->simplex[3]);
+        gjk_result->simplex[2].P, gjk_result->simplex[0].P, gjk_result->simplex[3].P);
     simplex.numFaces = 4;
 
     vec3 search_dir;
@@ -29,7 +28,7 @@ vec3 EPA(GJK_Result* gjk_result) {
     while (iteration < maxIterations) {
         EPA_Face face = getClosestFace(&simplex);
         search_dir = face.normal;
-        vec3 P = support(search_dir, origin1, origin2);
+        vec3 P = gjk_support(search_dir, f1, f2);
 
         float distanceFromPlane = Vector::dot(face.normal, P - face.center);
         if (distanceFromPlane < .1) {
@@ -41,7 +40,7 @@ vec3 EPA(GJK_Result* gjk_result) {
         iteration++;
     }
     
-    vec3 P = support(search_dir, origin1, origin2);
+    vec3 P = gjk_support(search_dir, f1, f2);
     float penDepth = Vector::magnitude(P);
     vec3  penNormal = Vector::normalized(P);
 

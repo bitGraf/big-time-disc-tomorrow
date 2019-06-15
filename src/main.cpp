@@ -1,38 +1,27 @@
 #include "Game.h"
 #include "Platform.h"
 
-#include "EPA.h"
+#include "CollisionDetection.h"
 
 GLFWwindow* createWindow();
 
 char exe_location[MAX_PATH];
 
 int main(int argc, char** argv) {
-    GJK_Result res;
-    gjk(&res);
+    CollisionEntity ent1;
+    ent1.collisionHull = new SphereHull;
+    ent1.collisionHull->radius = 4;
+    ent1.position = {0,3,0};
 
-    printf("GJK result: %s.\n", res.hit ? "intersecting" : "Not intersecting");
+    CollisionEntity ent2;
+    ent2.collisionHull = new SphereHull;
+    ent2.collisionHull->radius = 2;
+    ent2.position = {3,5,0};
 
-    printf("Simplex verts: \n");
-    for (int i = 0; i < res.simplexSize; i++) {
-        printf("   %d: ", i + 1);
-        res.simplex[i].print();
-    }
+    Collision::collisionTest(&ent1, &ent2);
 
-    if (res.hit) {
-        printf("Shapes are intersecting, proceeding to EPA algorithm\n");
-
-        printf("\n\nStarting simplex: \n");
-        printf("%.4f\t%.4f\t%.4f\t%.4f\n", res.simplex[0].x, res.simplex[1].x, res.simplex[2].x, res.simplex[3].x);
-        printf("%.4f\t%.4f\t%.4f\t%.4f\n", res.simplex[0].y, res.simplex[1].y, res.simplex[2].y, res.simplex[3].y);
-        printf("%.4f\t%.4f\t%.4f\t%.4f\n", res.simplex[0].z, res.simplex[1].z, res.simplex[2].z, res.simplex[3].z);
-
-        vec3 d = EPA(&res);
-        d.print("displacement: ");
-    }
-    else {
-        printf("Shapes are %.3f units apart\n", res.distance);
-    }
+    delete ent1.collisionHull;
+    delete ent2.collisionHull;
 
     //system("pause");
     //return 0;
