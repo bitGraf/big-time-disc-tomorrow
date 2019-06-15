@@ -14,7 +14,7 @@ struct GJK_Result {
     float distance = 0;
 };
 
-void gjk(GJK_Result* s, vec3 offset);
+void gjk(GJK_Result* s);
 vec3 sphereSupport(vec3 d, vec3 origin);
 vec3 support(vec3 d, vec3 origin1, vec3 origin2);
 vec3 planeNormal(vec3 a, vec3 b, vec3 c);

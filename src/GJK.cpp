@@ -6,9 +6,9 @@
 
 
 
-void gjk(GJK_Result* s, vec3 offset) {
+void gjk(GJK_Result* s) {
     vec3 origin1 = { 0,3,0 };
-    origin1 = origin1 + offset;
+    origin1 = origin1;
     vec3 origin2 = { 3,5,0 };
 
     vec3 search_dir = { 1, 2, 3 };

@@ -9,7 +9,7 @@ char exe_location[MAX_PATH];
 
 int main(int argc, char** argv) {
     GJK_Result res;
-    gjk(&res, { 0,0,0 });
+    gjk(&res);
 
     printf("GJK result: %s.\n", res.hit ? "intersecting" : "Not intersecting");
 
@@ -27,16 +27,8 @@ int main(int argc, char** argv) {
         printf("%.4f\t%.4f\t%.4f\t%.4f\n", res.simplex[0].y, res.simplex[1].y, res.simplex[2].y, res.simplex[3].y);
         printf("%.4f\t%.4f\t%.4f\t%.4f\n", res.simplex[0].z, res.simplex[1].z, res.simplex[2].z, res.simplex[3].z);
 
-        vec3 d = EPA(&res, { 0,0,0 });
+        vec3 d = EPA(&res);
         d.print("displacement: ");
-        gjk(&res, d*1.15);
-        printf("GJK result: %s.\n", res.hit ? "intersecting" : "Not intersecting");
-        if (!res.hit) {
-            printf("Shapes are %.3f units apart\n", res.distance);
-        }
-        else {
-            vec3 d = EPA(&res, d*1.05);
-        }
     }
     else {
         printf("Shapes are %.3f units apart\n", res.distance);

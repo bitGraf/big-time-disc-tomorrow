@@ -28,7 +28,7 @@ struct EPA_Simplex {
     EPA_Face faces[EPA_MAX_SIMPLEX_SIZE];
 };
 
-vec3 EPA(GJK_Result* gjk_result, vec3 offset);
+vec3 EPA(GJK_Result* gjk_result);
 void createFaceFromVerts(EPA_Face* face, vec3 a, vec3 b, vec3 c);
 EPA_Face getClosestFace(EPA_Simplex* simplex);
 void createNewSimplex(EPA_Simplex* simplex, EPA_Face face, vec3 P);

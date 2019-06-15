@@ -1,10 +1,10 @@
 #include "EPA.h"
 #include <assert.h>
 
-vec3 EPA(GJK_Result* gjk_result, vec3 offset) {
+vec3 EPA(GJK_Result* gjk_result) {
     // temp placeholders
     vec3 origin1 = { 0,3,0 }; //r=4
-    origin1 = origin1 + offset;
+    origin1 = origin1;
     vec3 origin2 = { 3,5,0 }; //r=2
 
     if (!gjk_result->hit) {
@@ -31,9 +31,8 @@ vec3 EPA(GJK_Result* gjk_result, vec3 offset) {
         search_dir = face.normal;
         vec3 P = support(search_dir, origin1, origin2);
 
-        float distanceFromPlane = Vector::dot(P - face.center, face.normal);
-        if (distanceFromPlane < .05) {
-            printf("Converged on iteration %d.\n", iteration);
+        float distanceFromPlane = Vector::dot(face.normal, P - face.center);
+        if (distanceFromPlane < .1) {
             break;
         }
 
@@ -45,10 +44,6 @@ vec3 EPA(GJK_Result* gjk_result, vec3 offset) {
     vec3 P = support(search_dir, origin1, origin2);
     float penDepth = Vector::magnitude(P);
     vec3  penNormal = Vector::normalized(P);
-
-    printf("After %d iteration: \n", iteration);
-    printf("%.4f units deep, along ", penDepth);
-    penNormal.print();
 
     return (penNormal * penDepth);
 }
