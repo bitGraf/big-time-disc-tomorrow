@@ -8,14 +8,15 @@ GLFWwindow* createWindow();
 char exe_location[MAX_PATH];
 
 int main(int argc, char** argv) {
+    /*
     CollisionEntity ent1;
     ent1.collisionHull = new SphereHull;
-    ent1.collisionHull->radius = 4;
+    ((SphereHull*)ent1.collisionHull)->radius = 4;
     ent1.position = {0,3,0};
 
     CollisionEntity ent2;
     ent2.collisionHull = new SphereHull;
-    ent2.collisionHull->radius = 2;
+    ((SphereHull*)ent2.collisionHull)->radius = 2;
     ent2.position = {3,5,0};
 
     CollisionEvent e = Collision::collisionTest(&ent1, &ent2);
@@ -62,7 +63,8 @@ int main(int argc, char** argv) {
     delete ent2.collisionHull;
 
     //system("pause");
-    //return 0;
+    return 0;
+    */
 
     printf("\n-------------------------------------------\n\n");
     get_run_location(exe_location);

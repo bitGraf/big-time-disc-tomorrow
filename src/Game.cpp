@@ -105,6 +105,35 @@ void initialize_game(GLFWwindow* window) {
 
     // Initialize Input state
     //Input::init();
+
+    //Collision Entity test
+    printf("%d collision entities\n", (int)Collision::manager.cEntList.size());
+
+    CollisionEntity* sphere1 = (CollisionEntity*)Entity::createNewEntity(ENT_Collision);
+    sphere1->position = {0, 1, 0};
+    sphere1->collisionHull = new SphereHull;
+    ((SphereHull*)sphere1->collisionHull)->radius = 2;
+    sphere1->scale = {2,2,2};
+    Resources::manager.loadTriMeshResource("sphere", ".ply");
+    sphere1->mesh = Resources::manager.getTriMeshResource("sphere");
+    sphere1->moveable = false; //static
+    sphere1->falling = false;
+
+    printf("%d collision entities\n", (int)Collision::manager.cEntList.size());
+
+    CollisionEntity* sphere2 = (CollisionEntity*)Entity::createNewEntity(ENT_Collision);
+    sphere2->position = {2, 8, 0};
+    sphere2->collisionHull = new SphereHull;
+    ((SphereHull*)sphere2->collisionHull)->radius = 1;
+    Resources::manager.loadTriMeshResource("sphere", ".ply");
+    sphere2->mesh = Resources::manager.getTriMeshResource("sphere");
+    sphere2->scale = {1,1,1};
+    sphere2->moveable = true;
+    sphere2->falling = true; //falling object
+
+    eee = (EntityBase*)sphere2;
+
+    printf("%d collision entities\n", (int)Collision::manager.cEntList.size());
 }
 
 void run_game_loop(GLFWwindow* window) {
@@ -188,6 +217,7 @@ void FrameUpdate (double dt) {
 void FixedUpdate(double dt) {
     if (currentState == GameStates::Normal) {
         // game update
+        Collision::Update();
     } else if (currentState == GameStates::Menu) {
         // menu update
     }
@@ -307,6 +337,11 @@ void handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int
 		if ((key == GLFW_KEY_I) && (action == GLFW_PRESS)) {
 			currentState = GameStates::Inventory;
 		}
+
+        if ((key == GLFW_KEY_T) && (action == GLFW_PRESS)) {
+            eee->position = {2, 8, 0};
+            ((CollisionEntity*)eee)->vel = .1f;
+        }
     } else if (currentState == GameStates::Menu) {
         if ((key == GLFW_KEY_ESCAPE) && (action == GLFW_PRESS)) {
             currentState = GameStates::Normal;

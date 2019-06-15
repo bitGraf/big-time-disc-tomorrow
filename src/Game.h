@@ -60,6 +60,8 @@ static GLuint currentInventoryItemY = 0;
 static GLuint currentInventoryXMax = 4;
 static GLuint currentInventoryYMax = 7;
 
+static EntityBase* eee = NULL;
+
 //External
 void initialize_game(GLFWwindow* window);
 void run_game_loop(GLFWwindow* window);

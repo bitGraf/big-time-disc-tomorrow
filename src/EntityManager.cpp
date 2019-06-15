@@ -111,7 +111,13 @@ void Entity::handleInputEvent(GLFWwindow* window, int key, int scancode, int act
         printf("Listing all entities...\n");
 
         Entity::pruneEntities();
-    }    
+    }
+
+    if ((key == GLFW_KEY_L) && (action == GLFW_PRESS)) {
+        printf("Performing collision tests\n");
+
+        Collision::Update();
+    }
 
     for (int i = 0; i < manager.numEntries; i++) {
         EntityBase* ent = (manager.pointerList[i]);
@@ -289,6 +295,10 @@ int Entity::registerEntity(EntityTypes type) {
         case ENT_AI: {
             manager.pointerList[manager.numEntries] = new AIEnt;
             //printf("Adding new EntityAI\n");
+        } break;
+        case ENT_Collision: {
+            manager.pointerList[manager.numEntries] = new CollisionEntity;
+            Collision::track(manager.pointerList[manager.numEntries]);
         } break;
         default: {
             manager.pointerList[manager.numEntries] = new EntityBase;

@@ -1,5 +1,64 @@
 #include "CollisionDetection.h"
 
+CollisionManager Collision::manager;
+
+void CollisionEntity::update(double dt) {
+    if (moveable) {
+        if (falling) {
+            vel = vel - 9.81*dt;
+            position.y += vel * dt;
+        }
+    }
+
+    EntityBase::update(dt);
+}
+
+void Collision::Update() {
+    for (int i = 0; i < manager.cEntList.size(); i++) {
+        CollisionEntity* e1 = manager.cEntList[i];
+        for (int j = i+1; j < manager.cEntList.size(); j++) {
+            CollisionEntity* e2 = manager.cEntList[j];
+
+            CollisionEvent e = Collision::collisionTest(e1, e2);
+
+            if (e.GJK_Converged) {
+                if (e.intersect) {
+                    printf("Shapes %d and %d are intersecting.\n", i, j);
+                    if (e.EPA_Converged) {
+                        printf("EPA succesful\n");
+                        printf("Shapes are %.4f units intersecting along ", e.distance);
+                        e.response.print();
+
+                        //Shift to resolve the collison;
+                        vec3 halfShift = e.response*e.distance*.505f;
+
+                        if (e1->moveable && e2->moveable) {
+                            //shift both in opposite direction
+                            e1->position = e1->position - halfShift;
+                            e2->position = e2->position + halfShift;
+                        } else if (e1->moveable && !e2->moveable) {
+                            //shift only 1
+                            e1->position = e1->position - (halfShift*2.0f);
+                        } else if (!e1->moveable && e2->moveable) {
+                            //shift only 2
+                            e2->position = e2->position + (halfShift*2.0f);
+                        } else {
+                            //shift neither -> How did we end up in this situation?
+                            printf("Two immoveable objects are colliding...\n");
+                        }
+                    }
+                }
+            } else {
+                printf("GJK algorithm failed to converge.\n");
+            }
+        }
+    }
+}
+
+void Collision::track(EntityBase* ent) {
+    manager.cEntList.push_back((CollisionEntity*)ent);
+}
+
 vec3 SphereHull::supportPoint(vec3 d) {
     vec3 v = Vector::normalized(d)*radius;
 
@@ -21,13 +80,19 @@ vec3 PolyHull::supportPoint(vec3 d) {
     return vFarthestAlongD;
 }
 
-vec3 CapsuleHull::supportPoint(vec3 d) {
-    //wrong
-    if (Vector::dot(a, d) < Vector::dot(b, d)) {
-        return b;
-    } else  {
-        return a;
+vec3 CylinderHull::supportPoint(vec3 d) {
+    float sig = (d.x*d.x + d.z*d.z);
+    vec3 v = Vector::normalized(d);
+    if (sig > .003) { //point is on curved surface
+        v.x *= radius/sig;
+        v.y *= halfHeight/abs(v.y);
+        v.z *= radius/sig;
+    } else { //point is either of the endcaps
+        v.x = 0;
+        v.y *= halfHeight/abs(v.y);
+        v.z = 0;
     }
+    return v;
 }
 
 GJK_SupportPoint entitySupport(vec3 search_dir, CollisionEntity* e1, CollisionEntity* e2) {

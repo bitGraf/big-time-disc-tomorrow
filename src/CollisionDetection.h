@@ -5,12 +5,15 @@
 #include "GJK.h"
 #include "EPA.h"
 
+#include <vector>
+
 struct ConvexHull {
-    float radius = 0;
     virtual vec3 supportPoint(vec3 d) { return {0,0,0};}
 };
 
 struct SphereHull : public ConvexHull {
+    float radius = 0;
+
     vec3 supportPoint(vec3 d) override;
 };
 
@@ -21,14 +24,19 @@ struct PolyHull : public ConvexHull {
     vec3 supportPoint(vec3 d) override;
 };
 
-struct CapsuleHull : public ConvexHull {
-    vec3 a, b;
+struct CylinderHull : public ConvexHull {
+    float radius, halfHeight;
 
     vec3 supportPoint(vec3 d) override;
 };
 
 struct CollisionEntity : public EntityBase {
     ConvexHull* collisionHull;
+    bool moveable = false;
+    bool falling = false;
+    float vel = 0;
+
+    void update(double dt) override;
 };
 
 struct CollisionEvent {
@@ -46,7 +54,14 @@ struct CollisionEvent {
     vec3 response;
 };
 
+struct CollisionManager {
+    std::vector<CollisionEntity*> cEntList;
+};
+
 namespace Collision {
+    extern CollisionManager manager;
+    void Update();
+    void track(EntityBase* ent);
     CollisionEvent collisionTest(CollisionEntity* e1, CollisionEntity* e2);
 }
 
