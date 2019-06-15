@@ -1,6 +1,45 @@
 #include "EPA.h"
 #include <assert.h>
 
+void epa_seed(EPA_Result* res, GJK_Result* seed, EPA_Face* face) {
+    if (!seed->hit) {
+        printf("Cannot perform EPA algorithm on a non-intersecting simplex.\n");
+        return;
+    }
+
+    createFaceFromVerts(&res->simplex.faces[0], //ABC
+        seed->simplex[0].P, seed->simplex[1].P, seed->simplex[2].P);
+    createFaceFromVerts(&res->simplex.faces[1], //ABD
+        seed->simplex[0].P, seed->simplex[1].P, seed->simplex[3].P);
+    createFaceFromVerts(&res->simplex.faces[2], //BCD
+        seed->simplex[1].P, seed->simplex[2].P, seed->simplex[3].P);
+    createFaceFromVerts(&res->simplex.faces[3], //CAD
+        seed->simplex[2].P, seed->simplex[0].P, seed->simplex[3].P);
+    res->simplex.numFaces = 4;
+
+    *face = getClosestFace(&res->simplex);
+}
+
+int epa_iteration(EPA_Result* res, GJK_SupportPoint p, EPA_Face* face) {
+    float distanceFromPlane = Vector::dot(face->normal, p.P - face->center);
+    if (distanceFromPlane < .1) {
+        //converged to final solution
+        res->converged = true;
+        res->contactPoint = p;
+        res->penetrationNormal = Vector::normalized(p.P);
+        res->penetrationDepth = Vector::magnitude(p.P);
+        return 0;
+    }
+
+    createNewSimplex(&res->simplex, *face, p.P);
+
+    res->iteration++;
+
+    *face = getClosestFace(&res->simplex);
+
+    return 1;
+}
+
 vec3 EPA(GJK_Result* gjk_result) {
     // temp placeholders
     vec3 f1 = { 0,3,0 }; //r=4

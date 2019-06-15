@@ -18,7 +18,45 @@ int main(int argc, char** argv) {
     ent2.collisionHull->radius = 2;
     ent2.position = {3,5,0};
 
-    Collision::collisionTest(&ent1, &ent2);
+    CollisionEvent e = Collision::collisionTest(&ent1, &ent2);
+
+    printf("First test.\n");
+    if (e.GJK_Converged) {
+        printf("GJK succesful.\n");
+        if (e.intersect) {
+            printf("Shapes are intersecting.\n");
+            if (e.EPA_Converged) {
+                printf("EPA succesful\n");
+                printf("Shapes are %.4f units intersecting along ", e.distance);
+                e.response.print();
+
+                //shift both in opposite direction
+                ent1.position = ent1.position - (e.response*e.distance*.525f);
+                ent2.position = ent2.position + (e.response*e.distance*.525f);
+            }
+        }
+        else {
+            printf("Shapes are %.4e apart.\n", e.distance);
+        }
+    }
+
+    printf("Second test.\n");
+    e = Collision::collisionTest(&ent1, &ent2);
+
+    if (e.GJK_Converged) {
+        printf("GJK succesful.\n");
+        if (e.intersect) {
+            printf("Shapes are intersecting.\n");
+            if (e.EPA_Converged) {
+                printf("EPA succesful\n");
+                printf("Shapes are %.4f units intersecting along ", e.distance);
+                e.response.print();
+            }
+        }
+        else {
+            printf("Shapes are %.4e apart.\n", e.distance);
+        }
+    }
 
     delete ent1.collisionHull;
     delete ent2.collisionHull;

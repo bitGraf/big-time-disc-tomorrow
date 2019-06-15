@@ -1,0 +1,223 @@
+function [direction, depth] = EPA(a, b, c, d)
+    direction = 0;
+    depth = 0;
+    origin1 = [0;3;0];
+    origin2 = [3;5;0];
+    drawSum(origin1, origin2);
+    
+    simplex = buildSimplex(a, b, c, d);
+    it = 0;
+    maxIt = 30;
+    while it < maxIt
+        drawSum(origin1, origin2);
+        drawSimplex(simplex, 1, 'r');
+        [face, simplex] = ripClosestFace(simplex);
+        search_dir = face.normal;
+        P = support(search_dir, origin1, origin2);
+        drawLine(face.v1, P, 'v1', 'p');
+        drawLine(face.v2, P, 'v2', ' ');
+        drawLine(face.v3, P, 'v3', ' ');
+        
+        if 
+        
+        pause
+        
+        drawSum(origin1, origin2);
+        drawSimplex(simplex, 1, 'c');
+        drawLine(face.v1, P, 'v1', 'p');
+        drawLine(face.v2, P, 'v2', ' ');
+        drawLine(face.v3, P, 'v3', ' ');
+        
+        pause
+        
+        simplex = buildNewSimplex(simplex, face, P);
+        drawSum(origin1, origin2);
+        drawSimplex(simplex, 1, 'r');
+        drawLine(face.v1, P, 'v1', 'p');
+        drawLine(face.v2, P, 'v2', ' ');
+        drawLine(face.v3, P, 'v3', ' ');
+        
+        it = it + 1;
+        
+%         break;
+    end
+end
+
+function [newSimplex] = buildNewSimplex(simplex, face, P)
+    faces = face;
+    numFaces = length(simplex);
+    
+    newSimplex = [];
+    
+    for n = 1:numFaces
+        f = simplex(n);
+        if dot(f.normal, P-f.center) > 0
+            faces = [faces f];
+        else
+            newSimplex = [newSimplex, f];
+        end
+    end
+    
+    edges = [];
+    numFaces = length(faces);
+    for n = 1:numFaces
+        f = faces(n);
+        
+        e1.v1 = f.v1;
+        e1.v2 = f.v2;
+        
+        e2.v1 = f.v2;
+        e2.v2 = f.v3;
+        
+        e3.v1 = f.v3;
+        e3.v2 = f.v1;
+        
+        edges = [edges, e1, e2, e3];
+    end
+    
+    edges = pruneEdges(edges);
+    numEdges = length(edges);
+    
+    for n = 1:numEdges
+        newSimplex = addFace(newSimplex, edges(n), P);
+    end
+end
+
+function [newSimplex] = addFace(simplex, edge, P)
+    f = createFace(edge.v1, edge.v2, P);
+    newSimplex = [simplex, f];
+end
+
+function [newEdges] = pruneEdges(edges)
+    numEdges = length(edges);
+    toRemove = [];
+    
+    for i = 1:numEdges
+        for j = i+1:numEdges
+            if sameEdges(edges(i), edges(j))
+                toRemove = [toRemove, i, j];
+            end
+        end
+    end
+    
+    newEdges = removeEdges(edges, toRemove);
+end
+
+function [newEdges] = removeEdges(edges, toRemove)
+    keep = [];
+    for n = 1:length(edges)
+        if ~inList(toRemove, n)
+            keep = [keep, n];
+        end
+    end
+    newEdges = edges(keep);
+end
+
+function [yes] = inList(list, val)
+    for n = 1:length(list)
+        if list(n) == val
+            yes = true;
+            return;
+        end
+    end
+    yes = false;
+end
+
+function [yes] = sameVec(v1, v2)
+    yes = norm(v1-v2) < .01;
+end
+
+function [yes] = sameEdges(e1, e2)
+    yes = (sameVec(e1.v1, e2.v1) && sameVec(e1.v2, e2.v2)) || ...
+          (sameVec(e1.v1, e2.v2) && sameVec(e1.v2, e2.v1));
+end
+
+function [] = drawLine(a, b, ta, tb)
+    plot3([a(1), b(1)], [a(2), b(2)], [a(3), b(3)], 'k--');
+    text(a(1), a(2), a(3), ta);
+    text(b(1), b(2), b(3), tb);
+end
+
+function [] = drawSimplex(simplex, id, c)
+    figure(id);
+    L = length(simplex);
+    
+    for n = 1:L
+        face = simplex(n);
+        drawTri(face.v1+face.normal, face.v2+face.normal, face.v3+face.normal, c);
+    end
+end
+
+function [] = drawTri(a, b, c, col)
+    fill3([a(1), b(1), c(1)], ...
+          [a(2), b(2), c(2)], ...
+          [a(3), b(3), c(3)], col);
+end
+
+function [] = drawSum(origin1, origin2)
+    [X,Y,Z] = sphere(12);
+    O3 = origin1-origin2;
+    R3 = 4 + 2;
+    
+    figure(1);
+    clf;hold on;grid on;axis equal;
+    mesh(X*R3+O3(1), Y*R3+O3(2), Z*R3+O3(3), 'FaceColor', 'none');
+    plot3(0,0,0, 'k+', 'MarkerSize', 10);
+end
+
+function [v] = support(search_dir, origin1, origin2)
+    d = search_dir/norm(search_dir);
+    p1 =  d*4 + origin1;
+    p2 = -d*2 + origin2;
+    
+    v = p1 - p2;
+end
+
+function [face, newSimplex] = ripClosestFace(simplex)
+    L = length(simplex);
+    
+    closestDist = inf;
+    closestID = -1;
+    
+    for n = 1:L
+        face = simplex(n);
+        if face.dist < closestDist
+            closestID = n;
+            closestDist = face.dist;
+        end
+    end
+    
+    face = simplex(closestID);
+    
+    %remove face from simplex
+    if closestID == 1
+        newSimplex = simplex(2:end);
+    elseif closestID == L
+        newSimplex = simplex(1:end-1);
+    else
+        newSimplex = [simplex(1:closestID-1), simplex(closestID+1:end)];
+    end
+end
+
+function [simplex] = buildSimplex(a, b, c, d)
+    %abc
+    simplex(1) = createFace(a, b, c);
+    simplex(2) = createFace(a, b, d);
+    simplex(3) = createFace(b, c, d);
+    simplex(4) = createFace(c, a, d);
+end
+
+function [face] = createFace(a, b, c)
+    face.v1 = a;
+    face.v2 = b;
+    face.v3 = c;
+    
+    face.normal = cross(b-a, c-a);
+    face.normal = face.normal/norm(face.normal);
+    face.center = (a+b+c)/3;
+    
+    if dot(face.normal, face.center) < 0
+        face.normal = -face.normal;
+    end
+    face.dist = dot(face.normal, face.center);
+end

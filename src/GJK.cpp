@@ -13,6 +13,7 @@ int gjk_iteration(GJK_Result* res, GJK_SupportPoint p, vec3* search_dir) {
         //converged
         res->hit = false;
         res->distance = Vector::magnitude(res->R);
+        res->converge = true;
         return 0;
     }
 
@@ -20,6 +21,7 @@ int gjk_iteration(GJK_Result* res, GJK_SupportPoint p, vec3* search_dir) {
         res->hit = true;
         res->distance = 0;
         res->simplex[3] = p;
+        res->converge = true;
         return 0;
     }
 
@@ -31,6 +33,7 @@ int gjk_iteration(GJK_Result* res, GJK_SupportPoint p, vec3* search_dir) {
             printf("Not converging\n");
             res->hit = false;
             res->distance =0;
+            res->converge = false;
             return 0;
         }
     }

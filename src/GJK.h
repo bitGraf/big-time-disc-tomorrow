@@ -22,6 +22,7 @@ struct GJK_Result {
     vec3 R;
     vec3 Rp;
     int numNoConverge = 0;
+    bool converge = false;
 };
 
 void gjk(GJK_Result* s, vec3 initial_guess);

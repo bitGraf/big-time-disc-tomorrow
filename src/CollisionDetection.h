@@ -35,11 +35,15 @@ struct CollisionEvent {
     CollisionEntity* entity1 = NULL;
     CollisionEntity* entity2 = NULL;
 
-    bool intersect = false;
-    float distance = 0;
+    bool GJK_Converged = false;
+    bool EPA_Converged = false;
 
-    vec3 response1;
-    vec3 response2;
+    bool intersect = false;
+    //If not intersecting, distance apart. 
+    //If intersecting, penetration depth.
+    float distance = 0;
+    //if intersecting, penetration normal.
+    vec3 response;
 };
 
 namespace Collision {

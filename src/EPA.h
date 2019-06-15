@@ -28,6 +28,20 @@ struct EPA_Simplex {
     EPA_Face faces[EPA_MAX_SIMPLEX_SIZE];
 };
 
+struct EPA_Result {
+    //return values
+    vec3 penetrationNormal;
+    float penetrationDepth = 0;
+    GJK_SupportPoint contactPoint;
+    bool converged = false;
+
+    //persistent information
+    EPA_Simplex simplex;
+    int iteration = 0;
+};
+
+void epa_seed(EPA_Result* res, GJK_Result* seed, EPA_Face* face);
+int epa_iteration(EPA_Result* res, GJK_SupportPoint p, EPA_Face* face);
 vec3 EPA(GJK_Result* gjk_result);
 void createFaceFromVerts(EPA_Face* face, vec3 a, vec3 b, vec3 c);
 EPA_Face getClosestFace(EPA_Simplex* simplex);
