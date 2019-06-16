@@ -39,26 +39,32 @@ void Collision::Update() {
                             e1->position = e1->position - halfShift;
                             e2->position = e2->position + halfShift;
 
+                            /*
                             vec3 nv = e1->velocity - e.response*(fudge*Vector::dot(e1->velocity, e.response));
                             printf("%.3f -> %.3f\n", Vector::magnitude(e1->velocity),Vector::magnitude(nv));
                             e1->velocity = nv;
                             nv = e2->velocity + e.response*(fudge*Vector::dot(e2->velocity, e.response));
                             printf("%.3f -> %.3f\n", Vector::magnitude(e2->velocity),Vector::magnitude(nv));
                             e2->velocity = nv;
+                            */
                         } else if (e1->moveable && !e2->moveable) {
                             //shift only 1
                             e1->position = e1->position - (halfShift*2.0f);
 
+                            /*
                             vec3 nv = e1->velocity - e.response*(fudge*Vector::dot(e1->velocity, e.response));
                             printf("%.3f -> %.3f\n", Vector::magnitude(e1->velocity),Vector::magnitude(nv));
                             e1->velocity = nv;
+                            */
                         } else if (!e1->moveable && e2->moveable) {
                             //shift only 2
                             e2->position = e2->position + (halfShift*2.0f);
 
+                            /*
                             vec3 nv = e2->velocity + e.response*(fudge*Vector::dot(e2->velocity, e.response));
                             printf("%.3f -> %.3f\n", Vector::magnitude(e2->velocity),Vector::magnitude(nv));
                             e2->velocity = nv;
+                            */
                         } else {
                             //shift neither -> How did we end up in this situation?
                             printf("Two immoveable objects are colliding...\n");
@@ -151,7 +157,7 @@ CollisionEvent Collision::collisionTest(CollisionEntity* e1, CollisionEntity* e2
 
     CollisionEvent event;
     event.entity1 = (CollisionEntity*)e1;
-    event.entity1 = (CollisionEntity*)e1;
+    event.entity2 = (CollisionEntity*)e2;
     event.intersect = gjk_res.hit;
     event.GJK_Converged = gjk_res.converge;
     event.distance = gjk_res.distance;

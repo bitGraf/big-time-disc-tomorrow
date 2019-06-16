@@ -1,7 +1,7 @@
 function [hit, a, b, c, d] = gjk(off)
     hit = false;
-    origin1 = [0;3;0] + off;
-    origin2 = [3;5;0];
+    origin1 = [0;1;0] + off;
+    origin2 = [2; 2.746; 0];
     drawSum(origin1, origin2);
     
     search_dir = [1;2;3];
@@ -52,6 +52,14 @@ function [hit, a, b, c, d] = gjk(off)
     end
 end
 
+function [v] = support(search_dir, origin1, origin2)
+    d = search_dir/norm(search_dir);
+    p1 =  d*2 + origin1;
+    p2 = -d*1 + origin2;
+    
+    v = p1 - p2;
+end
+
 function [] = drawSimplex(a, b, c, d)    
     drawTri(a, b, c);
     drawTri(a, b, d);
@@ -68,7 +76,7 @@ end
 function [] = drawSum(origin1, origin2)
     [X,Y,Z] = sphere(12);
     O3 = origin1-origin2;
-    R3 = 4 + 2;
+    R3 = 2 + 1;
     
     figure(1);
     clf;hold on;grid on;axis equal;
@@ -104,14 +112,6 @@ function [v,idx] = farthest(a,b,c,d)
     [~,idx] = max([norm(a), norm(b), norm(c), norm(d)]);
     
     v = [0;0;0];
-end
-
-function [v] = support(search_dir, origin1, origin2)
-    d = search_dir/norm(search_dir);
-    p1 =  d*4 + origin1;
-    p2 = -d*2 + origin2;
-    
-    v = p1 - p2;
 end
 
 function [v] = planeNormal(a, b, c)

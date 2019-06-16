@@ -26,8 +26,8 @@ int epa_iteration(EPA_Result* res, GJK_SupportPoint p, EPA_Face* face) {
         //converged to final solution
         res->converged = true;
         res->contactPoint = p;
-        res->penetrationNormal = Vector::normalized(p.P);
-        res->penetrationDepth = Vector::magnitude(p.P);
+        res->penetrationNormal = face->normal;
+        res->penetrationDepth = face->distance;
         return 0;
     }
 

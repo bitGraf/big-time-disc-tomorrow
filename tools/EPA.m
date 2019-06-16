@@ -1,8 +1,8 @@
 function [direction, depth] = EPA(a, b, c, d, off)
     direction = 0;
     depth = 0;
-    origin1 = [0;3;0] + off;
-    origin2 = [3;5;0];
+    origin1 = [0;1;0] + off;
+    origin2 = [2; 2.746; 0];
     drawSum(origin1, origin2);
     
     [a, b, c, d];
@@ -15,7 +15,7 @@ function [direction, depth] = EPA(a, b, c, d, off)
         drawSimplex(simplex, 1, 'r');
         [face, simplex] = ripClosestFace(simplex);
         search_dir = face.normal;
-        P = support(search_dir, origin1, origin2)
+        P = support(search_dir, origin1, origin2);
         drawLine(face.v1, P, 'v1', 'p');
         drawLine(face.v2, P, 'v2', ' ');
         drawLine(face.v3, P, 'v3', ' ');
@@ -24,10 +24,10 @@ function [direction, depth] = EPA(a, b, c, d, off)
         if distFromPlane < .1
             fprintf('Converged on iteration %d.\n', it);
             
-            penVec = P;
-            depth = norm(P);
-            direction = penVec/depth;
-            
+            direction = face.normal;
+            depth = face.dist;
+            origin1
+            origin2
             return;
         end
         
@@ -52,6 +52,14 @@ function [direction, depth] = EPA(a, b, c, d, off)
         
 %         break;
     end
+end
+
+function [v] = support(search_dir, origin1, origin2)
+    d = search_dir/norm(search_dir);
+    p1 =  d*2 + origin1;
+    p2 = -d*1 + origin2;
+    
+    v = p1 - p2;
 end
 
 function [newSimplex] = buildNewSimplex(simplex, face, P)
@@ -169,20 +177,12 @@ end
 function [] = drawSum(origin1, origin2)
     [X,Y,Z] = sphere(12);
     O3 = origin1-origin2;
-    R3 = 4 + 2;
+    R3 = 2 + 1;
     
     figure(1);
     clf;hold on;grid on;axis equal;
     mesh(X*R3+O3(1), Y*R3+O3(2), Z*R3+O3(3), 'FaceColor', 'none');
     plot3(0,0,0, 'k+', 'MarkerSize', 10);
-end
-
-function [v] = support(search_dir, origin1, origin2)
-    d = search_dir/norm(search_dir);
-    p1 =  d*4 + origin1;
-    p2 = -d*2 + origin2;
-    
-    v = p1 - p2;
 end
 
 function [face, newSimplex] = ripClosestFace(simplex)
