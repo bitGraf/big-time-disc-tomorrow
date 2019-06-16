@@ -34,7 +34,10 @@ struct CollisionEntity : public EntityBase {
     ConvexHull* collisionHull;
     bool moveable = false;
     bool falling = false;
-    float vel = 0;
+    vec3 velocity;
+
+    vec3 wishPosition;
+    vec3 wishVelocity;
 
     void update(double dt) override;
 };

@@ -5,8 +5,9 @@ CollisionManager Collision::manager;
 void CollisionEntity::update(double dt) {
     if (moveable) {
         if (falling) {
-            vel = vel - 9.81*dt;
-            position.y += vel * dt;
+            vec3 acc = {0, -9.81f, 0};
+            velocity = velocity + acc*dt;
+            position = position + velocity*dt;
         }
     }
 
@@ -30,24 +31,50 @@ void Collision::Update() {
                         e.response.print();
 
                         //Shift to resolve the collison;
-                        vec3 halfShift = e.response*e.distance*.505f;
+                        float fudge = 1.01;
+                        vec3 halfShift = e.response*e.distance*.5*fudge;
 
                         if (e1->moveable && e2->moveable) {
                             //shift both in opposite direction
                             e1->position = e1->position - halfShift;
                             e2->position = e2->position + halfShift;
+
+                            vec3 nv = e1->velocity - e.response*(fudge*Vector::dot(e1->velocity, e.response));
+                            printf("%.3f -> %.3f\n", Vector::magnitude(e1->velocity),Vector::magnitude(nv));
+                            e1->velocity = nv;
+                            nv = e2->velocity + e.response*(fudge*Vector::dot(e2->velocity, e.response));
+                            printf("%.3f -> %.3f\n", Vector::magnitude(e2->velocity),Vector::magnitude(nv));
+                            e2->velocity = nv;
                         } else if (e1->moveable && !e2->moveable) {
                             //shift only 1
                             e1->position = e1->position - (halfShift*2.0f);
+
+                            vec3 nv = e1->velocity - e.response*(fudge*Vector::dot(e1->velocity, e.response));
+                            printf("%.3f -> %.3f\n", Vector::magnitude(e1->velocity),Vector::magnitude(nv));
+                            e1->velocity = nv;
                         } else if (!e1->moveable && e2->moveable) {
                             //shift only 2
                             e2->position = e2->position + (halfShift*2.0f);
+
+                            vec3 nv = e2->velocity + e.response*(fudge*Vector::dot(e2->velocity, e.response));
+                            printf("%.3f -> %.3f\n", Vector::magnitude(e2->velocity),Vector::magnitude(nv));
+                            e2->velocity = nv;
                         } else {
                             //shift neither -> How did we end up in this situation?
                             printf("Two immoveable objects are colliding...\n");
                         }
                     }
-                }
+                }/* else {
+                    if (e1->moveable) {
+                        e1->position = e1->wishPosition;
+                        e1->velocity = e1->wishVelocity;
+                    }
+
+                    if (e2->moveable) {
+                        e2->position = e2->wishPosition;
+                        e2->velocity = e2->wishVelocity;
+                    }
+                }*/
             } else {
                 printf("GJK algorithm failed to converge.\n");
             }

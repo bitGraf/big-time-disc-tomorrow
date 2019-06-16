@@ -137,8 +137,7 @@ void initialize_game(GLFWwindow* window) {
 }
 
 void run_game_loop(GLFWwindow* window) {
-    using clock = std::chrono::steady_clock;
-    using cycle = std::chrono::duration<double, std::ratio<1, 250>>;
+    float timeRate = 1.0f;
 
     printf("Beginning Game Loop...\n");
     glfwSetTime(0);
@@ -156,13 +155,13 @@ void run_game_loop(GLFWwindow* window) {
 
         // Ensure fixedUpDate runs at the specified PhysicsRate
         while (Timer.lag >= PhysicsRate) {
-            FixedUpdate(PhysicsRate);
+            FixedUpdate(PhysicsRate*timeRate);
             Timer.lag -= PhysicsRate;
             numUpdates++;
         }
 
         // Update before every render call
-        FrameUpdate(Timer.deltaTime);
+        FrameUpdate(Timer.deltaTime*timeRate);
         // Render the entire scene
         Render();
 
@@ -340,7 +339,7 @@ void handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int
 
         if ((key == GLFW_KEY_T) && (action == GLFW_PRESS)) {
             eee->position = {2, 8, 0};
-            ((CollisionEntity*)eee)->vel = .1f;
+            ((CollisionEntity*)eee)->velocity = {0, .1f, 0};
         }
     } else if (currentState == GameStates::Menu) {
         if ((key == GLFW_KEY_ESCAPE) && (action == GLFW_PRESS)) {
