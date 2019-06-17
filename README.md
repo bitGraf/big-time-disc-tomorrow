@@ -1,30 +1,30 @@
 # big-time-disc-tomorrow
-TODO:
+## TODO:
 
-COLLISION:
+### COLLISION:
 - Fix GJK algorithm to actually be correct
 - Generalize ActorEntity movement to allow sliding over collision surfaces
 
-AI:
+### AI:
 - Fix math for distanceToPatrol
 - Issue w/ targetPos on same axis as Pos
 - Sometimes rotate wrong/awkward direction
 
-Geometry:
+### Geometry:
 - Fix panel transition math
 - Add 'smooth' transitioning
 - Player/AI location is misaligned with model, leads to awkward interactions
 
-Gamestate:
+### Gamestate:
 - Add inventory/player-stattracker
 - Add loading/saving
 
-Gameplay:
+### Gameplay:
 - Potentially remove 'thrust' dynamic from Ent_Missile
 - Basic effects? (ie "Call EffectManager to display text/effect at given loc, for given time, etc)
 
 
-After Pow-wow Ideas:
+### After Pow-wow Ideas:
 - Flesh out dual character control (Having a guy and a crawler that you can toggle control betweem)
 - Add functionality to panel system to allow the guy to use them as normal collision brushes
 - Finalizing a level format (a list of panels, a list of entities, start and end zones etc...)
