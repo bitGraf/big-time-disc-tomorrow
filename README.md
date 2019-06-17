@@ -1,6 +1,10 @@
 # big-time-disc-tomorrow
 TODO:
 
+COLLISION:
+- Fix GJK algorithm to actually be correct
+- Generalize ActorEntity movement to allow sliding over collision surfaces
+
 AI:
 - Fix math for distanceToPatrol
 - Issue w/ targetPos on same axis as Pos
