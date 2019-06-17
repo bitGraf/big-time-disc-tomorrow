@@ -10,7 +10,8 @@
 #include "Missile.h"
 #include "AI.h"
 #include "Lights.h"
-#include "CollisionDetection.h"
+//#include "CollisionDetection.h"
+#include "Actor.h"
 
 #include <string>
 
@@ -25,7 +26,8 @@ enum EntityTypes {
     ENT_Physics,
     ENT_Missile,
     ENT_AI,
-    ENT_Collision
+    ENT_Collision,
+    ENT_Actor
 };
 
 /*struct LoadOptions {

@@ -110,36 +110,47 @@ void initialize_game(GLFWwindow* window) {
     printf("%d collision entities\n", (int)Collision::manager.cEntList.size());
 
     CollisionEntity* sphere1 = (CollisionEntity*)Entity::createNewEntity(ENT_Collision);
-    sphere1->position = {0, 3, 0};
+    sphere1->position = {0, 2, 15};
     sphere1->collisionHull = new SphereHull;
-    ((SphereHull*)sphere1->collisionHull)->radius = 2;
-    sphere1->scale = {2,2,2};
+    ((SphereHull*)sphere1->collisionHull)->radius = 3;
+    sphere1->scale = {3,3,3};
     Resources::manager.loadTriMeshResource("sphere", ".ply");
     sphere1->mesh = Resources::manager.getTriMeshResource("sphere");
     sphere1->moveable = false; //static
-    sphere1->falling = false;
 
     CollisionEntity* sphere3 = (CollisionEntity*)Entity::createNewEntity(ENT_Collision);
-    sphere3->position = { 4.5f, 1, 0 };
+    sphere3->position = { 9, -1, 6 };
     sphere3->collisionHull = new SphereHull;
-    ((SphereHull*)sphere3->collisionHull)->radius = 2;
-    sphere3->scale = { 2,2,2 };    
+    ((SphereHull*)sphere3->collisionHull)->radius = 4;
+    //((SphereHull*)sphere3->collisionHull)->halfHeight = 1;
+    sphere3->scale = {4,4,4};
     sphere3->mesh = Resources::manager.getTriMeshResource("sphere");
     sphere3->moveable = false; //static
-    sphere3->falling = false;
 
     printf("%d collision entities\n", (int)Collision::manager.cEntList.size());
 
     CollisionEntity* sphere2 = (CollisionEntity*)Entity::createNewEntity(ENT_Collision);
-    sphere2->position = {2, 8, 0};
+    sphere2->position = {-6, -1, 4};
     sphere2->collisionHull = new SphereHull;
-    ((SphereHull*)sphere2->collisionHull)->radius = .75f;
+    ((SphereHull*)sphere2->collisionHull)->radius = 3;
     sphere2->mesh = Resources::manager.getTriMeshResource("sphere");
-    sphere2->scale = { .75f,.75f,.75f };
-    sphere2->moveable = true;
-    sphere2->falling = true; //falling object
+    sphere2->scale = {3,3,3};
+    sphere2->moveable = false;
 
-    eee = (EntityBase*)sphere2;
+    //test actor
+    actor = (ActorEntity*)Entity::createNewEntity(ENT_Actor);
+    actor->position = {0,1,-1};
+    actor->collisionHull = new SphereHull;
+    ((SphereHull*)actor->collisionHull)->radius = 2;
+    actor->mesh = Resources::manager.getTriMeshResource("sphere");
+    actor->baseColor = Resources::manager.getTextureResource("rustediron2_basecolor");
+    actor->normalMap = Resources::manager.getTextureResource("rustediron2_normal");
+    actor->amrMap = Resources::manager.getTextureResource("rustediron2_amr");
+    actor->scale = {2,2,2};
+    actor->moveable = true;
+
+    Entity::manager.Player->processInput = false;
+    Entity::manager.Player->shouldRender = false;
 
     printf("%d collision entities\n", (int)Collision::manager.cEntList.size());
 }
@@ -224,7 +235,7 @@ void FrameUpdate (double dt) {
 void FixedUpdate(double dt) {
     if (currentState == GameStates::Normal) {
         // game update
-        Collision::Update();
+        //Collision::Update();
     } else if (currentState == GameStates::Menu) {
         // menu update
     }
@@ -328,6 +339,22 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 
 void ProcessInput(GLFWwindow *window) {    
     Input::update(window);
+
+    if (Input::manager.move_forward.value > 0.5f) {
+        actor->command(am_MOVE_FORWARD);
+    }
+    if (Input::manager.move_left.value > 0.5f) {
+        actor->command(am_STRAFE_LEFT);
+    }
+    if (Input::manager.move_backward.value > 0.5f) {
+        actor->command(am_MOVE_BACKWARD);
+    }
+    if (Input::manager.move_right.value > 0.5f) {
+        actor->command(am_STRAFE_RIGHT);
+    }
+    if (Input::manager.move_jump.value > 0.5f) {
+        actor->command(am_JUMP);
+    }
 }
 
 void handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -344,11 +371,6 @@ void handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int
 		if ((key == GLFW_KEY_I) && (action == GLFW_PRESS)) {
 			currentState = GameStates::Inventory;
 		}
-
-        if ((key == GLFW_KEY_T) && (action == GLFW_PRESS)) {
-            eee->position = {.75f, 8, 0};
-            ((CollisionEntity*)eee)->velocity = {0, .1f, 0};
-        }
     } else if (currentState == GameStates::Menu) {
         if ((key == GLFW_KEY_ESCAPE) && (action == GLFW_PRESS)) {
             currentState = GameStates::Normal;

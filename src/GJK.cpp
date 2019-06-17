@@ -14,6 +14,7 @@ int gjk_iteration(GJK_Result* res, GJK_SupportPoint p, vec3* search_dir) {
         res->hit = false;
         res->distance = Vector::magnitude(res->R);
         res->converge = true;
+        res->search_dir = *search_dir;
         return 0;
     }
 
@@ -22,6 +23,7 @@ int gjk_iteration(GJK_Result* res, GJK_SupportPoint p, vec3* search_dir) {
         res->distance = 0;
         res->simplex[3] = p;
         res->converge = true;
+        res->search_dir = *search_dir;
         return 0;
     }
 
@@ -34,6 +36,7 @@ int gjk_iteration(GJK_Result* res, GJK_SupportPoint p, vec3* search_dir) {
             res->hit = false;
             res->distance =0;
             res->converge = false;
+            res->search_dir = *search_dir;
             return 0;
         }
     }

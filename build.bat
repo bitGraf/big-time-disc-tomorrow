@@ -16,7 +16,7 @@ set files=%files% Platform.cpp Input.cpp Texture.cpp Level.cpp
 set files=%files% stb_implementation.c DynamicFont.cpp
 set files=%files% ResourceManager.cpp Crawler.cpp Lights.cpp
 set files=%files% Physics.cpp Missile.cpp AI.cpp CollisionDetection.cpp
-set files=%files% EPA.cpp GJK.cpp
+set files=%files% EPA.cpp GJK.cpp Actor.cpp
 
 set opts=/MD /nologo /EHsc
 

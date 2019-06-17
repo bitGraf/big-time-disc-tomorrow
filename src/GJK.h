@@ -18,6 +18,7 @@ struct GJK_Result {
     int iterations = 0;
     bool hit = false;
     float distance = 0;
+    vec3 search_dir;
 
     vec3 R;
     vec3 Rp;

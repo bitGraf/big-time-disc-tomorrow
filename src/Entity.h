@@ -27,6 +27,9 @@ struct EntityBase {
     int subType = -1;
     bool Remove = false;    //whether to remove next update cycle
 
+    bool processInput = true;
+    bool shouldRender = true;
+
     //Textures
     TextureResource* baseColor = NULL;
     TextureResource* normalMap = NULL;

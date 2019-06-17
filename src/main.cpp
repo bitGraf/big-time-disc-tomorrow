@@ -1,8 +1,6 @@
 #include "Game.h"
 #include "Platform.h"
 
-#include "CollisionDetection.h"
-
 GLFWwindow* createWindow();
 
 char exe_location[MAX_PATH];

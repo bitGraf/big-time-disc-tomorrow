@@ -119,11 +119,21 @@ void Entity::handleInputEvent(GLFWwindow* window, int key, int scancode, int act
         Collision::Update();
     }
 
+    if ((key == GLFW_KEY_M) && (action == GLFW_PRESS)) {
+        printf("Toggling player control\n");
+
+        manager.Player->processInput = !manager.Player->processInput;
+        manager.Player->shouldRender = !manager.Player->shouldRender;
+    }
+
     for (int i = 0; i < manager.numEntries; i++) {
         EntityBase* ent = (manager.pointerList[i]);
 
-        if (!ent->Remove)
-            ent->handleInput(key, scancode, action, mods);
+        if (!ent->Remove) {
+            if (ent->processInput) {
+                ent->handleInput(key, scancode, action, mods);
+            }
+        }
     }
 }
 
@@ -140,7 +150,7 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
     for (int i = 0; i < manager.numEntries; i++) {
         EntityBase* ent = (manager.pointerList[i]);
 
-        if (!ent->Remove) {
+        if (ent->shouldRender) {
             ent->preRender();
             
             shader->use();
@@ -193,24 +203,25 @@ void Entity::renderAllEntities(ShaderProgram* shader) {
     }
 
 
-    for (int i = 0; i < manager.numEntries; i++) {
+    if (manager.showFrames) {
+        for (int i = 0; i < manager.numEntries; i++) {
             EntityBase* ent = (manager.pointerList[i]);
 
-            if (!ent->Remove) {
+            if (ent->shouldRender) {
                 ent->postRender();
 
-                if (manager.showFrames) {
-                    glDisable(GL_DEPTH_TEST);
-                    manager.lineShader->use();
-                    manager.lineShader->setMat4("model", &ent->modelMatrix);
-                    manager.lineShader->setMat4("view", &Entity::manager.camera.viewMatrix);
-                    glBindVertexArray(manager.axis.VAO);
-                    glDrawElements(GL_LINES, manager.axis.numFaces*2, GL_UNSIGNED_INT, 0);
-                    glBindVertexArray(0);
-                    glEnable(GL_DEPTH_TEST);
-                }
+
+                glDisable(GL_DEPTH_TEST);
+                manager.lineShader->use();
+                manager.lineShader->setMat4("model", &ent->modelMatrix);
+                manager.lineShader->setMat4("view", &Entity::manager.camera.viewMatrix);
+                glBindVertexArray(manager.axis.VAO);
+                glDrawElements(GL_LINES, manager.axis.numFaces*2, GL_UNSIGNED_INT, 0);
+                glBindVertexArray(0);
+                glEnable(GL_DEPTH_TEST);
             }
         }
+    }
     glBindVertexArray(0);
 }
 
@@ -298,6 +309,10 @@ int Entity::registerEntity(EntityTypes type) {
         } break;
         case ENT_Collision: {
             manager.pointerList[manager.numEntries] = new CollisionEntity;
+            Collision::track(manager.pointerList[manager.numEntries]);
+        } break;
+        case ENT_Actor: {
+            manager.pointerList[manager.numEntries] = new ActorEntity;
             Collision::track(manager.pointerList[manager.numEntries]);
         } break;
         default: {

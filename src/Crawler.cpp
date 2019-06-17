@@ -65,12 +65,12 @@ void CrawlerEnt::update(double dt) {
     if (attachCoolDown < 0)
         attachCoolDown = 0.0f;
 
-    float vf = Input::manager.move_forward.value;
-    float vb = Input::manager.move_backward.value;
-    float vl = Input::manager.move_left.value;
-    float vr = Input::manager.move_right.value;
-    float vsl = Input::manager.move_strafe_left.value;
-    float vsr = Input::manager.move_strafe_right.value;
+    float vf = processInput ? Input::manager.move_forward.value : 0;
+    float vb = processInput ? Input::manager.move_backward.value : 0;
+    float vl = processInput ? Input::manager.move_left.value : 0;
+    float vr = processInput ? Input::manager.move_right.value : 0;
+    float vsl = processInput ? Input::manager.move_strafe_left.value : 0;
+    float vsr = processInput ? Input::manager.move_strafe_right.value : 0;
 
     float forwardBackward = vf - vb;
     float rightLeft = vr - vl;

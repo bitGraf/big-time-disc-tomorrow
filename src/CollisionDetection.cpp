@@ -4,11 +4,7 @@ CollisionManager Collision::manager;
 
 void CollisionEntity::update(double dt) {
     if (moveable) {
-        if (falling) {
-            vec3 acc = {0, -9.81f, 0};
-            velocity = velocity + acc*dt;
             position = position + velocity*dt;
-        }
     }
 
     EntityBase::update(dt);
@@ -90,6 +86,9 @@ void Collision::Update() {
 
 void Collision::track(EntityBase* ent) {
     manager.cEntList.push_back((CollisionEntity*)ent);
+
+    //not sure how robust this is...
+    ((CollisionEntity*)ent)->collisionID = manager.cEntList.size()-1;
 }
 
 vec3 SphereHull::supportPoint(vec3 d) {
@@ -161,6 +160,7 @@ CollisionEvent Collision::collisionTest(CollisionEntity* e1, CollisionEntity* e2
     event.intersect = gjk_res.hit;
     event.GJK_Converged = gjk_res.converge;
     event.distance = gjk_res.distance;
+    event.response = gjk_res.search_dir;
 
     if (gjk_res.hit) {
         //printf("Intersecting. Continue to EPA\n");

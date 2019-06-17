@@ -27,8 +27,11 @@ bool Vector::isZero(vec3& v, float tol) {
 }
 
 void Vector::normalize(vec3& v) {
-    float m = 1/sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
-    v = (v * m);
+    float m = sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+    if (fabs(m) < 0.001f) {
+        return;
+    }
+    v = v * (1.0f/m);
 }
 
 vec3 Vector::inverse(vec3& v) {
