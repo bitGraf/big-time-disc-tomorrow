@@ -139,51 +139,72 @@ GJK_SupportPoint entitySupport(vec3 search_dir, CollisionEntity* e1, CollisionEn
 }
 
 CollisionEvent Collision::collisionTest(CollisionEntity* e1, CollisionEntity* e2) {
-    GJK_Result gjk_res;
-    vec3 d = { 1,2,3 };// e1->position - e2->position;
-    gjk_res.simplex[1] = entitySupport( d, e1, e2);
-    gjk_res.simplex[0] = entitySupport(-d, e1, e2);
-    d = Vector::cross(gjk_res.simplex[0].P, gjk_res.simplex[1].P- gjk_res.simplex[0].P);
-    gjk_res.simplex[2] = entitySupport( d, e1, e2);
-
-    GJK_SupportPoint p;
-    d = planeNormal(gjk_res.simplex[0].P, gjk_res.simplex[1].P, gjk_res.simplex[2].P);
-    p = entitySupport(d, e1, e2);
-
-    while(gjk_iteration(&gjk_res, p, &d)) {
-        p = entitySupport(d, e1, e2);
-    }
-
     CollisionEvent event;
     event.entity1 = (CollisionEntity*)e1;
     event.entity2 = (CollisionEntity*)e2;
-    event.intersect = gjk_res.hit;
-    event.GJK_Converged = gjk_res.converge;
-    event.distance = gjk_res.distance;
-    event.response = gjk_res.search_dir;
 
-    if (gjk_res.hit) {
-        //printf("Intersecting. Continue to EPA\n");
-        // continue to EPA
-        EPA_Result epa_res;
-        EPA_Face face;
-        epa_seed(&epa_res, &gjk_res, &face);
-        p = entitySupport(face.normal, e1, e2);
-        while (epa_iteration(&epa_res, p, &face)) {
-            d = face.normal;
+    /* First check if spheres are even close */
+    float boundingDist = Vector::magnitude(e1->position - e2->position) - (e1->boundingRadius + e2->boundingRadius);
+    if (boundingDist < 0) {
+        /* Bounding spheres intersect, MIGHT be a collision */
+        GJK_Result gjk_res;
+        vec3 d = { 1,2,3 };// e1->position - e2->position;
+        GJK_SupportPoint p = entitySupport(d, e1, e2);
+        while(gjk_iteration(&gjk_res, p, &d)) {
             p = entitySupport(d, e1, e2);
         }
 
-        if (epa_res.converged) {
-            //printf("EPA converged after %d iteration.\n", epa_res.iteration);
-            //epa_res.penetrationNormal.print("penVec = ");
-            //printf("penDepth = %.4f\n", epa_res.penetrationDepth);
+        /*gjk_res.simplex[1] = entitySupport( d, e1, e2);
+        gjk_res.simplex[0] = entitySupport(-d, e1, e2);
+        d = Vector::cross(gjk_res.simplex[0].P, gjk_res.simplex[1].P- gjk_res.simplex[0].P);
+        gjk_res.simplex[2] = entitySupport( d, e1, e2);
 
-            event.EPA_Converged = true;
-            event.distance = epa_res.penetrationDepth;
-            event.response = epa_res.penetrationNormal;
+        GJK_SupportPoint p;
+        d = planeNormal(gjk_res.simplex[0].P, gjk_res.simplex[1].P, gjk_res.simplex[2].P);
+        p = entitySupport(d, e1, e2);
+
+        while(gjk_iteration(&gjk_res, p, &d)) {
+            p = entitySupport(d, e1, e2);
+        }*/
+
+        event.intersect = gjk_res.hit;
+        event.GJK_Converged = gjk_res.converged;
+        event.distance = Vector::magnitude(gjk_res.result.P);
+        //printf("Distance: %.4f\n", event.distance);
+        event.response = Vector::normalized(gjk_res.result.P);
+
+        if (gjk_res.hit) {
+            printf("Intersecting. Continue to EPA\n");
+            // continue to EPA
+            EPA_Result epa_res;
+            EPA_Face face;
+            epa_seed(&epa_res, &gjk_res, &face);
+            p = entitySupport(face.normal, e1, e2);
+            while (epa_iteration(&epa_res, p, &face)) {
+                printf("  EPA Iteration: %d [%d]\n", epa_res.iteration, epa_res.simplex.numFaces);
+                d = face.normal;
+                p = entitySupport(d, e1, e2);
+            }
+
+            if (epa_res.converged) {
+                //printf("EPA converged after %d iteration.\n", epa_res.iteration);
+                //epa_res.penetrationNormal.print("penVec = ");
+                //printf("penDepth = %.4f\n", epa_res.penetrationDepth);
+
+                event.EPA_Converged = true;
+                event.distance = epa_res.penetrationDepth;
+                event.response = epa_res.penetrationNormal;
+            }
+
         }
 
+    } else {
+        event.intersect = false;
+        event.distance = boundingDist;
+        event.response = Vector::normalized(e1->position - e2->position);
+        event.GJK_Converged = true; //idk
+        event.EPA_Converged = true; //idk
+        printf("Not bothering with GJK (%.4f)\n", event.distance);
     }
 
     return event;

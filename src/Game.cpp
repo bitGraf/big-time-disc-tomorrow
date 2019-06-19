@@ -117,8 +117,9 @@ void initialize_game(GLFWwindow* window) {
     Resources::manager.loadTriMeshResource("sphere", ".ply");
     sphere1->mesh = Resources::manager.getTriMeshResource("sphere");
     sphere1->moveable = false; //static
+    sphere1->boundingRadius = 3.5f;
 
-    CollisionEntity* sphere3 = (CollisionEntity*)Entity::createNewEntity(ENT_Collision);
+    /*CollisionEntity* sphere3 = (CollisionEntity*)Entity::createNewEntity(ENT_Collision);
     sphere3->position = { 9, -1, 6 };
     sphere3->collisionHull = new SphereHull;
     ((SphereHull*)sphere3->collisionHull)->radius = 4;
@@ -127,15 +128,13 @@ void initialize_game(GLFWwindow* window) {
     sphere3->mesh = Resources::manager.getTriMeshResource("sphere");
     sphere3->moveable = false; //static
 
-    printf("%d collision entities\n", (int)Collision::manager.cEntList.size());
-
     CollisionEntity* sphere2 = (CollisionEntity*)Entity::createNewEntity(ENT_Collision);
     sphere2->position = {-6, -1, 4};
     sphere2->collisionHull = new SphereHull;
     ((SphereHull*)sphere2->collisionHull)->radius = 3;
     sphere2->mesh = Resources::manager.getTriMeshResource("sphere");
     sphere2->scale = {3,3,3};
-    sphere2->moveable = false;
+    sphere2->moveable = false;*/
 
     //test actor
     actor = (ActorEntity*)Entity::createNewEntity(ENT_Actor);
@@ -148,6 +147,7 @@ void initialize_game(GLFWwindow* window) {
     actor->amrMap = Resources::manager.getTextureResource("rustediron2_amr");
     actor->scale = {2,2,2};
     actor->moveable = true;
+    actor->boundingRadius = 2.5f;
 
     Entity::manager.Player->processInput = false;
     Entity::manager.Player->shouldRender = false;

@@ -35,6 +35,7 @@ struct CollisionEntity : public EntityBase {
     bool moveable = false;
     vec3 velocity;
     unsigned int collisionID;
+    float boundingRadius = 1.0f;
 
     void update(double dt) override;
 };

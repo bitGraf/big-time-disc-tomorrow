@@ -3,7 +3,7 @@
 
 #include "GJK.h"
 
-#define EPA_MAX_SIMPLEX_SIZE 50
+#define EPA_MAX_SIMPLEX_SIZE 100
 
 struct EPA_Face {
     float dotVal = 0;
@@ -42,7 +42,6 @@ struct EPA_Result {
 
 void epa_seed(EPA_Result* res, GJK_Result* seed, EPA_Face* face);
 int epa_iteration(EPA_Result* res, GJK_SupportPoint p, EPA_Face* face);
-vec3 EPA(GJK_Result* gjk_result);
 void createFaceFromVerts(EPA_Face* face, vec3 a, vec3 b, vec3 c);
 EPA_Face getClosestFace(EPA_Simplex* simplex);
 void createNewSimplex(EPA_Simplex* simplex, EPA_Face face, vec3 P);

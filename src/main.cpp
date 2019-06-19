@@ -1,11 +1,23 @@
 #include "Game.h"
 #include "Platform.h"
 
+#include "GJK.h"
+
 GLFWwindow* createWindow();
 
 char exe_location[MAX_PATH];
 
 int main(int argc, char** argv) {
+    /*vec3 O = {-8, -2, 0};
+
+    GJK_Result gjk_res;
+    vec3 d = { 1,2,3 };// e1->position - e2->position;
+    GJK_SupportPoint p;p.P = (Vector::normalized(d) * 6 + O);
+    while(gjk_iteration(&gjk_res, p, &d)) {
+        p.P = (Vector::normalized(d) * 6 + O);
+    }
+
+    return 0;*/
     /*
     CollisionEntity ent1;
     ent1.collisionHull = new SphereHull;

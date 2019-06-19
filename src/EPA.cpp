@@ -8,21 +8,21 @@ void epa_seed(EPA_Result* res, GJK_Result* seed, EPA_Face* face) {
     }
 
     createFaceFromVerts(&res->simplex.faces[0], //ABC
-        seed->simplex[0].P, seed->simplex[1].P, seed->simplex[2].P);
+        seed->simplex.a.P, seed->simplex.b.P, seed->simplex.c.P);
     createFaceFromVerts(&res->simplex.faces[1], //ABD
-        seed->simplex[0].P, seed->simplex[1].P, seed->simplex[3].P);
+        seed->simplex.a.P, seed->simplex.b.P, seed->simplex.d.P);
     createFaceFromVerts(&res->simplex.faces[2], //BCD
-        seed->simplex[1].P, seed->simplex[2].P, seed->simplex[3].P);
+        seed->simplex.b.P, seed->simplex.c.P, seed->simplex.d.P);
     createFaceFromVerts(&res->simplex.faces[3], //CAD
-        seed->simplex[2].P, seed->simplex[0].P, seed->simplex[3].P);
+        seed->simplex.c.P, seed->simplex.a.P, seed->simplex.d.P);
     res->simplex.numFaces = 4;
 
     *face = getClosestFace(&res->simplex);
 }
 
 int epa_iteration(EPA_Result* res, GJK_SupportPoint p, EPA_Face* face) {
-    float distanceFromPlane = Vector::dot(face->normal, p.P - face->center);
-    if (distanceFromPlane < .1) {
+    float distanceFromPlane = fabs(Vector::dot(face->normal, p.P - face->center));
+    if (distanceFromPlane < .25) {
         //converged to final solution
         res->converged = true;
         res->contactPoint = p;
@@ -40,54 +40,9 @@ int epa_iteration(EPA_Result* res, GJK_SupportPoint p, EPA_Face* face) {
     return 1;
 }
 
-vec3 EPA(GJK_Result* gjk_result) {
-    // temp placeholders
-    vec3 f1 = { 0,3,0 }; //r=4
-    vec3 f2 = { 3,5,0 }; //r=2
-
-    if (!gjk_result->hit) {
-        printf("Cannot perform EPA algorithm on a non-intersecting simplex.\n");
-        return { 0,0,0 };
-    }
-
-    EPA_Simplex simplex = { 0 };
-    createFaceFromVerts(&simplex.faces[0], //ABC
-        gjk_result->simplex[0].P, gjk_result->simplex[1].P, gjk_result->simplex[2].P);
-    createFaceFromVerts(&simplex.faces[1], //ABD
-        gjk_result->simplex[0].P, gjk_result->simplex[1].P, gjk_result->simplex[3].P);
-    createFaceFromVerts(&simplex.faces[2], //BCD
-        gjk_result->simplex[1].P, gjk_result->simplex[2].P, gjk_result->simplex[3].P);
-    createFaceFromVerts(&simplex.faces[3], //CAD
-        gjk_result->simplex[2].P, gjk_result->simplex[0].P, gjk_result->simplex[3].P);
-    simplex.numFaces = 4;
-
-    vec3 search_dir;
-
-    int iteration = 0, maxIterations = 30;
-    while (iteration < maxIterations) {
-        EPA_Face face = getClosestFace(&simplex);
-        search_dir = face.normal;
-        vec3 P = gjk_support(search_dir, f1, f2);
-
-        float distanceFromPlane = Vector::dot(face.normal, P - face.center);
-        if (distanceFromPlane < .1) {
-            break;
-        }
-
-        createNewSimplex(&simplex, face, P);
-
-        iteration++;
-    }
-    
-    vec3 P = gjk_support(search_dir, f1, f2);
-    float penDepth = Vector::magnitude(P);
-    vec3  penNormal = Vector::normalized(P);
-
-    return (penNormal * penDepth);
-}
 
 void createNewSimplex(EPA_Simplex* simplex, EPA_Face face, vec3 P) {
-    EPA_Edge edgeList[36];
+    EPA_Edge edgeList[100];
     //printf("%d faces\n", simplex->numFaces);
     int numEdges = getEdgeList(edgeList, simplex, face, P);
 
