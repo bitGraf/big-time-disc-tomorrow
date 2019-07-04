@@ -235,7 +235,7 @@ void Matrix::fromRoll(mat4* m, float x) {
 vec3 Matrix::transformVector(mat3* m, vec3* v) {
     vec3 ret;
 
-    ret = *v;
+    ret = (*m)*(*v);
 
     return ret;
 }

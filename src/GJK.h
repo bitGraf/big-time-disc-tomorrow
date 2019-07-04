@@ -1,42 +1,31 @@
-#ifndef GJK_H
-#define GJK_H
+#ifndef _GJK_H_
+#define _GJK_H_
 
-#define GJK_MAX_ITERATIONS 40
-#define GJK_FLT_MAX 1e30
+#include "Collider.h"
 
-#include "Vector.h"
-#include <math.h>
+#define GJK_MAX_ITERATIONS 64
 
-struct GJK_SupportPoint {
-    vec3 a; //point on shape 1
-    vec3 b; //point on shape 2
-    vec3 P; //point on Minkowski sum A-B
-    int aid;
-    int bid;
-};
+/**
+ * @brief Main GJK function
+ * 
+ * @param col1 Collider 1
+ * @param col2 Collider 2
+ * @param Output: mtv Minimum Translation Vector
+ * @return true Colliders are intersecting. mtv is valid
+ * @return false No intersection
+ */
+bool gjk(Collider* col1, Collider* col2, vec3* mtv=NULL);
 
-struct GJK_Struct {
-    //Working data
-    GJK_SupportPoint simplex[4];
-    float bc[4];
-    int cnt = 0;
-    float D;
+void update_simplex3(vec3 &a, vec3 &b, vec3 &c, vec3 &d, int &dim, vec3 &search_dir);
+bool update_simplex4(vec3 &a, vec3 &b, vec3 &c, vec3 &d, int &dim, vec3 &search_dir);
 
-    //Result
-    bool hit = false;
-
-    //Contact points
-    vec3 P0;
-    vec3 P1;
-    float distance;
-
-    //Convergence Criteria
-    int iteration = 0;
-};
-
-int gjk_iteration(GJK_Struct* res, GJK_SupportPoint p, vec3* search_dir, bool verbose = false);
-float f3box(vec3 a, vec3 b, vec3 c);
-void gjk_processResults(GJK_Struct* res);
-void gjk_processRadius(GJK_Struct* res, float r1, float r2);
+/**
+ * @brief Main EPA function. Should only run when colliders are interescting
+ * 
+ * @param a,b,c,d Simplex vertices - MUST enclose the origin, output of GJK algorithm
+ * @param col1,col2 Colliders
+ * @return vec3 minimum translation vector
+ */
+vec3 EPA(vec3 a, vec3 b, vec3 c, vec3 d, Collider* col1, Collider* col2);
 
 #endif

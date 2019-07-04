@@ -3,7 +3,7 @@
 #include "Vector.h"
 #include "Quaternion.h"
 
-struct mat4 {
+struct mat4 { //default to identity
     float a11=1, a21=0, a31=0, a41=0;
     float a12=0, a22=1, a32=0, a42=0;
     float a13=0, a23=0, a33=1, a43=0;

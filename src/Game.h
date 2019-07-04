@@ -52,8 +52,8 @@ enum GameStates {
     Inventory
 };
 
-//Test Actor
-static ActorEntity* actor = NULL;
+// Collision Test
+static ActorEntity* player;
 
 // Game State Manager
 static GLuint currentState = 0;

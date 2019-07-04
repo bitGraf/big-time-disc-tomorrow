@@ -1,5 +1,4 @@
 #include "Game.h"
-#include "CollisionDetection.h"
 
 void initialize_game(GLFWwindow* window) {
     // Load entities
@@ -106,53 +105,29 @@ void initialize_game(GLFWwindow* window) {
     // Initialize Input state
     //Input::init();
 
-    //Collision Entity test
-    printf("%d collision entities\n", (int)Collision::manager.cEntList.size());
+    //Collision testing
+    ActorEntity* box = (ActorEntity*)Entity::createNewEntity(ENT_Actor);
+    OBBCol* boxCollider = (OBBCol*)malloc(sizeof(OBBCol));
+    boxCollider->min = {-1,-1,-1};
+    boxCollider->max = { 1, 1, 1};
+    
+    box->collider = boxCollider;
+    box->collider->position = {0, 1, 0};
+    box->position = {0,1,0};
+    box->mesh = Resources::manager.getTriMeshResource("box");
 
-    CollisionEntity* sphere1 = (CollisionEntity*)Entity::createNewEntity(ENT_Collision);
-    sphere1->position = {0, 2, 15};
-    sphere1->collisionHull = new SphereHull;
-    sphere1->collisionHull->hullRadius = 3;
-    sphere1->scale = {3,3,3};
-    Resources::manager.loadTriMeshResource("sphere", ".ply");
-    sphere1->mesh = Resources::manager.getTriMeshResource("sphere");
-    sphere1->moveable = false; //static
-    sphere1->boundingRadius = 3.5f;
-
-    /*CollisionEntity* sphere3 = (CollisionEntity*)Entity::createNewEntity(ENT_Collision);
-    sphere3->position = { 9, -1, 6 };
-    sphere3->collisionHull = new SphereHull;
-    ((SphereHull*)sphere3->collisionHull)->radius = 4;
-    //((SphereHull*)sphere3->collisionHull)->halfHeight = 1;
-    sphere3->scale = {4,4,4};
-    sphere3->mesh = Resources::manager.getTriMeshResource("sphere");
-    sphere3->moveable = false; //static
-
-    CollisionEntity* sphere2 = (CollisionEntity*)Entity::createNewEntity(ENT_Collision);
-    sphere2->position = {-6, -1, 4};
-    sphere2->collisionHull = new SphereHull;
-    ((SphereHull*)sphere2->collisionHull)->radius = 3;
-    sphere2->mesh = Resources::manager.getTriMeshResource("sphere");
-    sphere2->scale = {3,3,3};
-    sphere2->moveable = false;*/
-
-    //test actor
-    actor = (ActorEntity*)Entity::createNewEntity(ENT_Actor);
-    actor->position = {0,1,-1};
-    actor->collisionHull = new SphereHull;
-    actor->collisionHull->hullRadius = 2;
-    actor->mesh = Resources::manager.getTriMeshResource("sphere");
-    actor->baseColor = Resources::manager.getTextureResource("rustediron2_basecolor");
-    actor->normalMap = Resources::manager.getTextureResource("rustediron2_normal");
-    actor->amrMap = Resources::manager.getTextureResource("rustediron2_amr");
-    actor->scale = {2,2,2};
-    actor->moveable = true;
-    actor->boundingRadius = 2.5f;
+    player = (ActorEntity*)Entity::createNewEntity(ENT_Actor);
+    CylinderCol* cylinderCollider = (CylinderCol*)malloc(sizeof(CapsuleCol));
+    cylinderCollider->y_base = 0;
+    cylinderCollider->y_cap  = 2;
+    cylinderCollider->r = 3;
+    player->collider = cylinderCollider;
+    player->mesh = Resources::manager.getTriMeshResource("bot");
+    player->position = {0, 5, 0};
+    player->collider->position = {0, 5, 0};
 
     Entity::manager.Player->processInput = false;
     Entity::manager.Player->shouldRender = false;
-
-    printf("%d collision entities\n", (int)Collision::manager.cEntList.size());
 }
 
 void run_game_loop(GLFWwindow* window) {
@@ -340,7 +315,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 void ProcessInput(GLFWwindow *window) {    
     Input::update(window);
 
-    if (Input::manager.move_forward.value > 0.5f) {
+    /*if (Input::manager.move_forward.value > 0.5f) {
         actor->command(am_MOVE_FORWARD);
     }
     if (Input::manager.move_left.value > 0.5f) {
@@ -354,7 +329,7 @@ void ProcessInput(GLFWwindow *window) {
     }
     if (Input::manager.move_jump.value > 0.5f) {
         actor->command(am_JUMP);
-    }
+    }*/
 }
 
 void handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int mods) {

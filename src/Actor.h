@@ -1,39 +1,24 @@
 #ifndef _ACTOR_H_
 #define _ACTOR_H_
 
-#include "CollisionDetection.h"
+#include "GJK.h"
+#include "Entity.h"
+#include "Utils.h"
 
-typedef unsigned char byte;
+/**
+ * @brief ActorEntity is an Entity that has collision associated with it.
+ * 
+ */
+struct ActorEntity : EntityBase {
+    Collider* collider; // collider interface
 
-enum ActorCommands {
-    am_NONE = 0,
-    am_MOVE_FORWARD = 1,
-    am_MOVE_BACKWARD = 2,
-    am_STRAFE_LEFT = 4,
-    am_STRAFE_RIGHT = 8,
-    am_ROTATE_RIGHT = 16,
-    am_ROTATE_LEFT = 32,
-    am_JUMP = 64
-};
-
-struct ActorEntity : public CollisionEntity {
-    byte commandFlag;
-
-    float groundFriction;
-    float acceleration;
-    float airAcceleration;
-    float maxSpeed;
-    float jumpPower;
-    float rotateSpeed;
-
-    bool grounded;
+    bool moveable;
 
     void onCreate() override;
     void update(double dt) override;
     void onDestroy() override;
 
-    void categorizeMovement();
-    void command(ActorCommands com);
+    bool testCollision(Collider* col, vec3* mtv = NULL, float* slope = NULL);
 };
 
 #endif

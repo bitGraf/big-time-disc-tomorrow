@@ -1,586 +1,247 @@
 #include "GJK.h"
 #include <assert.h>
 
-int gjk_iteration(GJK_Struct* res, GJK_SupportPoint p, vec3* search_dir, bool verbose) {
-    if (verbose) {
-        printf("\n\n***GJK iteration [%-2d]***\n", res->iteration);
-        search_dir->print("   Search direction: ");
-        p.P.print("   p = ");
-        p.a.print("    .a = ");
-        p.b.print("    .b = ");
-        printf("    aid = %d\n    bid = %d\n", p.aid, p.bid);
+/**
+ * Collider and GJK code based on (basically copied) kevinmoran on github
+ * https://github.com/kevinmoran/GJK
+ * modified to integrate into this project 
+ */
+
+bool gjk(Collider* col1, Collider* col2, vec3* mtv) {
+    vec3 a, b, c, d; // Simplex verts -> a is always most recent
+    vec3 search_dir = col1->position - col2->position; // Initial search direction
+
+    // Get initial simplex point
+    c = col2->support(search_dir) - col1->support(-search_dir);
+    search_dir = -c;
+
+    // Get second point
+    b = col2->support(search_dir) - col1->support(-search_dir);
+
+    if (Vector::dot(b, search_dir) < 0) { return false; } //didnt reach the origin, won't enclose it
+
+    // search perpendicular to line segment towards origin
+    search_dir = Vector::cross(Vector::cross(c-b,-b), c-b);
+    if (Vector::isZero(search_dir)) { //origin on line segment
+        // ? choose a normal search vector?
+        search_dir = Vector::cross(c-b,{1,0,0}); // ? normal with x-axis
+        if (Vector::isZero(search_dir)) search_dir = Vector::cross(c-b,{0,0,-1}); // ? normal with z-axis
     }
+    int simp_dim = 2; //2-simplex
 
-    if (res->iteration >= GJK_MAX_ITERATIONS) {
-        printf("Failed to converge after %d iterations.\n", res->iteration);
-    }
+    for (int iterations = 0; iterations < GJK_MAX_ITERATIONS; iterations++) {
+        printf("iteration: %d, simplex size: %d\n", iterations, simp_dim);
+        a = col2->support(search_dir) - col1->support(-search_dir);
+        if (Vector::dot(a, search_dir)<0) {return false;} //won't enclose the origin
 
-    /* Initialize */
-    if (res->cnt == 0) {
-        res->D = GJK_FLT_MAX;
-        res->hit = false;
-    }
-
-    /* Check for duplicates */
-    float dc = Vector::dot(*search_dir, p.P);
-    for (int i = 0; i < res->cnt; i++) {
-        //if (p.aid != res->simplex[i].aid) continue;
-        //if (p.bid != res->simplex[i].bid) continue;
-        float di = Vector::dot(*search_dir, res->simplex[i].P);
-        if (fabs(di-dc) > .01) continue;
-        if (verbose) printf("Duplicate found.\n");
-        return 0;
-    }
-
-    /* Add new point to simplex */
-    res->simplex[res->cnt] = p;
-    res->bc[res->cnt++] = 1.0f;
-
-    /* Find closest element of simplex */
-    switch(res->cnt) {
-        case 1: {
-            /* Point */
-            if (verbose) printf("   1 point in simplex\n    Taking point A\n");
-        } break;
-        case 2: {
-            /* Line Segment */
-            if (verbose) printf("   2 points in simplex\n");
-            vec3 a = res->simplex[0].P;
-            vec3 b = res->simplex[1].P;
-
-            float u = Vector::dot(b, b-a);
-            float v = Vector::dot(a, a-b);
-
-            if (v <= 0) {
-                /* Region A */
-                if (verbose) printf("    Taking point A\n");
-                res->bc[0] = 1.0f;
-                res->cnt = 1;
-                break;
-            }
-
-            if (u <= 0) {
-                /* Region B */
-                if (verbose) printf("    Taking point B\n");
-                res->simplex[0] = res->simplex[1];
-                res->bc[0] = 1.0f;
-                res->cnt = 1;
-                break;
-            }
-            /* Region AB */
-            if (verbose) printf("    Taking line AB\n");
-            res->bc[0] = u;
-            res->bc[1] = v;
-            res->cnt = 2;
-        } break;
-        case 3: {
-            /* Triangle */
-            if (verbose) printf("   3 Points in simplex\n");
-            vec3 a = res->simplex[0].P;
-            vec3 b = res->simplex[1].P;
-            vec3 c = res->simplex[2].P;
-
-            vec3 ab = a - b;
-            vec3 ba = b - a;
-            vec3 bc = b - c;
-            vec3 cb = c - b;
-            vec3 ca = c - a;
-            vec3 ac = a - c;
-
-            float u_ab = Vector::dot(b, ba);
-            float v_ab = Vector::dot(a, ab);
-
-            float u_bc = Vector::dot(c, cb);
-            float v_bc = Vector::dot(b, bc);
-
-            float u_ca = Vector::dot(a, ac);
-            float v_ca = Vector::dot(c, ca);
-
-            if (v_ab <= 0 && u_ca <= 0) {
-                /* Region A */
-                if (verbose) printf("    Taking point A\n");
-                res->bc[0] = 1.0f;
-                res->cnt = 1;
-                break;
-            }
-            if (u_ab <= 0 && v_bc <= 0) {
-                /* Region B */
-                if (verbose) printf("    Taking point B\n");
-                res->simplex[0] = res->simplex[1];
-                res->bc[0] = 1.0f;
-                res->cnt = 1;
-                break;
-            }
-
-            if (u_bc <= 0 && v_ca <= 0) {
-                /* Region C */
-                if (verbose) printf("    Taking point C\n");
-                res->simplex[0] = res->simplex[2];
-                res->bc[0] = 1.0f;
-                res->cnt = 1;
-                break;
-            }
-
-            /* Calculate fractional area */
-            vec3 n  = Vector::cross(ba, ca);
-            vec3 n1 = Vector::cross(b, c);
-            vec3 n2 = Vector::cross(c, a);
-            vec3 n3 = Vector::cross(a, b);
-
-            float u_abc = Vector::dot(n1, n);
-            float v_abc = Vector::dot(n2, n);
-            float w_abc = Vector::dot(n3, n);
-
-            if (u_ab > 0 && v_ab > 0 && w_abc <= 0) {
-                /* Region AB */
-                if (verbose) printf("    Taking line AB\n");
-                res->bc[0] = u_ab;
-                res->bc[1] = v_ab;
-                res->cnt = 2;
-                break;
-            }
-            if (u_bc > 0 && v_bc > 0 && u_abc <= 0) {
-                /* Region BC */
-                if (verbose) printf("    Taking line BC\n");
-                res->simplex[0] = res->simplex[1];
-                res->simplex[1] = res->simplex[2];
-                res->bc[0] = u_bc;
-                res->bc[1] = v_bc;
-                res->cnt = 2;
-                break;
-            }
-
-            if (u_ca > 0 && v_ca > 0 && v_abc <= 0) {
-                /* Region CA */
-                if (verbose) printf("    Taking line CA\n");
-                res->simplex[1] = res->simplex[0];
-                res->simplex[0] = res->simplex[2];
-                res->bc[0] = u_ca;
-                res->bc[1] = v_ca;
-                res->cnt = 2;
-                break;
-            }
-
-            /* Region ABC */
-            if (verbose) printf("    Taking triangle ABC\n");
-            if (!(u_abc > 0.0f && v_abc > 0.0f && w_abc > 0.0f)) printf("Wuh oh\n");
-            res->bc[0] = u_abc;
-            res->bc[1] = v_abc;
-            res->bc[2] = w_abc;
-            res->cnt = 3;
-        } break;
-        case 4: {
-            /* Tetrahedron */
-            if (verbose) printf("   4 Points in simplex\n");
-            vec3 a = res->simplex[0].P;
-            vec3 b = res->simplex[1].P;
-            vec3 c = res->simplex[2].P;
-            vec3 d = res->simplex[3].P;
-
-            float u_ab = Vector::dot(b, b-a);
-            float v_ab = Vector::dot(a, a-b);
-
-            float u_bc = Vector::dot(c, c-b);
-            float v_bc = Vector::dot(b, b-c);
-
-            float u_ca = Vector::dot(a, a-c);
-            float v_ca = Vector::dot(c, c-a);
-
-            float u_dc = Vector::dot(c, c-d);
-            float v_dc = Vector::dot(d, d-c);
-
-            float u_bd = Vector::dot(d, d-b);
-            float v_bd = Vector::dot(b, b-d);
-
-            float u_ad = Vector::dot(d, d-a);
-            float v_ad = Vector::dot(a, a-d);
-
-            /* Check vertices as closest point */
-            if (v_ab <= 0 && u_ca <= 0 && v_ad <= 0) {
-                /* Region A */
-                if (verbose) printf("    Taking point A\n");
-                res->bc[0] = 1.0f;
-                res->cnt = 1;
-                break;
-            }
-
-            if (u_ab <= 0 && v_bc <= 0 && v_bd <= 0) {
-                /* Region B */
-                if (verbose) printf("    Taking point B\n");
-                res->simplex[0] = res->simplex[1];
-                res->bc[0] = 1.0f;
-                res->cnt = 1;
-                break;
-            }
-
-            if (u_bc <= 0 && v_ca <= 0 && u_dc <= 0) {
-                /* Region C */
-                if (verbose) printf("    Taking point C\n");
-                res->simplex[0] = res->simplex[2];
-                res->bc[0] = 1.0f;
-                res->cnt = 1;
-                break;
-            }
-
-            if (u_bd <= 0 && v_dc <= 0 && u_ad <= 0) {
-                /* Region D */
-                if (verbose) printf("    Taking point D\n");
-                res->simplex[0] = res->simplex[3];
-                res->bc[0] = 1.0f;
-                res->cnt = 1;
-                break;
-            }
-
-            /* calculate fractional area */
-
-            vec3 n  = Vector::cross(d-a, b-a);
-            vec3 n1 = Vector::cross(d, b);
-            vec3 n2 = Vector::cross(b, a);
-            vec3 n3 = Vector::cross(a, d);
-
-            float u_adb = Vector::dot(n1, n);
-            float v_adb = Vector::dot(n2, n);
-            float w_adb = Vector::dot(n3, n);
-
-            n  = Vector::cross(c-a, d-a);
-            n1 = Vector::cross(c, d);
-            n2 = Vector::cross(d, a);
-            n3 = Vector::cross(a, c);
-
-            float u_acd = Vector::dot(n1, n);
-            float v_acd = Vector::dot(n2, n);
-            float w_acd = Vector::dot(n3, n);
-
-            n  = Vector::cross(b-c, d-c);
-            n1 = Vector::cross(b, d);
-            n2 = Vector::cross(d, c);
-            n3 = Vector::cross(c, b);
-
-            float u_cbd = Vector::dot(n1, n);
-            float v_cbd = Vector::dot(n2, n);
-            float w_cbd = Vector::dot(n3, n);
-
-            n  = Vector::cross(b-a, c-a);
-            n1 = Vector::cross(b, c);
-            n2 = Vector::cross(c, a);
-            n3 = Vector::cross(a, b);
-
-            float u_abc = Vector::dot(n1, n);
-            float v_abc = Vector::dot(n2, n);
-            float w_abc = Vector::dot(n3, n);
-
-            /* Check edges for closest edge */
-            if (w_abc <= 0 && v_adb <= 0 && u_ab > 0 && v_ab > 0) {
-                /* Region AB */
-                if (verbose) printf("    Taking line AB\n");
-                res->bc[0] = u_ab;
-                res->bc[1] = v_ab;
-                res->cnt = 2;
-                break;
-            }
-
-            if (u_abc <= 0 && w_cbd <= 0 && u_bc > 0 && v_bc > 0) {
-                /* Region BC */
-                if (verbose) printf("    Taking line BC\n");
-                res->simplex[0] = res->simplex[1];
-                res->simplex[1] = res->simplex[2];
-                res->bc[0] = u_bc;
-                res->bc[1] = v_bc;
-                res->cnt = 2;
-                break;
-            }
-
-            if (v_abc <= 0 && w_acd <= 0 && u_ca > 0 && v_ca > 0) {
-                /* Region CA */
-                if (verbose) printf("    Taking line CA\n");
-                res->simplex[1] = res->simplex[0];
-                res->simplex[0] = res->simplex[2];
-                res->bc[0] = u_ca;
-                res->bc[1] = v_ca;
-                res->cnt = 2;
-                break;
-            }
-
-            if (v_cbd <= 0 && u_acd <= 0 && u_dc > 0 && v_dc > 0) {
-                /* Region DC */
-                if (verbose) printf("    Taking line DC\n");
-                res->simplex[0] = res->simplex[3];
-                res->simplex[1] = res->simplex[2];
-                res->bc[0] = u_dc;
-                res->bc[1] = v_dc;
-                res->cnt = 2;
-                break;
-            }
-
-            if (v_acd <= 0 && w_adb <= 0 && u_ad > 0 && v_ad > 0) {
-                /* Region AD */
-                if (verbose) printf("    Taking line AD\n");
-                res->simplex[1] = res->simplex[3];
-                res->bc[0] = u_ad;
-                res->bc[1] = v_ad;
-                res->cnt = 2;
-                break;
-            }
-
-            if (u_cbd <= 0 && u_adb <= 0 && u_bd > 0 && v_bd > 0) {
-                /* Region BD */
-                if (verbose) printf("    Taking line BD\n");
-                res->simplex[0] = res->simplex[1];
-                res->simplex[1] = res->simplex[3];
-                res->bc[0] = u_bd;
-                res->bc[1] = v_bd;
-                res->cnt = 2;
-                break;
-            }
-
-            /* calculate fractional volume (can be negative) */
-            float denom = f3box(c-b, a-b, d-b);
-            float volume = (denom == 0) ? 1.0f: 1.0f/denom;
-            float u_abcd = f3box(c, d, b) * volume;
-            float v_abcd = f3box(c, a, d) * volume;
-            float w_abcd = f3box(d, a, b) * volume;
-            float x_abcd = f3box(b, a, c) * volume;
-
-            /* check faces for closest point */
-            if (x_abcd <= 0 && u_abc > 0 && v_abc > 0 && w_abc > 0) {
-                /* Region ABC */
-                if (verbose) printf("    Taking triangle ABC\n");
-                res->bc[0] = u_abc;
-                res->bc[1] = v_abc;
-                res->bc[2] = w_abc;
-                res->cnt = 3;
-                break;
-            }
-            if (u_abcd <= 0 && u_cbd > 0 && v_cbd > 0 && w_cbd > 0) {
-                /* Region CBD */
-                if (verbose) printf("    Taking triangle CBD\n");
-                res->simplex[0] = res->simplex[2];
-                res->simplex[2] = res->simplex[3];
-                res->bc[0] = u_cbd;
-                res->bc[1] = v_cbd;
-                res->bc[2] = w_cbd;
-                res->cnt = 3;
-                break;
-            }
-            if (v_abcd <= 0 && u_acd > 0 && v_acd > 0 && w_acd > 0) {
-                /* Region ACD */
-                if (verbose) printf("    Taking triangle ACD\n");
-                res->simplex[1] = res->simplex[2];
-                res->simplex[2] = res->simplex[3];
-                res->bc[0] = u_acd;
-                res->bc[1] = v_acd;
-                res->bc[2] = w_acd;
-                res->cnt = 3;
-                break;
-            }
-            if (w_abcd <= 0 && u_adb > 0 && v_adb > 0 && w_adb > 0) {
-                /* Region ADB */
-                if (verbose) printf("    Taking triangle ADB\n");
-                res->simplex[2] = res->simplex[1];
-                res->simplex[1] = res->simplex[3];
-                res->bc[0] = u_adb;
-                res->bc[1] = v_adb;
-                res->bc[2] = w_adb;
-                res->cnt = 3;
-                break;
-            }
-            /* Region ABCD */
-            if (verbose) printf("    Taking tetrahedron ABCD\n");
-            res->bc[0] = u_abcd;
-            res->bc[1] = v_abcd;
-            res->bc[2] = w_abcd;
-            res->bc[3] = x_abcd;
-            res->cnt = 4;
-        } break;
-    }
-
-    /* check if origin is contained */
-    if (res->cnt == 4) {
-        res->hit = true;
-        printf("Origin contained.\n");
-        return 0;
-    }
-
-    /* Ensure closing in on origin */
-    vec3 pnt;
-    float denom = 0;
-    for (int i = 0; i < res->cnt; ++i) {
-        denom += res->bc[i];
-    }
-    denom = 1.0f/denom;
-    switch(res->cnt) {
-        case 1: {
-            /* Single point */
-            pnt = res->simplex[0].P;
-        } break;
-        case 2: {
-            /* Line Segment */
-            vec3 a = res->simplex[0].P*denom*res->bc[0];
-            vec3 b = res->simplex[1].P*denom*res->bc[1];
-            pnt = a + b;
-        } break;
-        case 3: {
-            /* Triangle */
-            vec3 a = res->simplex[0].P*denom*res->bc[0];
-            vec3 b = res->simplex[1].P*denom*res->bc[1];
-            vec3 c = res->simplex[2].P*denom*res->bc[2];
-            pnt = a + b + c;
-        } break;
-        case 4: {
-            /* Tetrahedron */
-            printf("Pretty cringe tbh...\n");
-            vec3 a = res->simplex[0].P*denom*res->bc[0];
-            vec3 b = res->simplex[1].P*denom*res->bc[1];
-            vec3 c = res->simplex[2].P*denom*res->bc[2];
-            vec3 d = res->simplex[3].P*denom*res->bc[3];
-            pnt = a + b + c + d;
-        } break;
-    }
-
-    float d2 = Vector::dot(pnt, pnt);
-    if (d2 >= res->D) {
-        printf("Leaving the origin?\n");
-        //return 0;
-    }
-    res->D = d2;
-
-    /* Find new search direction */
-    switch(res->cnt) {
-        case 1: {
-            /* Point */
-            if (verbose) printf("point\n    Taking opposite of point\n");
-            *search_dir = -res->simplex[0].P;
-        } break;
-        case 2: {
-            /* Line Segment */
-            if (verbose) printf("line\n    Taking normal to line\n");
-            vec3 ba = res->simplex[1].P-res->simplex[0].P;
-            vec3 t = Vector::cross(ba, -res->simplex[1].P);
-            *search_dir = Vector::cross(t, ba);
-        } break;
-        case 3: {
-            /* Triangle */
-            if (verbose) printf("triangle\n    Taking normal to triangle\n");
-            vec3 ab = res->simplex[1].P - res->simplex[0].P;
-            vec3 ac = res->simplex[2].P - res->simplex[0].P;
-            vec3 n = Vector::cross(ab, ac);
-            if (Vector::dot(n, res->simplex[0].P) <= 0)
-                *search_dir = n;
-            else
-                *search_dir = -n;
-        } break;
-        default:
-            // ! This should never occur...
-            break;
-    }
-
-    vec3 nd = *search_dir;
-    if (verbose) nd.print("    New search direction: ");
-    if (Vector::dot(nd, nd) < ((1e-7)*(1e-7))) {
-        /* Both shapes are just touching */
-        res->hit = true;
-        printf("Shapes are touching\n");
-        return 0;
-    }
-
-    res->iteration++;
-    return 1;
+        simp_dim++;
+        if (simp_dim == 3) {
+            update_simplex3(a,b,c,d,simp_dim,search_dir);
+        } else if (update_simplex4(a,b,c,d,simp_dim,search_dir)) {
+            if (mtv) *mtv = EPA(a,b,c,d,col1,col2);
+            return true;
+        }
+    } // ! failed to converge in max number of iterations?
+    return false;
 }
 
-float f3box(vec3 a, vec3 b, vec3 c) {
-    vec3 n = Vector::cross(a, b);
-    return Vector::dot(n, c);
+// Triangle simplex
+void update_simplex3(vec3 &a, vec3 &b, vec3 &c, vec3 &d, int &dim, vec3 &search_dir) {
+    vec3 n = Vector::cross(b-a, c-a);
+    vec3 AO = -a;
+
+    dim = 2;
+    if (Vector::dot(Vector::cross(b-a, n), AO)>0) {
+        /* Take Edge AB */
+        c = a;
+        search_dir = Vector::cross(Vector::cross(b-a, AO), b-a);
+        return;
+    }
+    if (Vector::dot(Vector::cross(n, c-a), AO)>0) {
+        /* Take Edge AC */
+        b = a;
+        search_dir = Vector::cross(Vector::cross(c-a, AO), c-a);
+        return;
+    }
+
+    dim = 3;
+    /* Take triangle ABC */
+    if (Vector::dot(n, AO)>0) {
+        /* Above triangle */
+        d = c;
+        c = b;
+        b = a;
+        search_dir = n;
+        return;
+    }
+
+    /* Below triangle */
+    d = b;
+    b = a;
+    search_dir = -n;
+    return;
 }
 
-void gjk_processResults(GJK_Struct* res) {
-    /* calculate normalization denominator */
-    float denom = 0;
-    for (int i = 0; i < res->cnt; i++) {
-        denom += res->bc[i];
+// Tetrahedron simplex
+bool update_simplex4(vec3 &a, vec3 &b, vec3 &c, vec3 &d, int &simp_dim, vec3 &search_dir){
+    // Get normals of three faces
+    vec3 ABC = Vector::cross(b-a,c-a);
+    vec3 ACD = Vector::cross(c-a,d-a);
+    vec3 ADB = Vector::cross(d-a,b-a);
+
+    vec3 AO = -a;
+    simp_dim = 3;
+
+    ABC.print("ABC: ");
+    ACD.print("ACD: ");
+    ADB.print("ADB: ");
+
+    AO.print("AO: ");
+
+    printf("ABD dot AO: %f\n", Vector::dot(ABC, AO));
+    printf("ACD dot AO: %f\n", Vector::dot(ACD, AO));
+    printf("ADB dot AO: %f\n", Vector::dot(ADB, AO));
+
+    if (Vector::dot(ABC, AO)>0) {
+        d = c;
+        c = b;
+        b = a;
+        search_dir = ABC;
+        return false;
     }
-    denom = 1.0f / denom;
-
-    /* Find closest points */
-    switch(res->cnt) {
-        case 1: {
-            /* Single point */
-            res->P0 = res->simplex[0].a;
-            res->P1 = res->simplex[0].b;
-        } break;
-        case 2: {
-            /* Line segment */
-            float as = denom * res->bc[0];
-            float bs = denom * res->bc[1];
-
-            vec3 a = res->simplex[0].a * as;
-            vec3 b = res->simplex[1].a * bs;
-
-            vec3 c = res->simplex[0].b * as;
-            vec3 d = res->simplex[1].b * bs;
-
-            res->P0 = a + b;
-            res->P1 = c + d;
-        } break;
-        case 3: {
-            /* Triangle */
-            float as = denom * res->bc[0];
-            float bs = denom * res->bc[1];
-            float cs = denom * res->bc[2];
-
-            vec3 a = res->simplex[0].a * as;
-            vec3 b = res->simplex[1].a * bs;
-            vec3 c = res->simplex[2].a * cs;
-
-            vec3 d = res->simplex[0].b * as;
-            vec3 e = res->simplex[1].b * bs;
-            vec3 f = res->simplex[2].b * cs;
-
-            res->P0 = a + b + c;
-            res->P1 = d + e + f;
-        } break;
-        case 4: {
-            vec3 a = res->simplex[0].a*(denom*res->bc[0]);
-            vec3 b = res->simplex[1].a*(denom*res->bc[1]);
-            vec3 c = res->simplex[2].a*(denom*res->bc[2]);
-            vec3 d = res->simplex[3].a*(denom*res->bc[3]);
-
-            res->P0 = a + b + c + d;
-            res->P1 = res->P0;
-        } break;
+    if (Vector::dot(ACD, AO)>0) {
+        b = a;
+        search_dir = ACD;
+        return false;
     }
-    /* If not hit, find distance */
-    if (!res->hit) {
-        vec3 d = res->P1 - res->P0;
-        res->distance = sqrt(Vector::dot(d,d));
-    } else {
-        res->distance = 0;
+    if (Vector::dot(ADB, AO)>0) {
+        c = d;
+        d = b;
+        b = a;
+        search_dir = ADB;
+        return false;
     }
+
+    return true;
 }
 
-void gjk_processRadius(GJK_Struct* res, float r1, float r2) {
-    float combinedRadius = r1 + r2;
-    float signedDistance = res->distance;
-    if (signedDistance > combinedRadius) {
-        signedDistance -= combinedRadius; //the distance between the expanded points
+// EPA Algorithm
+#define EPA_TOLERANCE 0.01
+#define EPA_MAX_NUM_FACES 128
+#define EPA_MAX_NUM_LOOSE_EDGES 32
+#define EPA_MAX_NUM_ITERATIONS 64
+vec3 EPA(vec3 a, vec3 b, vec3 c, vec3 d, Collider* col1, Collider* col2) {
+    vec3 faces[EPA_MAX_NUM_FACES][4]; //Array of faces, each with 3 verts and a normal
 
-        res->distance = signedDistance;
+    //Init with final simplex from GJK
+    faces[0][0] = a;
+    faces[0][1] = b;
+    faces[0][2] = c;
+    faces[0][3] = Vector::normalized(Vector::cross(b-a, c-a)); //ABC
+    faces[1][0] = a;
+    faces[1][1] = c;
+    faces[1][2] = d;
+    faces[1][3] = Vector::normalized(Vector::cross(c-a, d-a)); //ACD
+    faces[2][0] = a;
+    faces[2][1] = d;
+    faces[2][2] = b;
+    faces[2][3] = Vector::normalized(Vector::cross(d-a, b-a)); //ADB
+    faces[3][0] = b;
+    faces[3][1] = d;
+    faces[3][2] = c;
+    faces[3][3] = Vector::normalized(Vector::cross(d-b, c-b)); //BDC
 
-        /* calculate normal */
-        vec3 n = res->P1 - res->P0;
-        Vector::normalize(n);
+    int num_faces = 4;
+    int closest_face;
 
-        vec3 da = n*r1;
-        vec3 db = n*r2;
+    for (int iterations = 0; iterations < EPA_MAX_NUM_ITERATIONS; iterations++) {
+        // Find closest face
+        float min_dist = Vector::dot(faces[0][0], faces[0][3]);
+        closest_face = 0;
+        for (int i = 1; i < num_faces; i++) {
+            float dist = Vector::dot(faces[i][0], faces[i][3]);
+            if (dist < min_dist) {
+                min_dist = dist;
+                closest_face = i;
+            }
+        }
 
-        /* New collision points */
-        res->P0 = res->P0 + da;
-        res->P1 = res->P1 - db;
-    } else {
-        vec3 p1 = res->P0;
-        vec3 p2 = res->P1;
-        res->P0 = p2*(r1/(r1+r2)) + p1*(r2/(r1+r2));
-        res->P1 = res->P0;
-        res->distance = 0;
-        res->hit = true;
-    }
+        // Search normal to closest face
+        vec3 search_dir = faces[closest_face][3];
+        vec3 p = col2->support(search_dir) - col1->support(-search_dir);
+
+        if (Vector::dot(p, search_dir)-min_dist < EPA_TOLERANCE) {
+            // solution has converged
+            return faces[closest_face][3]*Vector::dot(p, search_dir);
+        }
+
+        vec3 loose_edges[EPA_MAX_NUM_LOOSE_EDGES][2]; //edges we need to fix after ripping a face
+        int num_loose_edges = 0;
+
+        // Find all tris that can 'see' p
+        for (int i = 0; i < num_faces; i++) {
+            if (Vector::dot(faces[i][3], p-faces[i][0]) >0) { //triangle i can see p, remove it
+                //add renived truabgkes edges to loose edge list
+                // if its already there, remove it
+                for (int j = 0; j < 3; j++) {
+                    vec3 current_edge[2] = {faces[i][j], faces[i][(j+1)%3]};
+                    bool found_edge = false;
+                    for (int k = 0; k < num_loose_edges; k++) {
+                        if (Vector::isZero(loose_edges[k][1] - current_edge[0]) &&
+                            Vector::isZero(loose_edges[k][0] - current_edge[1])) {
+                            loose_edges[k][0] = loose_edges[num_loose_edges-1][0];
+                            loose_edges[k][1] = loose_edges[num_loose_edges-1][1];
+                            num_loose_edges--;
+                            found_edge = true;
+                            k = num_loose_edges; //exit loop early
+                        }
+                    }//endfor loose_edges
+
+                    if (!found_edge) {
+                        assert(num_loose_edges < EPA_MAX_NUM_LOOSE_EDGES);
+                        if (num_loose_edges >= EPA_MAX_NUM_LOOSE_EDGES) break;
+                        loose_edges[num_loose_edges][0] = current_edge[0];
+                        loose_edges[num_loose_edges][1] = current_edge[1];
+                        num_loose_edges++;
+                    }
+                }
+                
+                // remove triangle i from list
+                faces[i][0] = faces[num_faces-1][0];
+                faces[i][1] = faces[num_faces-1][1];
+                faces[i][2] = faces[num_faces-1][2];
+                faces[i][3] = faces[num_faces-1][3];
+                num_faces--;
+                i--;
+            }//endid p can see triangle i
+        }//endfor num_faces
+
+        //Reconstruct polytope with p added
+        for (int i = 0; i < num_loose_edges; i++) {
+            if (num_faces >= EPA_MAX_NUM_FACES) {
+                printf("num_faces: %d\n", num_faces);
+                for (int cface = 0; cface < num_faces; cface++) {
+                    printf("%d: %f\n", cface, Vector::dot(faces[cface][3], faces[cface][0]));
+                }
+            }
+            assert(num_faces < EPA_MAX_NUM_FACES);
+            if (num_faces >= EPA_MAX_NUM_FACES) break;
+            faces[num_faces][0] = loose_edges[i][0];
+            faces[num_faces][1] = loose_edges[i][1];
+            faces[num_faces][2] = p;
+            faces[num_faces][3] = Vector::normalized(Vector::cross(loose_edges[i][0] - loose_edges[i][1], loose_edges[i][0]-p));
+
+            //check for wrong normal to maintain CCW winding
+            float bias = .000001;
+            if (Vector::dot(faces[num_faces][0], faces[num_faces][3]) + bias < 0) {
+                vec3 temp = faces[num_faces][0];
+                faces[num_faces][0] = faces[num_faces][1];
+                faces[num_faces][1] = temp;
+                faces[num_faces][3] = -faces[num_faces][3];
+            }
+            num_faces++;
+        }
+    } //Endfor iterations
+    printf("EPA did not converge\n");
+    return faces[closest_face][3] * Vector::dot(faces[closest_face][0], faces[closest_face][3]);
 }

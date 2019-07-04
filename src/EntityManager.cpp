@@ -113,12 +113,6 @@ void Entity::handleInputEvent(GLFWwindow* window, int key, int scancode, int act
         Entity::pruneEntities();
     }
 
-    if ((key == GLFW_KEY_L) && (action == GLFW_PRESS)) {
-        printf("Performing collision tests\n");
-
-        Collision::Update();
-    }
-
     if ((key == GLFW_KEY_M) && (action == GLFW_PRESS)) {
         printf("Toggling player control\n");
 
@@ -307,13 +301,9 @@ int Entity::registerEntity(EntityTypes type) {
             manager.pointerList[manager.numEntries] = new AIEnt;
             //printf("Adding new EntityAI\n");
         } break;
-        case ENT_Collision: {
-            manager.pointerList[manager.numEntries] = new CollisionEntity;
-            Collision::track(manager.pointerList[manager.numEntries]);
-        } break;
         case ENT_Actor: {
             manager.pointerList[manager.numEntries] = new ActorEntity;
-            Collision::track(manager.pointerList[manager.numEntries]);
+            //printf("Adding new EntityAI\n");
         } break;
         default: {
             manager.pointerList[manager.numEntries] = new EntityBase;
