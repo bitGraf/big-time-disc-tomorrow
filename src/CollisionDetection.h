@@ -6,28 +6,29 @@
 #include "EPA.h"
 
 #include <vector>
+#include <assert.h>
 
 struct ConvexHull {
-    virtual vec3 supportPoint(vec3 d) { return {0,0,0};}
+    float hullRadius = 0.0f;
+    virtual int supportPoint(vec3 d, vec3* p) { assert(0);return 0;}
+    virtual void cleanup() {}
 };
 
 struct SphereHull : public ConvexHull {
-    float radius = 0;
-
-    vec3 supportPoint(vec3 d) override;
+    int supportPoint(vec3 d, vec3* p) override;
 };
 
 struct PolyHull : public ConvexHull {
     vec3* vertices = NULL;
     int numVerts = 0;
 
-    vec3 supportPoint(vec3 d) override;
+    int supportPoint(vec3 d, vec3* p) override;
+    void cleanup() override;
 };
 
-struct CylinderHull : public ConvexHull {
-    float radius, halfHeight;
-
-    vec3 supportPoint(vec3 d) override;
+struct CapsuleHull : public ConvexHull {
+    vec3 va, vb;
+    int supportPoint(vec3 d, vec3* p) override;
 };
 
 struct CollisionEntity : public EntityBase {
@@ -44,15 +45,13 @@ struct CollisionEvent {
     CollisionEntity* entity1 = NULL;
     CollisionEntity* entity2 = NULL;
 
-    bool GJK_Converged = false;
-    bool EPA_Converged = false;
-
     bool intersect = false;
     //If not intersecting, distance apart. 
     //If intersecting, penetration depth.
     float distance = 0;
     //if intersecting, penetration normal.
-    vec3 response;
+    vec3 P0;
+    vec3 P1;
 };
 
 struct CollisionManager {

@@ -1,17 +1,31 @@
-#include "GJK.h"
+#include "gjk.h"
 #include <assert.h>
 
 #define GJK_FLT_MAX 3.40282347E+28F
 #define GJK_EPSILON 1.19209290E-07F
 
 static const float f3z[3];
+#define fop(r,e,a,p,b,i,s) (r) e ((a) p (b)) i (s)
+#define f3op(r,e,a,p,b,i,s) do {\
+    fop((r)[0],e,(a)[0],p,(b)[0],i,s),\
+    fop((r)[1],e,(a)[1],p,(b)[1],i,s),\
+    fop((r)[2],e,(a)[2],p,(b)[2],i,s);}while(0)
+#define f3cpy(d,s) (d)[0]=(s)[0],(d)[1]=(s)[1],(d)[2]=(s)[2]
+#define f3add(d,a,b) f3op(d,=,a,+,b,+,0)
+#define f3sub(d,a,b) f3op(d,=,a,-,b,+,0)
+#define f3mul(d,a,s) f3op(d,=,a,+,f3z,*,s)
+#define f3dot(a,b) ((a)[0]*(b)[0]+(a)[1]*(b)[1]+(a)[2]*(b)[2])
+#define f3cross(d,a,b) do {\
+    (d)[0] = ((a)[1]*(b)[2]) - ((a)[2]*(b)[1]),\
+    (d)[1] = ((a)[2]*(b)[0]) - ((a)[0]*(b)[2]),\
+    (d)[2] = ((a)[0]*(b)[1]) - ((a)[1]*(b)[0]);}while(0)
 
 static inline float
-f3box(const vec3 a, const vec3 b, const vec3 c)
+f3box(const float *a, const float *b, const float *c)
 {
-    vec3 n;
-    n = Vector::cross(a, b);
-    return Vector::dot(n, c);
+    float n[3];
+    f3cross(n, a, b);
+    return f3dot(n, c);
 }
 static float
 inv_sqrt(float n)
@@ -22,7 +36,7 @@ inv_sqrt(float n)
     return conv.f;
 }
 extern int
-gjk(struct gjk_simplex *s, const struct gjk_support *sup, vec3 *dv)
+gjk(struct gjk_simplex *s, const struct gjk_support *sup, float *dv)
 {
     assert(s);
     assert(dv);
@@ -40,13 +54,14 @@ gjk(struct gjk_simplex *s, const struct gjk_support *sup, vec3 *dv)
     for (int i = 0; i < s->cnt; ++i) {
         if (sup->aid != s->v[i].aid) continue;
         if (sup->bid != s->v[i].bid) continue;
+        printf("Dupe found.\n");
         return 0;
     }
     /* III.) Add vertex into simplex */
-    gjk_vertex *vert = &(s->v[s->cnt]);
-    vert->a = sup->a;
-    vert->b = sup->b;
-    vert->p = *dv;
+    struct gjk_vertex *vert = &s->v[s->cnt];
+    f3cpy(vert->a, sup->a);
+    f3cpy(vert->b, sup->b);
+    f3cpy(vert->p, dv);
     vert->aid = sup->aid;
     vert->bid = sup->bid;
     s->bc[s->cnt++] = 1.0f;
@@ -56,15 +71,15 @@ gjk(struct gjk_simplex *s, const struct gjk_support *sup, vec3 *dv)
     case 1: break;
     case 2: {
         /* -------------------- Line ----------------------- */
-        vec3 a = s->v[0].p;
-        vec3 b = s->v[1].p;
+        float a[3]; f3cpy(a, s->v[0].p);
+        float b[3]; f3cpy(b, s->v[1].p);
 
         /* compute barycentric coordinates */
-        vec3 ab = a - b;
-        vec3 ba = b - a;
+        float ab[3]; f3sub(ab, a, b);
+        float ba[3]; f3sub(ba, b, a);
 
-        float u = Vector::dot(b, ba);
-        float v = Vector::dot(a, ab);
+        float u = f3dot(b, ba);
+        float v = f3dot(a, ab);
         if (v <= 0.0f) {
             /* region A */
             s->bc[0] = 1.0f;
@@ -85,26 +100,26 @@ gjk(struct gjk_simplex *s, const struct gjk_support *sup, vec3 *dv)
     } break;
     case 3: {
         /* -------------------- Triangle ----------------------- */
-        vec3 a = s->v[0].p;
-        vec3 b = s->v[1].p;
-        vec3 c = s->v[2].p;
+        float a[3]; f3cpy(a, s->v[0].p);
+        float b[3]; f3cpy(b, s->v[1].p);
+        float c[3]; f3cpy(c, s->v[2].p);
 
-        vec3 ab = a - b;
-        vec3 ba = b - a;
-        vec3 bc = b - c;
-        vec3 cb = c - b;
-        vec3 ca = c - a;
-        vec3 ac = a - c;
+        float ab[3]; f3sub(ab, a, b);
+        float ba[3]; f3sub(ba, b, a);
+        float bc[3]; f3sub(bc, b, c);
+        float cb[3]; f3sub(cb, c, b);
+        float ca[3]; f3sub(ca, c, a);
+        float ac[3]; f3sub(ac, a, c);
 
         /* compute barycentric coordinates */
-        float u_ab = Vector::dot(b, ba);
-        float v_ab = Vector::dot(a, ab);
+        float u_ab = f3dot(b, ba);
+        float v_ab = f3dot(a, ab);
 
-        float u_bc = Vector::dot(c, cb);
-        float v_bc = Vector::dot(b, bc);
+        float u_bc = f3dot(c, cb);
+        float v_bc = f3dot(b, bc);
 
-        float u_ca = Vector::dot(a, ac);
-        float v_ca = Vector::dot(c, ca);
+        float u_ca = f3dot(a, ac);
+        float v_ca = f3dot(c, ca);
 
         if (v_ab <= 0.0f && u_ca <= 0.0f) {
             /* region A */
@@ -127,14 +142,14 @@ gjk(struct gjk_simplex *s, const struct gjk_support *sup, vec3 *dv)
             break;
         }
         /* calculate fractional area */
-        vec3  n = Vector::cross(ba, ca);
-        vec3 n1 = Vector::cross(b, c);
-        vec3 n2 = Vector::cross(c, a);
-        vec3 n3 = Vector::cross(a, b);
+        float n[3]; f3cross(n, ba, ca);
+        float n1[3]; f3cross(n1, b, c);
+        float n2[3]; f3cross(n2, c, a);
+        float n3[3]; f3cross(n3, a, b);
 
-        float u_abc = Vector::dot(n1, n);
-        float v_abc = Vector::dot(n2, n);
-        float w_abc = Vector::dot(n3, n);
+        float u_abc = f3dot(n1, n);
+        float v_abc = f3dot(n2, n);
+        float w_abc = f3dot(n3, n);
 
         if (u_ab > 0.0f && v_ab > 0.0f && w_abc <= 0.0f) {
             /* region AB */
@@ -170,43 +185,43 @@ gjk(struct gjk_simplex *s, const struct gjk_support *sup, vec3 *dv)
     } break;
     case 4: {
         /* -------------------- Tetrahedron ----------------------- */
-        vec3 a = s->v[0].p;
-        vec3 b = s->v[1].p;
-        vec3 c = s->v[2].p;
-        vec3 d = s->v[3].p;
+        float a[3]; f3cpy(a, s->v[0].p);
+        float b[3]; f3cpy(b, s->v[1].p);
+        float c[3]; f3cpy(c, s->v[2].p);
+        float d[3]; f3cpy(d, s->v[3].p);
 
-        vec3 ab = a - b;
-        vec3 ba = b - a;
-        vec3 bc = b - c;
-        vec3 cb = c - b;
-        vec3 ca = c - a;
-        vec3 ac = a - c;
+        float ab[3]; f3sub(ab, a, b);
+        float ba[3]; f3sub(ba, b, a);
+        float bc[3]; f3sub(bc, b, c);
+        float cb[3]; f3sub(cb, c, b);
+        float ca[3]; f3sub(ca, c, a);
+        float ac[3]; f3sub(ac, a, c);
 
-        vec3 db = d - b;
-        vec3 bd = b - d;
-        vec3 dc = d - c;
-        vec3 cd = c - d;
-        vec3 da = d - a;
-        vec3 ad = a - d;
+        float db[3]; f3sub(db, d, b);
+        float bd[3]; f3sub(bd, b, d);
+        float dc[3]; f3sub(dc, d, c);
+        float cd[3]; f3sub(cd, c, d);
+        float da[3]; f3sub(da, d, a);
+        float ad[3]; f3sub(ad, a, d);
 
         /* compute barycentric coordinates */
-        float u_ab = Vector::dot(b, ba);
-        float v_ab = Vector::dot(a, ab);
+        float u_ab = f3dot(b, ba);
+        float v_ab = f3dot(a, ab);
 
-        float u_bc = Vector::dot(c, cb);
-        float v_bc = Vector::dot(b, bc);
+        float u_bc = f3dot(c, cb);
+        float v_bc = f3dot(b, bc);
 
-        float u_ca = Vector::dot(a, ac);
-        float v_ca = Vector::dot(c, ca);
+        float u_ca = f3dot(a, ac);
+        float v_ca = f3dot(c, ca);
 
-        float u_bd = Vector::dot(d, db);
-        float v_bd = Vector::dot(b, bd);
+        float u_bd = f3dot(d, db);
+        float v_bd = f3dot(b, bd);
 
-        float u_dc = Vector::dot(c, cd);
-        float v_dc = Vector::dot(d, dc);
+        float u_dc = f3dot(c, cd);
+        float v_dc = f3dot(d, dc);
 
-        float u_ad = Vector::dot(d, da);
-        float v_ad = Vector::dot(a, ad);
+        float u_ad = f3dot(d, da);
+        float v_ad = f3dot(a, ad);
 
         /* check verticies for closest point */
         if (v_ab <= 0.0f && u_ca <= 0.0f && v_ad <= 0.0f) {
@@ -237,41 +252,41 @@ gjk(struct gjk_simplex *s, const struct gjk_support *sup, vec3 *dv)
             break;
         }
         /* calculate fractional area */
-        vec3  n = Vector::cross(da, ba);
-        vec3 n1 = Vector::cross(d, b);
-        vec3 n2 = Vector::cross(b, a);
-        vec3 n3 = Vector::cross(a, d);
+        float n[3]; f3cross(n, da, ba);
+        float n1[3]; f3cross(n1, d, b);
+        float n2[3]; f3cross(n2, b, a);
+        float n3[3]; f3cross(n3, a, d);
 
-        float u_adb = Vector::dot(n1, n);
-        float v_adb = Vector::dot(n2, n);
-        float w_adb = Vector::dot(n3, n);
+        float u_adb = f3dot(n1, n);
+        float v_adb = f3dot(n2, n);
+        float w_adb = f3dot(n3, n);
 
-        n  = Vector::cross(ca, da);
-        n1 = Vector::cross(c, d);
-        n2 = Vector::cross(d, a);
-        n3 = Vector::cross(a, c);
+        f3cross(n, ca, da);
+        f3cross(n1, c, d);
+        f3cross(n2, d, a);
+        f3cross(n3, a, c);
 
-        float u_acd = Vector::dot(n1, n);
-        float v_acd = Vector::dot(n2, n);
-        float w_acd = Vector::dot(n3, n);
+        float u_acd = f3dot(n1, n);
+        float v_acd = f3dot(n2, n);
+        float w_acd = f3dot(n3, n);
 
-        n  = Vector::cross(bc, dc);
-        n1 = Vector::cross(b, d);
-        n2 = Vector::cross(d, c);
-        n3 = Vector::cross(c, b);
+        f3cross(n, bc, dc);
+        f3cross(n1, b, d);
+        f3cross(n2, d, c);
+        f3cross(n3, c, b);
 
-        float u_cbd = Vector::dot(n1, n);
-        float v_cbd = Vector::dot(n2, n);
-        float w_cbd = Vector::dot(n3, n);
+        float u_cbd = f3dot(n1, n);
+        float v_cbd = f3dot(n2, n);
+        float w_cbd = f3dot(n3, n);
 
-        n  = Vector::cross(ba, ca);
-        n1 = Vector::cross(b, c);
-        n2 = Vector::cross(c, a);
-        n3 = Vector::cross(a, b);
+        f3cross(n, ba, ca);
+        f3cross(n1, b, c);
+        f3cross(n2, c, a);
+        f3cross(n3, a, b);
 
-        float u_abc = Vector::dot(n1, n);
-        float v_abc = Vector::dot(n2, n);
-        float w_abc = Vector::dot(n3, n);
+        float u_abc = f3dot(n1, n);
+        float v_abc = f3dot(n2, n);
+        float w_abc = f3dot(n3, n);
 
         /* check edges for closest point */
         if (w_abc <= 0.0f && v_adb <= 0.0f && u_ab > 0.0f && v_ab > 0.0f) {
@@ -387,39 +402,41 @@ gjk(struct gjk_simplex *s, const struct gjk_support *sup, vec3 *dv)
         return 0;
     }
     /* VI.) Ensure closing in on origin to prevent multi-step cycling */
-    vec3 pnt;
-    float denom = 0;
+    float pnt[3], denom = 0;
     for (int i = 0; i < s->cnt; ++i)
         denom += s->bc[i];
     denom = 1.0f / denom;
 
     switch (s->cnt) {
-    case 1: pnt = s->v[0].p; break;
+    case 1: f3cpy(pnt, s->v[0].p); break;
     case 2: {
         /* --------- Line -------- */
-        vec3 a = s->v[0].p * denom * s->bc[0];
-        vec3 b = s->v[1].p * denom * s->bc[1];
-        pnt = a + b;
+        float a[3]; f3mul(a, s->v[0].p, denom * s->bc[0]);
+        float b[3]; f3mul(b, s->v[1].p, denom * s->bc[1]);
+        f3add(pnt, a, b);
     } break;
     case 3: {
         /* ------- Triangle ------ */
-        vec3 a = s->v[0].p * denom * s->bc[0];
-        vec3 b = s->v[1].p * denom * s->bc[1];
-        vec3 c = s->v[2].p * denom * s->bc[2];
+        float a[3]; f3mul(a, s->v[0].p, denom * s->bc[0]);
+        float b[3]; f3mul(b, s->v[1].p, denom * s->bc[1]);
+        float c[3]; f3mul(c, s->v[2].p, denom * s->bc[2]);
 
-        pnt = a + b + c;
+        f3add(pnt, a, b);
+        f3add(pnt, pnt, c);
     } break;
     case 4: {
         /* ----- Tetrahedron ----- */
-        vec3 a = s->v[0].p * denom * s->bc[0];
-        vec3 b = s->v[1].p * denom * s->bc[1];
-        vec3 c = s->v[2].p * denom * s->bc[2];
-        vec3 d = s->v[3].p * denom * s->bc[3];
+        float a[3]; f3mul(a, s->v[0].p, denom * s->bc[0]);
+        float b[3]; f3mul(b, s->v[1].p, denom * s->bc[1]);
+        float c[3]; f3mul(c, s->v[2].p, denom * s->bc[2]);
+        float d[3]; f3mul(d, s->v[3].p, denom * s->bc[3]);
 
-        pnt = a + b + c + d;
+        f3add(pnt, a, b);
+        f3add(pnt, pnt, c);
+        f3add(pnt, pnt, d);
     } break;}
 
-    float d2 = Vector::dot(pnt, pnt);
+    float d2 = f3dot(pnt, pnt);
     if (d2 >= s->D) return 0;
     s->D = d2;
 
@@ -428,25 +445,25 @@ gjk(struct gjk_simplex *s, const struct gjk_support *sup, vec3 *dv)
     default: assert(0); break;
     case 1: {
         /* --------- Point -------- */
-        *dv = -s->v[0].p;
+        f3mul(dv, s->v[0].p, -1);
     } break;
     case 2: {
         /* ------ Line segment ---- */
-        vec3 ba = s->v[1].p - s->v[0].p;
-        vec3 b0 = -s->v[1].p;
-        vec3 t = Vector::cross(ba, b0);
-        *dv = Vector::cross(t, ba);
+        float ba[3]; f3sub(ba, s->v[1].p, s->v[0].p);
+        float b0[3]; f3mul(b0, s->v[1].p, -1);
+        float t[3];  f3cross(t, ba, b0);
+        f3cross(dv, t, ba);
     } break;
     case 3: {
         /* ------- Triangle ------- */
-        vec3 ab = s->v[1].p - s->v[0].p;
-        vec3 ac = s->v[2].p - s->v[0].p;
-        vec3 n = Vector::cross(ab, ac);
-        if (Vector::dot(n, s->v[0].p) <= 0.0f)
-            *dv = n;
-        else *dv -n;
+        float ab[3]; f3sub(ab, s->v[1].p, s->v[0].p);
+        float ac[3]; f3sub(ac, s->v[2].p, s->v[0].p);
+        float n[3];  f3cross(n, ab, ac);
+        if (f3dot(n, s->v[0].p) <= 0.0f)
+            f3cpy(dv, n);
+        else f3mul(dv, n, -1);
     }}
-    if (Vector::dot(*dv,*dv) < GJK_EPSILON * GJK_EPSILON)
+    if (f3dot(dv,dv) < GJK_EPSILON * GJK_EPSILON)
         return 0;
     return 1;
 }
@@ -467,21 +484,21 @@ gjk_analyze(struct gjk_result *res, const struct gjk_simplex *s)
     default: assert(0); break;
     case 1: {
         /* Point */
-        res->p0 = s->v[0].a;
-        res->p1 = s->v[0].b;
+        f3cpy(res->p0, s->v[0].a);
+        f3cpy(res->p1, s->v[0].b);
     } break;
     case 2: {
         /* Line */
         float as = denom * s->bc[0];
         float bs = denom * s->bc[1];
 
-        vec3 a = s->v[0].a * as;
-        vec3 b = s->v[1].a * bs;
-        vec3 c = s->v[0].b * as;
-        vec3 d = s->v[1].b * bs;
+        float a[3]; f3mul(a, s->v[0].a, as);
+        float b[3]; f3mul(b, s->v[1].a, bs);
+        float c[3]; f3mul(c, s->v[0].b, as);
+        float d[3]; f3mul(d, s->v[1].b, bs);
 
-        res->p0 = a + b;
-        res->p1 = c + d;
+        f3add(res->p0, a, b);
+        f3add(res->p1, c, d);
     } break;
     case 3: {
         /* Triangle */
@@ -489,65 +506,73 @@ gjk_analyze(struct gjk_result *res, const struct gjk_simplex *s)
         float bs = denom * s->bc[1];
         float cs = denom * s->bc[2];
 
-        vec3 a = s->v[0].a * as;
-        vec3 b = s->v[1].a * bs;
-        vec3 c = s->v[2].a * cs;
+        float a[3]; f3mul(a, s->v[0].a, as);
+        float b[3]; f3mul(b, s->v[1].a, bs);
+        float c[3]; f3mul(c, s->v[2].a, cs);
 
-        vec3 d = s->v[0].b * as;
-        vec3 e = s->v[1].b * bs;
-        vec3 f = s->v[2].b * cs;
+        float d[3]; f3mul(d, s->v[0].b, as);
+        float e[3]; f3mul(e, s->v[1].b, bs);
+        float f[3]; f3mul(f, s->v[2].b, cs);
 
-        res->p0 = a + b;
-        res->p0 = res->p0 + c;
+        f3add(res->p0, a, b);
+        f3add(res->p0, res->p0, c);
 
-        res->p1 = d + e;
-        res->p1 = res->p1 + f;
+        f3add(res->p1, d, e);
+        f3add(res->p1, res->p1, f);
     } break;
     case 4: {
         /* Tetrahedron */
-        vec3 a = s->v[0].a * denom * s->bc[0];
-        vec3 b = s->v[1].a * denom * s->bc[1];
-        vec3 c = s->v[2].a * denom * s->bc[2];
-        vec3 d = s->v[3].a * denom * s->bc[3];
+        float a[3]; f3mul(a, s->v[0].a, denom * s->bc[0]);
+        float b[3]; f3mul(b, s->v[1].a, denom * s->bc[1]);
+        float c[3]; f3mul(c, s->v[2].a, denom * s->bc[2]);
+        float d[3]; f3mul(d, s->v[3].a, denom * s->bc[3]);
 
-        res->p0 = a + b;
-        res->p0 = res->p0 + c;
-        res->p0 = res->p0 + d;
-        res->p1 = res->p0;
+        f3add(res->p0, a, b);
+        f3add(res->p0, res->p0, c);
+        f3add(res->p0, res->p0, d);
+        f3cpy(res->p1, res->p0);
     } break;}
 
     if (!res->hit) {
         /* compute distance */
-        vec3 d = res->p1 - res->p0;
-        res->distance_squared = Vector::dot(d, d);
+        float d[3]; f3sub(d, res->p1, res->p0);
+        res->distance_squared = f3dot(d, d);
     } else res->distance_squared = 0;
 }
 extern void
 gjk_quad(struct gjk_result *res, float a_radius, float b_radius)
 {
     float radius = a_radius + b_radius;
-    float radius_squared = radius * radius;
-    if (res->distance_squared > GJK_EPSILON &&
-        res->distance_squared > radius_squared) {
-        res->distance_squared -= radius_squared;
+    float distance = sqrt(res->distance_squared);
+    if (distance > GJK_EPSILON &&
+        distance > radius) {
+        printf("d2 = %f\n", distance);
+        distance -= radius;
+        printf("d2 = %f\n", distance);
+        res->distance_squared = distance * distance;
 
         /* calculate normal */
-        vec3 n = res->p1 - res->p0;
-        float l2 = Vector::dot(n, n);
+        float n[3]; f3sub(n, res->p1, res->p0);
+        printf("n: (%.2f,%.2f,%.2f)\n", n[0],n[1],n[2]);
+        float l2 = f3dot(n, n);
         if (l2 != 0.0f) {
             float il = inv_sqrt(l2);
-            n = n * il;
+            f3mul(n,n,il);
         }
-        vec3 da = n * a_radius;
-        vec3 db = n * b_radius;
+        printf("n: (%.2f,%.2f,%.2f)\n", n[0],n[1],n[2]);
+        float da[3]; f3mul(da, n, a_radius);
+        float db[3]; f3mul(db, n, b_radius);
+
+        printf("da: (%.2f,%.2f,%.2f)\n", da[0],da[1],da[2]);
+        printf("db: (%.2f,%.2f,%.2f)\n", db[0],db[1],db[2]);
 
         /* calculate new collision points */
-        res->p0 = res->p0 + da;
-        res->p1 = res->p1 - db;
+        f3add(res->p0, res->p0, da);
+        f3sub(res->p1, res->p1, db);
     } else {
-        vec3 p = res->p0 + res->p1;
-        res->p0 = p * 0.5f;
-        res->p1 = res->p0;
+        float p[3]; f3add(p, res->p0, res->p1);
+        f3mul(res->p0, p, 0.5f);
+        f3cpy(res->p1, res->p0);
         res->distance_squared = 0;
         res->hit = 1;
     }

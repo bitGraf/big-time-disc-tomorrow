@@ -112,7 +112,7 @@ void initialize_game(GLFWwindow* window) {
     CollisionEntity* sphere1 = (CollisionEntity*)Entity::createNewEntity(ENT_Collision);
     sphere1->position = {0, 2, 15};
     sphere1->collisionHull = new SphereHull;
-    ((SphereHull*)sphere1->collisionHull)->radius = 3;
+    sphere1->collisionHull->hullRadius = 3;
     sphere1->scale = {3,3,3};
     Resources::manager.loadTriMeshResource("sphere", ".ply");
     sphere1->mesh = Resources::manager.getTriMeshResource("sphere");
@@ -140,7 +140,7 @@ void initialize_game(GLFWwindow* window) {
     actor = (ActorEntity*)Entity::createNewEntity(ENT_Actor);
     actor->position = {0,1,-1};
     actor->collisionHull = new SphereHull;
-    ((SphereHull*)actor->collisionHull)->radius = 2;
+    actor->collisionHull->hullRadius = 2;
     actor->mesh = Resources::manager.getTriMeshResource("sphere");
     actor->baseColor = Resources::manager.getTextureResource("rustediron2_basecolor");
     actor->normalMap = Resources::manager.getTextureResource("rustediron2_normal");

@@ -8,16 +8,113 @@ GLFWwindow* createWindow();
 char exe_location[MAX_PATH];
 
 int main(int argc, char** argv) {
-    /*vec3 O = {-8, -2, 0};
+    CapsuleHull capsule;
+    PolyHull poly;
 
-    GJK_Result gjk_res;
-    vec3 d = { 1,2,3 };// e1->position - e2->position;
-    GJK_SupportPoint p;p.P = (Vector::normalized(d) * 6 + O);
-    while(gjk_iteration(&gjk_res, p, &d)) {
-        p.P = (Vector::normalized(d) * 6 + O);
+    capsule.va = {0,0,0};
+    capsule.vb = {0,3,0};
+    capsule.hullRadius = 1.0f;
+    vec3 capsulePos = {0,0,0};
+
+    poly.numVerts = 6;
+    poly.vertices = (vec3*)malloc(poly.numVerts*sizeof(vec3));
+    poly.vertices[0] = {0,1,0};
+    poly.vertices[1] = {1,0,1};
+    poly.vertices[2] = {1,0,-1};
+    poly.vertices[3] = {-1,0,1};
+    poly.vertices[4] = {-1,0,-1};
+    poly.vertices[5] = {0,-1,0};
+    vec3 polyPos = {0,4.25f,0};
+
+    SphereHull ball1;
+    ball1.hullRadius = 4.0f;
+    vec3 ball1Pos = {1,1,1};
+    SphereHull ball2;
+    ball2.hullRadius = 2.0f;
+    vec3 ball2Pos = {0,5,0};
+
+    vec3 d = {1, 0, 0}; //initial guess
+
+    GJK_Struct gjk_struct;
+    GJK_SupportPoint p;
+
+    p.aid = ball1.supportPoint(d, &p.a);
+    p.a = p.a + ball1Pos + Vector::normalized(d)*ball1.hullRadius;
+    p.bid = ball2.supportPoint(-d, &p.b);
+    p.b = p.b + ball2Pos + Vector::normalized(-d)*ball2.hullRadius;
+    p.P = p.a - p.b;
+    
+    p.a.print("a = ");
+    p.b.print("b = ");
+    p.P.print("P = ");
+//
+    d = -p.P;
+    d.print("\nd = ");
+
+    p.aid = ball1.supportPoint(d, &p.a);
+    p.a = p.a + ball1Pos + Vector::normalized(d)*ball1.hullRadius;
+    p.bid = ball2.supportPoint(-d, &p.b);
+    p.b = p.b + ball2Pos + Vector::normalized(-d)*ball2.hullRadius;
+    p.P = p.a - p.b;
+    p.a.print("\na = ");
+    p.b.print("b = ");
+    p.P.print("P = ");
+
+    return 0;
+
+    while(gjk_iteration(&gjk_struct, p, &d, true)) {
+        p.aid = ball1.supportPoint(d, &p.a);
+        p.a = p.a + ball1Pos + Vector::normalized(d)*ball1.hullRadius;
+        p.bid = ball2.supportPoint(-d, &p.b);
+        p.b = p.b + ball2Pos + Vector::normalized(-d)*ball2.hullRadius;
+        p.P = p.a - p.b;
+    }
+    gjk_processResults(&gjk_struct);
+    //gjk_processRadius(&gjk_struct, poly.hullRadius, capsule.hullRadius);
+    printf("%d GJK iterations\n", gjk_struct.iteration);
+
+    if (gjk_struct.hit) {
+        printf("Intersection, proceeding to EPA.\n");
+        gjk_struct.simplex[0].P.print("a = ");
+        gjk_struct.simplex[1].P.print("b = ");
+        gjk_struct.simplex[2].P.print("c = ");
+        gjk_struct.simplex[3].P.print("d = ");
+        EPA_Struct epa_struct;
+        EPA_Face face;
+        if (!epa_seed(&epa_struct, &gjk_struct, &face)) {
+            printf("Failed to seed EPA from GJK results.\n");
+        } else {
+            d = face.normal;
+
+            p.aid = ball1.supportPoint(d, &p.a);
+            p.a = p.a + ball1Pos + Vector::normalized(d)*ball1.hullRadius;
+            p.bid = ball2.supportPoint(-d, &p.b);
+            p.b = p.b + ball2Pos + Vector::normalized(-d)*ball2.hullRadius;
+            p.P = p.a - p.b;
+
+            while (epa_iteration(&epa_struct, &face, p)) {
+                d = face.normal;
+
+                p.aid = ball1.supportPoint(d, &p.a);
+                p.a = p.a + ball1Pos + Vector::normalized(d)*ball1.hullRadius;
+                p.bid = ball2.supportPoint(-d, &p.b);
+                p.b = p.b + ball2Pos + Vector::normalized(-d)*ball2.hullRadius;
+                p.P = p.a - p.b;
+            }
+
+            epa_struct.contactPoint.P.print("Vector: ");
+        }
+    } else {
+        printf("Shapes are %.3f units apart.\n", gjk_struct.distance);
+        gjk_struct.P0.print("P0: ");
+        gjk_struct.P1.print("P1: ");
     }
 
-    return 0;*/
+    capsule.cleanup();
+    poly.cleanup();
+
+    system("pause");
+    return 0;
     /*
     CollisionEntity ent1;
     ent1.collisionHull = new SphereHull;

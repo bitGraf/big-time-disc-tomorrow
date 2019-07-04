@@ -18,67 +18,31 @@ void Collision::Update() {
 
             CollisionEvent e = Collision::collisionTest(e1, e2);
 
-            if (e.GJK_Converged) {
-                if (e.intersect) {
-                    printf("Shapes %d and %d are intersecting.\n", i, j);
-                    if (e.EPA_Converged) {
-                        printf("EPA succesful\n");
-                        printf("Shapes are %.4f units intersecting along ", e.distance);
-                        e.response.print();
+            if (e.intersect) {
+                printf("Shapes %d and %d are intersecting.\n", i, j);
+                printf("EPA succesful\n");
+                printf("Shapes are %.4f units intersecting along ", e.distance);
+                vec3 response = (e.P1 - e.P0);
+                response.print("Response: ");
 
-                        //Shift to resolve the collison;
-                        float fudge = 1.01;
-                        vec3 halfShift = e.response*e.distance*.5*fudge;
+                //Shift to resolve the collison;
+                float fudge = 1.01;
+                vec3 halfShift = response*e.distance*.5*fudge;
 
-                        if (e1->moveable && e2->moveable) {
-                            //shift both in opposite direction
-                            e1->position = e1->position - halfShift;
-                            e2->position = e2->position + halfShift;
-
-                            /*
-                            vec3 nv = e1->velocity - e.response*(fudge*Vector::dot(e1->velocity, e.response));
-                            printf("%.3f -> %.3f\n", Vector::magnitude(e1->velocity),Vector::magnitude(nv));
-                            e1->velocity = nv;
-                            nv = e2->velocity + e.response*(fudge*Vector::dot(e2->velocity, e.response));
-                            printf("%.3f -> %.3f\n", Vector::magnitude(e2->velocity),Vector::magnitude(nv));
-                            e2->velocity = nv;
-                            */
-                        } else if (e1->moveable && !e2->moveable) {
-                            //shift only 1
-                            e1->position = e1->position - (halfShift*2.0f);
-
-                            /*
-                            vec3 nv = e1->velocity - e.response*(fudge*Vector::dot(e1->velocity, e.response));
-                            printf("%.3f -> %.3f\n", Vector::magnitude(e1->velocity),Vector::magnitude(nv));
-                            e1->velocity = nv;
-                            */
-                        } else if (!e1->moveable && e2->moveable) {
-                            //shift only 2
-                            e2->position = e2->position + (halfShift*2.0f);
-
-                            /*
-                            vec3 nv = e2->velocity + e.response*(fudge*Vector::dot(e2->velocity, e.response));
-                            printf("%.3f -> %.3f\n", Vector::magnitude(e2->velocity),Vector::magnitude(nv));
-                            e2->velocity = nv;
-                            */
-                        } else {
-                            //shift neither -> How did we end up in this situation?
-                            printf("Two immoveable objects are colliding...\n");
-                        }
-                    }
-                }/* else {
-                    if (e1->moveable) {
-                        e1->position = e1->wishPosition;
-                        e1->velocity = e1->wishVelocity;
-                    }
-
-                    if (e2->moveable) {
-                        e2->position = e2->wishPosition;
-                        e2->velocity = e2->wishVelocity;
-                    }
-                }*/
-            } else {
-                printf("GJK algorithm failed to converge.\n");
+                if (e1->moveable && e2->moveable) {
+                    //shift both in opposite direction
+                    e1->position = e1->position - halfShift;
+                    e2->position = e2->position + halfShift;
+                } else if (e1->moveable && !e2->moveable) {
+                    //shift only 1
+                    e1->position = e1->position - (halfShift*2.0f);
+                } else if (!e1->moveable && e2->moveable) {
+                    //shift only 2
+                    e2->position = e2->position + (halfShift*2.0f);
+                } else {
+                    //shift neither -> How did we end up in this situation?
+                    printf("Two immoveable objects are colliding...\n");
+                }
             }
         }
     }
@@ -91,40 +55,45 @@ void Collision::track(EntityBase* ent) {
     ((CollisionEntity*)ent)->collisionID = manager.cEntList.size()-1;
 }
 
-vec3 SphereHull::supportPoint(vec3 d) {
-    vec3 v = Vector::normalized(d)*radius;
+int SphereHull::supportPoint(vec3 d, vec3* p) {
+    *p = {0,0,0};
 
-    return v;
+    return 0;
 }
 
-vec3 PolyHull::supportPoint(vec3 d) {
-    vec3 vFarthestAlongD = {0,0,0};
-    float distFarthestAlongD = 0;
+int PolyHull::supportPoint(vec3 d, vec3* p) {
+    assert(vertices != NULL);
 
-    for (GLuint i = 0; i < numVerts; i++) {
-        float dist = Vector::dot(vertices[i], d);
-        if (dist > distFarthestAlongD) {
-            vFarthestAlongD = vertices[i];
-            distFarthestAlongD = dist;
-        }
+    int imax = 0;
+    float dmax = Vector::dot(vertices[0], d);
+
+    for (int i = 1; i < numVerts; i++) {
+        float dot = Vector::dot(vertices[i], d);
+        if (dot < dmax) continue;
+        imax = i;
+        dmax = dot;
     }
 
-    return vFarthestAlongD;
+    *p = vertices[imax];
+    return imax;
 }
 
-vec3 CylinderHull::supportPoint(vec3 d) {
-    float sig = (d.x*d.x + d.z*d.z);
-    vec3 v = Vector::normalized(d);
-    if (sig > .003) { //point is on curved surface
-        v.x *= radius/sig;
-        v.y *= halfHeight/abs(v.y);
-        v.z *= radius/sig;
-    } else { //point is either of the endcaps
-        v.x = 0;
-        v.y *= halfHeight/abs(v.y);
-        v.z = 0;
+void PolyHull::cleanup() {
+    if (vertices) {
+        free(vertices);
+        vertices = NULL;
     }
-    return v;
+}
+
+int CapsuleHull::supportPoint(vec3 d, vec3* p) {
+    int i = 0;
+    if (Vector::dot(va, d) < Vector::dot(vb, d)) {
+        *p = vb;
+        i = 1;
+    } else {
+        *p = va;
+    }
+    return i;
 }
 
 GJK_SupportPoint entitySupport(vec3 search_dir, CollisionEntity* e1, CollisionEntity* e2) {
@@ -132,8 +101,10 @@ GJK_SupportPoint entitySupport(vec3 search_dir, CollisionEntity* e1, CollisionEn
     vec3 tDir2 = -search_dir;
 
     GJK_SupportPoint p;
-    p.a = e1->collisionHull->supportPoint(tDir1) + e1->position;
-    p.b = e2->collisionHull->supportPoint(tDir2) + e2->position;
+    p.aid = e1->collisionHull->supportPoint(tDir1, &p.a);
+    p.a = p.a + e1->position;
+    p.bid = e2->collisionHull->supportPoint(tDir2, &p.b);
+    p.b = p.b + e2->position;
     p.P = p.a - p.b;
     return p;
 }
@@ -147,63 +118,50 @@ CollisionEvent Collision::collisionTest(CollisionEntity* e1, CollisionEntity* e2
     float boundingDist = Vector::magnitude(e1->position - e2->position) - (e1->boundingRadius + e2->boundingRadius);
     if (boundingDist < 0) {
         /* Bounding spheres intersect, MIGHT be a collision */
-        GJK_Result gjk_res;
-        vec3 d = { 1,2,3 };// e1->position - e2->position;
+        GJK_Struct gjk_struct;
+        vec3 d = e1->position - e2->position;
         GJK_SupportPoint p = entitySupport(d, e1, e2);
-        while(gjk_iteration(&gjk_res, p, &d)) {
+        while(gjk_iteration(&gjk_struct, p, &d)) {
             p = entitySupport(d, e1, e2);
         }
+        gjk_processResults(&gjk_struct);
 
-        /*gjk_res.simplex[1] = entitySupport( d, e1, e2);
-        gjk_res.simplex[0] = entitySupport(-d, e1, e2);
-        d = Vector::cross(gjk_res.simplex[0].P, gjk_res.simplex[1].P- gjk_res.simplex[0].P);
-        gjk_res.simplex[2] = entitySupport( d, e1, e2);
-
-        GJK_SupportPoint p;
-        d = planeNormal(gjk_res.simplex[0].P, gjk_res.simplex[1].P, gjk_res.simplex[2].P);
-        p = entitySupport(d, e1, e2);
-
-        while(gjk_iteration(&gjk_res, p, &d)) {
-            p = entitySupport(d, e1, e2);
-        }*/
-
-        event.intersect = gjk_res.hit;
-        event.GJK_Converged = gjk_res.converged;
-        event.distance = Vector::magnitude(gjk_res.result.P);
+        event.intersect = gjk_struct.hit;
+        event.distance = gjk_struct.distance;
         //printf("Distance: %.4f\n", event.distance);
-        event.response = Vector::normalized(gjk_res.result.P);
+        event.P0 = gjk_struct.P0;
+        event.P1 = gjk_struct.P1;
 
-        if (gjk_res.hit) {
+        if (event.intersect) {
             printf("Intersecting. Continue to EPA\n");
             // continue to EPA
-            EPA_Result epa_res;
+            EPA_Struct epa_struct;
             EPA_Face face;
-            epa_seed(&epa_res, &gjk_res, &face);
+            /*
+            epa_seed(&epa_struct, &gjk_struct, &face);
             p = entitySupport(face.normal, e1, e2);
-            while (epa_iteration(&epa_res, p, &face)) {
-                printf("  EPA Iteration: %d [%d]\n", epa_res.iteration, epa_res.simplex.numFaces);
+            while (epa_iteration(&epa_struct, p, &face)) {
+                printf("  EPA Iteration: %d [%d]\n", epa_struct.iteration, epa_struct.simplex.numFaces);
                 d = face.normal;
                 p = entitySupport(d, e1, e2);
             }
 
-            if (epa_res.converged) {
-                //printf("EPA converged after %d iteration.\n", epa_res.iteration);
-                //epa_res.penetrationNormal.print("penVec = ");
-                //printf("penDepth = %.4f\n", epa_res.penetrationDepth);
+            epa_processResults(&epa_struct, &gjk_struct);
 
-                event.EPA_Converged = true;
-                event.distance = epa_res.penetrationDepth;
-                event.response = epa_res.penetrationNormal;
-            }
+            //printf("EPA converged after %d iteration.\n", epa_res.iteration);
+            //epa_res.penetrationNormal.print("penVec = ");
+            //printf("penDepth = %.4f\n", epa_res.penetrationDepth);
 
+            event.distance = epa_struct.penetrationDepth;
+            event.P0 = epa_struct.contactPoint.a;
+            event.P1 = epa_struct.contactPoint.b;
+            */
         }
-
     } else {
         event.intersect = false;
         event.distance = boundingDist;
-        event.response = Vector::normalized(e1->position - e2->position);
-        event.GJK_Converged = true; //idk
-        event.EPA_Converged = true; //idk
+        event.P0 =  Vector::normalized(e1->position - e2->position); //wrong
+        event.P1 = -Vector::normalized(e1->position - e2->position); //wrong
         printf("Not bothering with GJK (%.4f)\n", event.distance);
     }
 

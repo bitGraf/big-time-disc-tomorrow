@@ -76,19 +76,20 @@ void ActorEntity::update(double dt) {
         if (i != collisionID) { //dont test against itself
             CollisionEntity* other = Collision::manager.cEntList[i];
             CollisionEvent event = Collision::collisionTest(me, other);
+            vec3 response = event.P0 - event.P1;
 
             if (event.intersect) {
                 //they are already intersecting, resolve it
                 if (moveable) {
                     //move us out of the other object
-                    position = position - (event.response*event.distance*1.03f);
+                    position = position - (response*event.distance*1.03f);
                 }
             } else {
                 //check if they will intersect after this update
 
                 //how far i will move in the direction of other entity
                 vec3 relVel = wVelocity - other->velocity;
-                float dist = Vector::dot(relVel, event.response);
+                float dist = Vector::dot(relVel, response);
 
                 if ((dist > 0) && (dist > event.distance)) {
                     //moving in the direction of the other entity AND
