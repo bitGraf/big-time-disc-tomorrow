@@ -301,6 +301,10 @@ int Entity::registerEntity(EntityTypes type) {
             manager.pointerList[manager.numEntries] = new AIEnt;
             //printf("Adding new EntityAI\n");
         } break;
+        case ENT_Collision: {
+            manager.pointerList[manager.numEntries] = new CollisionEntity;
+            //printf("Adding new EntityAI\n");
+        } break;
         case ENT_Actor: {
             manager.pointerList[manager.numEntries] = new ActorEntity;
             //printf("Adding new EntityAI\n");

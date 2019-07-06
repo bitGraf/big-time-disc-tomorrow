@@ -53,7 +53,8 @@ enum GameStates {
 };
 
 // Collision Test
-static ActorEntity* player;
+extern CollisionEntity* box;
+extern ActorEntity* player;
 
 // Game State Manager
 static GLuint currentState = 0;

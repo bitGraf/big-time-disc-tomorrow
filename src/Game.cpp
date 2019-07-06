@@ -1,5 +1,8 @@
 #include "Game.h"
 
+CollisionEntity* box;
+ActorEntity* player;
+
 void initialize_game(GLFWwindow* window) {
     // Load entities
     Entity::init_entities(windowInfo);
@@ -106,25 +109,25 @@ void initialize_game(GLFWwindow* window) {
     //Input::init();
 
     //Collision testing
-    ActorEntity* box = (ActorEntity*)Entity::createNewEntity(ENT_Actor);
-    OBBCol* boxCollider = (OBBCol*)malloc(sizeof(OBBCol));
-    boxCollider->min = {-1,-1,-1};
-    boxCollider->max = { 1, 1, 1};
+    box = (CollisionEntity*)Entity::createNewEntity(ENT_Collision);
+    OBBCol* boxCollider = new OBBCol;
+    boxCollider->min = {-4, -1, -4};
+    boxCollider->max = { 4,  1,  4};
     
     box->collider = boxCollider;
-    box->collider->position = {0, 1, 0};
-    box->position = {0,1,0};
+    box->position = {0,1,4};
+    box->scale = {4, 1, 4};
+    Quaternion::buildFromAxisAngleD(box->orientation, {1,0,0}, 15);
     box->mesh = Resources::manager.getTriMeshResource("box");
 
     player = (ActorEntity*)Entity::createNewEntity(ENT_Actor);
-    CylinderCol* cylinderCollider = (CylinderCol*)malloc(sizeof(CapsuleCol));
+    CylinderCol* cylinderCollider = new CylinderCol;
     cylinderCollider->y_base = 0;
-    cylinderCollider->y_cap  = 2;
-    cylinderCollider->r = 3;
+    cylinderCollider->y_cap  = 1.5f;
+    cylinderCollider->r = 1.25f;
     player->collider = cylinderCollider;
     player->mesh = Resources::manager.getTriMeshResource("bot");
     player->position = {0, 5, 0};
-    player->collider->position = {0, 5, 0};
 
     Entity::manager.Player->processInput = false;
     Entity::manager.Player->shouldRender = false;
@@ -211,6 +214,35 @@ void FixedUpdate(double dt) {
     if (currentState == GameStates::Normal) {
         // game update
         //Collision::Update();
+        bool hit_ground = false;
+        vec3 mtv;
+        if (gjk(player->collider, box->collider, &mtv)) {
+            if (!Vector::isZero(mtv)) {
+                float slope = rad2deg(acos(Vector::dot(Vector::normalized(mtv), {0,1,0})));
+                if (slope < player->max_stand_slope) {
+                    hit_ground = true;
+                    player->vel.y = 0;
+                    player->grounded = true;
+                    player->jumping = false;
+                }
+            }
+        }
+        player->collider->position = player->collider->position + mtv;
+
+        //grace period for jumping
+        {
+            static float grace_timer = 0;
+            const float grace_time = 0;
+            if (!hit_ground && player->position.y>0) {
+                grace_timer += dt;
+                if (grace_timer>grace_time*1.5*Vector::magnitude(player->vel)/player->top_speed) {
+                    grace_timer = 0;
+                    player->grounded = false;
+                }
+            }
+        }
+
+        player->position = player->collider->position;
     } else if (currentState == GameStates::Menu) {
         // menu update
     }
@@ -304,6 +336,18 @@ void Render() {
     Font::drawText(fpsFont, windowInfo.width, y+=dy, kb_color, kb_text, ALIGN_TOP_RIGHT);
     sprintf(kb_text, "m_right:    %.0f", Input::manager.move_right.value);
     Font::drawText(fpsFont, windowInfo.width, y+=dy, kb_color, kb_text, ALIGN_TOP_RIGHT);
+
+    sprintf(kb_text, "Player: ");
+    Font::drawText(fpsFont, windowInfo.width, y+=dy, kb_color, kb_text, ALIGN_TOP_RIGHT);
+    sprintf(kb_text, "Grounded: %s", player->grounded ? "true " : "false");
+    Font::drawText(fpsFont, windowInfo.width, y+=dy, kb_color, kb_text, ALIGN_TOP_RIGHT);
+    sprintf(kb_text, "Jumping: %s", player->jumping ? "true " : "false");
+    Font::drawText(fpsFont, windowInfo.width, y+=dy, kb_color, kb_text, ALIGN_TOP_RIGHT);
+    sprintf(kb_text, "Jump-Button: %s", player->jump_button_pressed ? "true " : "false");
+    Font::drawText(fpsFont, windowInfo.width, y+=dy, kb_color, kb_text, ALIGN_TOP_RIGHT);
+
+    sprintf(kb_text, "Position: (%.2f,%.2f,%.2f)", player->position.x, player->position.y, player->position.z);
+    Font::drawText(fpsFont, 0, 0, kb_color, kb_text, ALIGN_TOP_LEFT);
 
     numRenders++;
 }

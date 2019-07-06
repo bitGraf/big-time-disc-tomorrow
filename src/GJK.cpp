@@ -30,7 +30,6 @@ bool gjk(Collider* col1, Collider* col2, vec3* mtv) {
     int simp_dim = 2; //2-simplex
 
     for (int iterations = 0; iterations < GJK_MAX_ITERATIONS; iterations++) {
-        printf("iteration: %d, simplex size: %d\n", iterations, simp_dim);
         a = col2->support(search_dir) - col1->support(-search_dir);
         if (Vector::dot(a, search_dir)<0) {return false;} //won't enclose the origin
 
@@ -91,16 +90,6 @@ bool update_simplex4(vec3 &a, vec3 &b, vec3 &c, vec3 &d, int &simp_dim, vec3 &se
 
     vec3 AO = -a;
     simp_dim = 3;
-
-    ABC.print("ABC: ");
-    ACD.print("ACD: ");
-    ADB.print("ADB: ");
-
-    AO.print("AO: ");
-
-    printf("ABD dot AO: %f\n", Vector::dot(ABC, AO));
-    printf("ACD dot AO: %f\n", Vector::dot(ACD, AO));
-    printf("ADB dot AO: %f\n", Vector::dot(ADB, AO));
 
     if (Vector::dot(ABC, AO)>0) {
         d = c;
