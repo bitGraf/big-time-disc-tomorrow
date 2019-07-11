@@ -1,7 +1,7 @@
 #include "Actor.h"
 
 void ActorEntity::onCreate() {
-
+    jump_button_pressed = false;
 }
 
 void ActorEntity::onDestroy() {
@@ -16,24 +16,24 @@ void ActorEntity::update(double dt) {
 
     //do some input stuff?
     {
-        if (Input::manager.move_forward.value > 0.5f) {
+        if (currentAction & MOVEMENT_FORWARD) {
             vel = vel + fwd_xz_proj*acc*dt;
             moved = true;
-        } 
+        }
         else if (Vector::dot(fwd_xz_proj,vel)>0) vel = vel - fwd_xz_proj*acc*dt;
-        if (Input::manager.move_backward.value > 0.5f) {
+        if (currentAction & MOVEMENT_BACKWARD) {
             vel = vel - fwd_xz_proj*acc*dt;
             moved = true;
-        } 
+        }
         else if (Vector::dot(-fwd_xz_proj,vel)>0) vel = vel + fwd_xz_proj*acc*dt;
-        if (Input::manager.move_right.value > 0.5f) {
+        if (currentAction & MOVEMENT_STRAFE_RIGHT) {
             quat tq; Quaternion::buildFromAxisAngleD(tq, Up, -160.0f*dt);
             orientation = Quaternion::mul(orientation, tq);
-        } 
-        if (Input::manager.move_left.value > 0.5f) {
+        }
+        if (currentAction & MOVEMENT_STRAFE_LEFT) {
             quat tq; Quaternion::buildFromAxisAngleD(tq, Up,  160.0f*dt);
             orientation = Quaternion::mul(orientation, tq);
-        } 
+        }
     }
 
     if (grounded) {
@@ -45,8 +45,7 @@ void ActorEntity::update(double dt) {
         if (!moved) vel = vel*friction_factor;
         
         //jump test
-        jump_button_pressed = false;
-        if (Input::manager.move_jump.value>0.5f) {
+        if (currentAction & MOVEMENT_JUMP) {
             if (!jump_button_pressed) {
                 vel.y += jump_vel;
                 grounded = false;
@@ -59,7 +58,9 @@ void ActorEntity::update(double dt) {
     } else { //not grounded
         if (jumping) {
             //if you dont hold jump you don't go as high
-            if (Input::manager.move_jump.value<0.5f && vel.y>0) vel.y += 5*g*dt;
+            if (!(currentAction & MOVEMENT_JUMP) && vel.y>0) {
+                vel.y += 5*g*dt;
+            }
         }
 
         //clamp xz speed
@@ -69,7 +70,7 @@ void ActorEntity::update(double dt) {
             vel.x = xz_vel.x;
             vel.z = xz_vel.z;
         }
-        vel.y += .25f*g*dt;
+        vel.y += g*dt;
     }
 
     //Update player position
@@ -83,5 +84,29 @@ void ActorEntity::update(double dt) {
         jumping = false;
     }
 
+    currentAction = MOVEMENT_NONE;
+
     CollisionEntity::update(dt);
+}
+
+void ActorEntity::moveForward() {
+    currentAction |= MOVEMENT_FORWARD;
+}
+void ActorEntity::moveBackward() {
+    currentAction |= MOVEMENT_BACKWARD;
+}
+void ActorEntity::strafeLeft() {
+    currentAction |= MOVEMENT_STRAFE_LEFT;
+}
+void ActorEntity::strafeRight() {
+    currentAction |= MOVEMENT_STRAFE_RIGHT;
+}
+void ActorEntity::rotateLeft() {
+    currentAction |= MOVEMENT_ROTATE_LEFT;
+}
+void ActorEntity::rotateRight() {
+    currentAction |= MOVEMENT_ROTATE_RIGHT;
+}
+void ActorEntity::jump() {
+    currentAction |= MOVEMENT_JUMP;
 }

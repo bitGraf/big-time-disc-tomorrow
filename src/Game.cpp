@@ -359,21 +359,21 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 void ProcessInput(GLFWwindow *window) {    
     Input::update(window);
 
-    /*if (Input::manager.move_forward.value > 0.5f) {
-        actor->command(am_MOVE_FORWARD);
+    if (Input::manager.move_forward.value > 0.5f) {
+        player->moveForward();
     }
     if (Input::manager.move_left.value > 0.5f) {
-        actor->command(am_STRAFE_LEFT);
+        player->strafeLeft();
     }
     if (Input::manager.move_backward.value > 0.5f) {
-        actor->command(am_MOVE_BACKWARD);
+        player->moveBackward();
     }
     if (Input::manager.move_right.value > 0.5f) {
-        actor->command(am_STRAFE_RIGHT);
+        player->strafeRight();
     }
     if (Input::manager.move_jump.value > 0.5f) {
-        actor->command(am_JUMP);
-    }*/
+        player->jump();
+    }
 }
 
 void handleInputEvent(GLFWwindow* window, int key, int scancode, int action, int mods) {
