@@ -38,6 +38,7 @@
 - Level events (getting caught, scripted events, cutscenes)
 - Save/loading (track 'career' progress, what should be in the inter-mission hub zone)
 - inter mission hubs
+- Mac UX improved by 10%
 
 
 
