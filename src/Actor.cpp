@@ -1,7 +1,7 @@
 #include "Actor.h"
 
 void ActorEntity::onCreate() {
-    jump_button_pressed = false;
+    groundNormal = {0,1,0};
 }
 
 void ActorEntity::onDestroy() {
@@ -9,81 +9,6 @@ void ActorEntity::onDestroy() {
 }
 
 void ActorEntity::update(double dt) {
-    bool moved = false;
-
-    vec3 fwd_xz_proj = Vector::normalized({Forward.x, 0, Forward.z});
-    vec3 rgt_xz_proj = Vector::normalized({-Left.x,   0,-Left.z});
-
-    //do some input stuff?
-    {
-        if (currentAction & MOVEMENT_FORWARD) {
-            vel = vel + fwd_xz_proj*acc*dt;
-            moved = true;
-        }
-        else if (Vector::dot(fwd_xz_proj,vel)>0) vel = vel - fwd_xz_proj*acc*dt;
-        if (currentAction & MOVEMENT_BACKWARD) {
-            vel = vel - fwd_xz_proj*acc*dt;
-            moved = true;
-        }
-        else if (Vector::dot(-fwd_xz_proj,vel)>0) vel = vel + fwd_xz_proj*acc*dt;
-        if (currentAction & MOVEMENT_STRAFE_RIGHT) {
-            quat tq; Quaternion::buildFromAxisAngleD(tq, Up, -160.0f*dt);
-            orientation = Quaternion::mul(orientation, tq);
-        }
-        if (currentAction & MOVEMENT_STRAFE_LEFT) {
-            quat tq; Quaternion::buildFromAxisAngleD(tq, Up,  160.0f*dt);
-            orientation = Quaternion::mul(orientation, tq);
-        }
-    }
-
-    if (grounded) {
-        //clamp speed
-        if (Vector::magnitude(vel) > top_speed) {
-            vel = Vector::normalized(vel) * top_speed;
-        }
-        //Deceleration
-        if (!moved) vel = vel*friction_factor;
-        
-        //jump test
-        if (currentAction & MOVEMENT_JUMP) {
-            if (!jump_button_pressed) {
-                vel.y += jump_vel;
-                grounded = false;
-                jumping = true;
-                jump_button_pressed = true;
-            }
-        } else {
-            jump_button_pressed = false;
-        }
-    } else { //not grounded
-        if (jumping) {
-            //if you dont hold jump you don't go as high
-            if (!(currentAction & MOVEMENT_JUMP) && vel.y>0) {
-                vel.y += 5*g*dt;
-            }
-        }
-
-        //clamp xz speed
-        vec3 xz_vel = vel;  xz_vel.y = 0;
-        if (Vector::magnitude(xz_vel) > top_speed) {
-            xz_vel = Vector::normalized(xz_vel) * top_speed;
-            vel.x = xz_vel.x;
-            vel.z = xz_vel.z;
-        }
-        vel.y += g*dt;
-    }
-
-    //Update player position
-    position = position + vel*dt;
-
-    //collided into ground
-    if (position.y < 0) {
-        position.y = 0;
-        vel.y = 0;
-        grounded = true;
-        jumping = false;
-    }
-
     currentAction = MOVEMENT_NONE;
 
     CollisionEntity::update(dt);
@@ -109,4 +34,142 @@ void ActorEntity::rotateRight() {
 }
 void ActorEntity::jump() {
     currentAction |= MOVEMENT_JUMP;
+}
+
+void  ActorEntity::PM_WalkMove() {
+    int i;
+    vec3 wishvel;
+    float fmove, smove;
+    vec3 wishdir;
+    float wishspeed;
+    float scale;
+    //usercmd_t cmd;
+    float accelerate;
+    float vel;
+
+    ///////////////
+    int pm_waterlevel = 0;
+    ///////////////
+
+    if (pm_waterlevel > 0 && Vector::dot(Forward, groundNormal) > 0) {
+        // begin swimming
+        PM_WaterMove();
+        return;
+    }
+
+    if (PM_CheckJump()) {
+        // jumped away
+        if (pm_waterlevel > 1) {
+            PM_WaterMove();
+        } else {
+            PM_AirMove();
+        }
+        return;
+    }
+
+    PM_Friction();
+
+    float fmove = ((float)(currentAction & MOVEMENT_FORWARD) - (float)(currentAction & MOVEMENT_BACKWARD));
+    float smove = ((float)(currentAction & MOVEMENT_STRAFE_RIGHT) - (float)(currentAction & MOVEMENT_STRAFE_LEFT));
+
+    scale = PM_CmdScale();
+
+    // set movementDir
+    PM_SetMovementDir();
+
+    //project moves down to flat plane
+    vec3 forward = Forward; forward.y = 0;
+    vec3 right   = -Left;   right.y   = 0;
+
+    // projecct the forward and right directions onto the ground plane
+    #define OVERCLIP 0
+    PM_ClipVelocity(forward, groundNormal, forward, OVERCLIP);
+    PM_ClipVelocity(right,   groundNormal, right,   OVERCLIP);
+    //
+    Vector::normalize(forward);
+    Vector::normalize(right);
+
+    wishvel = forward*fmove + right*smove;
+
+    wishdir = wishvel;
+    wishspeed = Vector::magnitude(wishdir);
+    Vector::normalize(wishdir);
+    wishspeed *= scale;
+
+    // clamp speed lower if ducking
+    if (false) {
+        if (wishspeed > pm_speed * pm_duckscale) {
+            wishspeed = pm_speed * pm_duckscale;
+        }
+    }
+
+    // clamp speed lower if wading or walking on the bottom
+    if (pm_waterlevel) {
+        float waterScale;
+
+        waterScale = pm_waterlevel / 3.0;
+        waterScale = 1.0 - (1.0 - pm_swimScale) * waterScale;
+        if (wishspeed > pm_speed * waterScale) {
+            wishspeed = pm_speed * waterScale;
+        }
+    }
+
+    // when get hit temporarily lose full control
+    if (false) {
+        accelerate = pm_airaccelerate;
+    } else {
+        accelerate = pm_accelerate;
+    }
+
+    PM_Accelerate(wishdir, wishspeed, accelerate);
+
+    //
+    //
+
+    if (false) {
+        velocity.y -= 0; ////////////////////////
+    } else {
+        //don't reset the z velocity for slopes
+        // velocity.y = 0;
+    }
+
+    vel = Vector::magnitude(velocity);
+
+    // slide along the ground plane
+    PM_ClipVelocity(velocity, groundNormal, velocity, OVERCLIP);
+
+    // don't decrease velocity when going up or down a slope
+    Vector::normalize(velocity);
+    velocity = velocity * vel;
+
+    //don't do anything if standing still
+    if (!velocity.x && !velocity.z) {
+        return;
+    }
+
+    PM_StepSlideMove(false);
+}
+void  ActorEntity::PM_Accelerate(vec3 wishdir, float wishspeed, float accelerate) {
+
+}
+void  ActorEntity::PM_ClipVelocity(vec3 v1, vec3 v2, vec3 v3, int k) {
+
+}
+void  ActorEntity::PM_SetMovementDir() {
+
+}
+float ActorEntity::PM_CmdScale() {
+
+}
+bool  ActorEntity::PM_CheckJump() {
+
+}
+void  ActorEntity::PM_AirMove() {
+
+}
+void  ActorEntity::PM_Friction() {
+
+}
+void ActorEntity::PM_StepSlideMove(bool gravity) {
+    
 }

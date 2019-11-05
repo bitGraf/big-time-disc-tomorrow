@@ -14,20 +14,18 @@
 #define MOVEMENT_JUMP 64
 
 struct ActorEntity : CollisionEntity {
-    bool grounded = false;
-    bool jumping = false;
-    bool jump_button_pressed = false;
-    float max_stand_slope = 45;
-    float top_speed = 10.0f;
-    float time_till_top_speed = 0.25f;
-    float acc = top_speed/time_till_top_speed;
-    float friction_factor = 0.3f;
-    float jump_height = 4.0f;
-    float jump_dist_to_peak = 2.0f;
-    float g = -2*jump_height*top_speed*top_speed/(jump_dist_to_peak*jump_dist_to_peak);
-    float jump_vel = 2*jump_height*top_speed/jump_dist_to_peak;
+    vec3 velocity;
+    vec3 groundNormal;
 
-    vec3 vel;
+    float pm_speed = 10.0f;
+    float pm_duckscale = 0.25f;
+    float pm_swimScale = 0.50f;
+    float pm_wadeScale = 0.70f;
+
+    float	pm_accelerate = 10.0f;
+    float	pm_airaccelerate = 1.0f;
+    float	pm_wateraccelerate = 4.0f;
+    float	pm_flyaccelerate = 8.0f;
 
     void onCreate() override;
     void update(double dt) override;
@@ -42,6 +40,18 @@ struct ActorEntity : CollisionEntity {
     void rotateLeft();
     void rotateRight();
     void jump();
+
+    // Quake style moving
+    void  PM_Accelerate(vec3 wishdir, float wishspeed, float accelerate);
+    void  PM_ClipVelocity(vec3 v1, vec3 v2, vec3 v3, int k);
+    void  PM_SetMovementDir();
+    float PM_CmdScale();
+    bool  PM_CheckJump();
+    void  PM_WalkMove();
+    void  PM_WaterMove();
+    void  PM_AirMove();
+    void  PM_Friction();
+    void PM_StepSlideMove(bool gravity);
 };
 
 #endif
